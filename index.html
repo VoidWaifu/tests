@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLESS Поисковик</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: monospace;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #219a52);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 7px 14px rgba(39, 174, 96, 0.3);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #d4f8e8;
+            color: #27ae60;
+            border: 1px solid #a3e9c4;
+        }
+        
+        .status-error {
+            background: #fde8e8;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-info {
+            background: #d6eaf8;
+            color: #3498db;
+            border: 1px solid #aed6f1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .search-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .search-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+        }
+        
+        .search-btn {
+            width: auto;
+            padding: 12px 25px;
+            margin: 0;
+        }
+        
+        .results {
+            margin-top: 25px;
+        }
+        
+        .result-item {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .result-item:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .result-title a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .result-title a:hover {
+            text-decoration: underline;
+        }
+        
+        .result-url {
+            color: #27ae60;
+            font-size: 14px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .result-snippet {
+            color: #5d6d7e;
+            line-height: 1.5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .examples {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #f1c40f;
+        }
+        
+        .examples h3 {
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+        
+        .example-item {
+            font-family: monospace;
+            background: #fff;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #f39c12;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .example-item:hover {
+            background: #fef5e7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 VLESS Поисковик</h1>
+        <p class="subtitle">Безопасный поиск через ваш VLESS прокси</p>
+        
+        <div class="config-section">
+            <h2>⚙️ Настройка подключения</h2>
+            <div class="input-group">
+                <label for="vlessConfig">VLESS конфигурация:</label>
+                <textarea id="vlessConfig" placeholder="Введите ваш VLESS ключ в формате: vless://uuid@сервер:порт?параметры#имя"></textarea>
+            </div>
+            
+            <button class="btn" onclick="connectVless()">📡 Подключиться</button>
+            
+            <div id="connectionStatus" class="status hidden"></div>
+            
+            <div class="examples">
+                <h3>📋 Примеры форматов VLESS:</h3>
+                <div class="example-item" onclick="document.getElementById('vlessConfig').value = this.textContent">
+                    vless://uuid@server.com:443?security=tls&sni=domain.com&type=ws#МойСервер
+                </div>
+                <div class="example-item" onclick="document.getElementById('vlessConfig').value = this.textContent">
+                    vless://uuid@ip-адрес:8080?security=none&type=tcp#ПрямоеПодключение
+                </div>
+            </div>
+        </div>
+        
+        <div id="searchSection" class="search-section hidden">
+            <h2>🔍 Безопасный поиск</h2>
+            <div class="search-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Введите поисковый запрос...">
+                <button class="btn btn-success search-btn" onclick="performSearch()">Найти</button>
+            </div>
+            
+            <div class="input-group">
+                <label for="searchEngine">Поисковая система:</label>
+                <select id="searchEngine">
+                    <option value="google">Google</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="yandex">Yandex</option>
+                    <option value="bing">Bing</option>
+                </select>
+            </div>
+            
+            <div id="searchResults" class="results">
+                <div class="status status-info">
+                    Введите запрос и нажмите "Найти" для начала поиска
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class VlessSearchEngine {
+            constructor() {
+                this.connected = false;
+                this.config = null;
+                this.ws = null;
+            }
+
+            async connect(configString) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        this.config = this.parseConfig(configString);
+                        
+                        // Создаем WebSocket подключение через прокси
+                        const wsUrl = this.buildWebSocketUrl();
+                        this.ws = new WebSocket(wsUrl);
+                        
+                        this.ws.onopen = () => {
+                            console.log('VLESS подключение установлено');
+                            this.connected = true;
+                            resolve(true);
+                        };
+                        
+                        this.ws.onerror = (error) => {
+                            console.error('Ошибка подключения:', error);
+                            reject(new Error('Не удалось подключиться к серверу'));
+                        };
+                        
+                        this.ws.onclose = () => {
+                            this.connected = false;
+                            console.log('Соединение закрыто');
+                        };
+                        
+                        // Таймаут подключения
+                        setTimeout(() => {
+                            if (!this.connected) {
+                                reject(new Error('Таймаут подключения'));
+                            }
+                        }, 10000);
+                        
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+
+            parseConfig(configString) {
+                if (!configString.startsWith('vless://')) {
+                    throw new Error('Неверный формат VLESS конфигурации');
+                }
+
+                try {
+                    // Упрощенный парсинг VLESS URL
+                    const cleanConfig = configString.replace('vless://', 'https://');
+                    const url = new URL(cleanConfig);
+                    const params = new URLSearchParams(url.search);
+                    
+                    return {
+                        uuid: url.username,
+                        server: url.hostname,
+                        port: url.port || '443',
+                        security: params.get('security') || 'tls',
+                        sni: params.get('sni') || url.hostname,
+                        type: params.get('type') || 'tcp',
+                        path: params.get('path') || '/',
+                        host: params.get('host'),
+                        hash: url.hash.slice(1) || 'VLESS-Client'
+                    };
+                } catch (e) {
+                    throw new Error('Ошибка разбора VLESS конфигурации: ' + e.message);
+                }
+            }
+
+            buildWebSocketUrl() {
+                const protocol = this.config.security === 'tls' ? 'wss' : 'ws';
+                let url = `${protocol}://${this.config.server}`;
+                
+                if (this.config.port) {
+                    url += `:${this.config.port}`;
+                }
+                
+                if (this.config.path) {
+                    url += this.config.path;
+                }
+                
+                // Добавляем параметры для VLESS handshake
+                const params = new URLSearchParams();
+                params.append('uuid', this.config.uuid);
+                if (this.config.sni) params.append('sni', this.config.sni);
+                if (this.config.host) params.append('host', this.config.host);
+                
+                return `${url}?${params.toString()}`;
+            }
+
+            async search(query, engine = 'google') {
+                if (!this.connected) {
+                    throw new Error('Нет подключения к VLESS');
+                }
+
+                return new Promise((resolve, reject) => {
+                    const searchId = Date.now().toString();
+                    
+                    const searchData = {
+                        id: searchId,
+                        type: 'search',
+                        query: query,
+                        engine: engine,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Обработчик ответа
+                    const messageHandler = (event) => {
+                        try {
+                            const response = JSON.parse(event.data);
+                            if (response.id === searchId) {
+                                this.ws.removeEventListener('message', messageHandler);
+                                resolve(response.results);
+                            }
+                        } catch (e) {
+                            // Игнорируем не-JSON сообщения
+                        }
+                    };
+                    
+                    this.ws.addEventListener('message', messageHandler);
+                    this.ws.send(JSON.stringify(searchData));
+                    
+                    // Таймаут запроса
+                    setTimeout(() => {
+                        this.ws.removeEventListener('message', messageHandler);
+                        reject(new Error('Таймаут поискового запроса'));
+                    }, 30000);
+                });
+            }
+        }
+
+        // Глобальный экземпляр поискового движка
+        const searchEngine = new VlessSearchEngine();
+
+        async function connectVless() {
+            const configInput = document.getElementById('vlessConfig');
+            const statusDiv = document.getElementById('connectionStatus');
+            const config = configInput.value.trim();
+            
+            if (!config) {
+                showStatus('Введите VLESS конфигурацию', 'error');
+                return;
+            }
+            
+            showStatus('🔄 Подключаемся к VLESS серверу...', 'info');
+            
+            try {
+                await searchEngine.connect(config);
+                
+                showStatus('✅ Успешно подключено! Теперь вы можете использовать безопасный поиск', 'success');
+                
+                // Показываем секцию поиска
+                document.getElementById('searchSection').classList.remove('hidden');
+                
+                // Сохраняем конфиг в localStorage
+                localStorage.setItem('vlessConfig', config);
+                
+            } catch (error) {
+                showStatus(`❌ Ошибка подключения: ${error.message}`, 'error');
+                console.error('Connection error:', error);
+            }
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const engine = document.getElementById('searchEngine').value;
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!query) {
+                showResults([{
+                    title: 'Введите поисковый запрос',
+                    url: '#',
+                    snippet: 'Пожалуйста, введите текст для поиска в поле выше'
+                }]);
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // В реальной реализации здесь будет вызов searchEngine.search()
+                // Для демонстрации используем имитацию
+                const results = await simulateSearch(query, engine);
+                showResults(results);
+                
+            } catch (error) {
+                showResults([{
+                    title: 'Ошибка поиска',
+                    url: '#',
+                    snippet: `Не удалось выполнить поиск: ${error.message}`
+                }]);
+            }
+        }
+
+        function simulateSearch(query, engine) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Имитация результатов поиска
+                    const results = [
+                        {
+                            title: `Результат поиска: "${query}"`,
+                            url: `https://${engine}.com/search?q=${encodeURIComponent(query)}`,
+                            snippet: `Это демонстрационный результат поиска через ${engine}. В реальной реализации здесь будут показаны настоящие результаты, полученные через ваше VLESS-подключение.`
+                        },
+                        {
+                            title: `Второй результат по запросу "${query}"`,
+                            url: `https://example.com/result1`,
+                            snippet: `Еще один пример результата поиска. Система использует безопасное VLESS-соединение для защиты вашей конфиденциальности.`
+                        },
+                        {
+                            title: `Третий результат - ${query}`,
+                            url: `https://example.com/result2`,
+                            snippet: `Все поисковые запросы проходят через защищенное VLESS-подключение, что обеспечивает анонимность и безопасность.`
+                        }
+                    ];
+                    resolve(results);
+                }, 1500);
+            });
+        }
+
+        function showLoading() {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="loader"></div>
+                    <div>Ищем результаты...</div>
+                </div>
+            `;
+        }
+
+        function showResults(results) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!results || results.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="status status-info">
+                        По вашему запросу ничего не найдено. Попробуйте изменить формулировку.
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-url">${result.url}</div>
+                        <div class="result-title">
+                            <a href="${result.url}" target="_blank" onclick="trackClick(${index})">${result.title}</a>
+                        </div>
+                        <div class="result-snippet">${result.snippet}</div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `status status-${type}`;
+            statusDiv.classList.remove('hidden');
+        }
+
+        function trackClick(resultIndex) {
+            // В реальной реализации здесь можно добавить аналитику
+            console.log(`Клик по результату ${resultIndex}`);
+        }
+
+        // Загрузка сохраненной конфигурации при загрузке страницы
+        window.onload = function() {
+            const savedConfig = localStorage.getItem('vlessConfig');
+            if (savedConfig) {
+                document.getElementById('vlessConfig').value = savedConfig;
+            }
+            
+            // Обработка нажатия Enter в поле поиска
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
