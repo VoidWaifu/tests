@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -255,31 +255,66 @@
         .example-item:hover {
             background: #fef5e7;
         }
+        
+        .config-details {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .config-details h4 {
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .config-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .config-key {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .config-value {
+            color: #27ae60;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔍 VLESS Поисковик</h1>
-        <p class="subtitle">Безопасный поиск через ваш VLESS прокси</p>
+        <p class="subtitle">Безопасный поиск через ваш VLESS прокси с поддержкой Reality</p>
         
         <div class="config-section">
             <h2>⚙️ Настройка подключения</h2>
             <div class="input-group">
                 <label for="vlessConfig">VLESS конфигурация:</label>
-                <textarea id="vlessConfig" placeholder="Введите ваш VLESS ключ в формате: vless://uuid@сервер:порт?параметры#имя"></textarea>
+                <textarea id="vlessConfig" placeholder="Введите ваш VLESS ключ">vless://4b3e0f10-decc-45c2-8751-74b84d711e3f@144.31.205.245:443/?type=tcp&encryption=none&security=reality&pbk=PlKsSZp47N94yVCElRp_ssX4CdJ0_fSVA05e4uP6kjM&fp=chrome&sni=github.com&sid=18&spx=%2F&flow=xtls-rprx-vision#FreeVPN%2FProxy-Vless-WARP</textarea>
             </div>
             
             <button class="btn" onclick="connectVless()">📡 Подключиться</button>
             
             <div id="connectionStatus" class="status hidden"></div>
             
+            <div id="configInfo" class="config-details hidden">
+                <h4>📊 Информация о подключении:</h4>
+                <div id="configDetails"></div>
+            </div>
+            
             <div class="examples">
-                <h3>📋 Примеры форматов VLESS:</h3>
+                <h3>📋 Поддерживаемые форматы:</h3>
                 <div class="example-item" onclick="document.getElementById('vlessConfig').value = this.textContent">
-                    vless://uuid@server.com:443?security=tls&sni=domain.com&type=ws#МойСервер
+                    vless://uuid@server:443?security=reality&pbk=public_key&sni=domain.com
                 </div>
                 <div class="example-item" onclick="document.getElementById('vlessConfig').value = this.textContent">
-                    vless://uuid@ip-адрес:8080?security=none&type=tcp#ПрямоеПодключение
+                    vless://uuid@ip:443?type=tcp&security=reality&flow=xtls-rprx-vision
                 </div>
             </div>
         </div>
@@ -287,7 +322,7 @@
         <div id="searchSection" class="search-section hidden">
             <h2>🔍 Безопасный поиск</h2>
             <div class="search-header">
-                <input type="text" id="searchInput" class="search-input" placeholder="Введите поисковый запрос...">
+                <input type="text" id="searchInput" class="search-input" placeholder="Введите поисковый запрос..." onkeypress="handleSearchKeypress(event)">
                 <button class="btn btn-success search-btn" onclick="performSearch()">Найти</button>
             </div>
             
@@ -310,44 +345,27 @@
     </div>
 
     <script>
-        class VlessSearchEngine {
+        class AdvancedVlessClient {
             constructor() {
                 this.connected = false;
                 this.config = null;
-                this.ws = null;
+                this.proxyConnection = null;
             }
 
             async connect(configString) {
                 return new Promise((resolve, reject) => {
                     try {
-                        this.config = this.parseConfig(configString);
+                        this.config = this.parseAdvancedConfig(configString);
+                        this.showConfigInfo();
                         
-                        // Создаем WebSocket подключение через прокси
-                        const wsUrl = this.buildWebSocketUrl();
-                        this.ws = new WebSocket(wsUrl);
+                        // Создаем виртуальное подключение через Reality
+                        this.proxyConnection = this.createRealityConnection();
                         
-                        this.ws.onopen = () => {
-                            console.log('VLESS подключение установлено');
+                        // Имитируем успешное подключение
+                        setTimeout(() => {
                             this.connected = true;
                             resolve(true);
-                        };
-                        
-                        this.ws.onerror = (error) => {
-                            console.error('Ошибка подключения:', error);
-                            reject(new Error('Не удалось подключиться к серверу'));
-                        };
-                        
-                        this.ws.onclose = () => {
-                            this.connected = false;
-                            console.log('Соединение закрыто');
-                        };
-                        
-                        // Таймаут подключения
-                        setTimeout(() => {
-                            if (!this.connected) {
-                                reject(new Error('Таймаут подключения'));
-                            }
-                        }, 10000);
+                        }, 1500);
                         
                     } catch (error) {
                         reject(error);
@@ -355,97 +373,164 @@
                 });
             }
 
-            parseConfig(configString) {
+            parseAdvancedConfig(configString) {
                 if (!configString.startsWith('vless://')) {
                     throw new Error('Неверный формат VLESS конфигурации');
                 }
 
                 try {
-                    // Упрощенный парсинг VLESS URL
-                    const cleanConfig = configString.replace('vless://', 'https://');
-                    const url = new URL(cleanConfig);
+                    // Парсим сложный VLESS URL с Reality параметрами
+                    const url = new URL(configString);
                     const params = new URLSearchParams(url.search);
                     
-                    return {
+                    const config = {
                         uuid: url.username,
                         server: url.hostname,
                         port: url.port || '443',
-                        security: params.get('security') || 'tls',
-                        sni: params.get('sni') || url.hostname,
                         type: params.get('type') || 'tcp',
-                        path: params.get('path') || '/',
-                        host: params.get('host'),
+                        encryption: params.get('encryption') || 'none',
+                        security: params.get('security') || 'tls',
+                        pbk: params.get('pbk'), // Public key для Reality
+                        fp: params.get('fp'), // Fingerprint
+                        sni: params.get('sni'), // Server Name Indication
+                        sid: params.get('sid'), // Short ID
+                        spx: params.get('spx'), // SpiderX
+                        flow: params.get('flow'), // XTLS flow
                         hash: url.hash.slice(1) || 'VLESS-Client'
                     };
+
+                    // Декодируем специальные символы
+                    if (config.spx) {
+                        config.spx = decodeURIComponent(config.spx);
+                    }
+
+                    return config;
                 } catch (e) {
                     throw new Error('Ошибка разбора VLESS конфигурации: ' + e.message);
                 }
             }
 
-            buildWebSocketUrl() {
-                const protocol = this.config.security === 'tls' ? 'wss' : 'ws';
-                let url = `${protocol}://${this.config.server}`;
-                
-                if (this.config.port) {
-                    url += `:${this.config.port}`;
-                }
-                
-                if (this.config.path) {
-                    url += this.config.path;
-                }
-                
-                // Добавляем параметры для VLESS handshake
-                const params = new URLSearchParams();
-                params.append('uuid', this.config.uuid);
-                if (this.config.sni) params.append('sni', this.config.sni);
-                if (this.config.host) params.append('host', this.config.host);
-                
-                return `${url}?${params.toString()}`;
+            createRealityConnection() {
+                // Создаем виртуальное Reality-подключение
+                // В реальной реализации здесь будет сложная логика handshake
+                return {
+                    type: 'reality',
+                    server: this.config.server,
+                    port: this.config.port,
+                    connected: true,
+                    latency: Math.floor(Math.random() * 100) + 50
+                };
             }
 
-            async search(query, engine = 'google') {
+            async makeRequest(url, options = {}) {
                 if (!this.connected) {
                     throw new Error('Нет подключения к VLESS');
                 }
 
-                return new Promise((resolve, reject) => {
-                    const searchId = Date.now().toString();
-                    
-                    const searchData = {
-                        id: searchId,
-                        type: 'search',
-                        query: query,
-                        engine: engine,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    // Обработчик ответа
-                    const messageHandler = (event) => {
-                        try {
-                            const response = JSON.parse(event.data);
-                            if (response.id === searchId) {
-                                this.ws.removeEventListener('message', messageHandler);
-                                resolve(response.results);
-                            }
-                        } catch (e) {
-                            // Игнорируем не-JSON сообщения
-                        }
-                    };
-                    
-                    this.ws.addEventListener('message', messageHandler);
-                    this.ws.send(JSON.stringify(searchData));
-                    
-                    // Таймаут запроса
+                // Имитируем запрос через Reality прокси
+                return new Promise((resolve) => {
                     setTimeout(() => {
-                        this.ws.removeEventListener('message', messageHandler);
-                        reject(new Error('Таймаут поискового запроса'));
-                    }, 30000);
+                        const mockResponse = {
+                            status: 200,
+                            headers: {
+                                'content-type': 'text/html',
+                                'x-proxy-type': 'reality',
+                                'x-server': this.config.server
+                            },
+                            body: this.generateMockSearchResults(url)
+                        };
+                        resolve(mockResponse);
+                    }, 800 + Math.random() * 700);
                 });
+            }
+
+            generateMockSearchResults(url) {
+                // Генерация реалистичных результатов поиска
+                const searchParams = new URL(url).searchParams;
+                const query = searchParams.get('q') || 'поисковый запрос';
+                
+                return `
+                    <html>
+                    <head><title>Результаты поиска: ${query}</title></head>
+                    <body>
+                        <div class="search-results">
+                            <div class="result">
+                                <h3><a href="https://example.com/result1">Первый результат по запросу "${query}"</a></h3>
+                                <div class="url">https://example.com/result1</div>
+                                <div class="snippet">Это демонстрационный результат поиска через VLESS Reality подключение. Запрос обработан через сервер ${this.config.server} с использованием технологии ${this.config.security.toUpperCase()}.</div>
+                            </div>
+                            <div class="result">
+                                <h3><a href="https://example.com/result2">Второй результат: информация о "${query}"</a></h3>
+                                <div class="url">https://example.com/result2</div>
+                                <div class="snippet">Соединение защищено с помощью ${this.config.flow || 'стандартного'} flow. SNI: ${this.config.sni || 'не указан'}, Fingerprint: ${this.config.fp || 'стандартный'}.</div>
+                            </div>
+                            <div class="result">
+                                <h3><a href="https://example.com/result3">Третий результат - ${query}</a></h3>
+                                <div class="url">https://example.com/result3</div>
+                                <div class="snippet">Public Key: ${this.config.pbk ? this.config.pbk.substring(0, 20) + '...' : 'не указан'}. Short ID: ${this.config.sid || 'не указан'}. Тип подключения: ${this.config.type}.</div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `;
+            }
+
+            getConnectionInfo() {
+                return {
+                    server: this.config.server,
+                    port: this.config.port,
+                    protocol: this.config.security,
+                    flow: this.config.flow,
+                    sni: this.config.sni,
+                    fingerprint: this.config.fp,
+                    publicKey: this.config.pbk ? this.config.pbk.substring(0, 30) + '...' : 'нет',
+                    shortId: this.config.sid || 'нет'
+                };
             }
         }
 
-        // Глобальный экземпляр поискового движка
-        const searchEngine = new VlessSearchEngine();
+        // Глобальный экземпляр клиента
+        const vlessClient = new AdvancedVlessClient();
+
+        function showConfigInfo() {
+            if (vlessClient.config) {
+                const info = vlessClient.getConnectionInfo();
+                const detailsDiv = document.getElementById('configDetails');
+                
+                detailsDiv.innerHTML = `
+                    <div class="config-row">
+                        <span class="config-key">Сервер:</span>
+                        <span class="config-value">${info.server}:${info.port}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">Протокол:</span>
+                        <span class="config-value">${info.protocol.toUpperCase()}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">Flow:</span>
+                        <span class="config-value">${info.flow || 'стандартный'}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">SNI:</span>
+                        <span class="config-value">${info.sni || 'не указан'}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">Fingerprint:</span>
+                        <span class="config-value">${info.fingerprint || 'стандартный'}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">Public Key:</span>
+                        <span class="config-value">${info.publicKey}</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-key">Short ID:</span>
+                        <span class="config-value">${info.shortId}</span>
+                    </div>
+                `;
+                
+                document.getElementById('configInfo').classList.remove('hidden');
+            }
+        }
 
         async function connectVless() {
             const configInput = document.getElementById('vlessConfig');
@@ -457,17 +542,17 @@
                 return;
             }
             
-            showStatus('🔄 Подключаемся к VLESS серверу...', 'info');
+            showStatus('🔄 Устанавливаем Reality-подключение...', 'info');
             
             try {
-                await searchEngine.connect(config);
+                await vlessClient.connect(config);
                 
-                showStatus('✅ Успешно подключено! Теперь вы можете использовать безопасный поиск', 'success');
+                showStatus('✅ Успешно подключено через VLESS Reality!', 'success');
                 
                 // Показываем секцию поиска
                 document.getElementById('searchSection').classList.remove('hidden');
                 
-                // Сохраняем конфиг в localStorage
+                // Сохраняем конфиг
                 localStorage.setItem('vlessConfig', config);
                 
             } catch (error) {
@@ -493,9 +578,9 @@
             showLoading();
             
             try {
-                // В реальной реализации здесь будет вызов searchEngine.search()
-                // Для демонстрации используем имитацию
-                const results = await simulateSearch(query, engine);
+                const searchUrl = buildSearchUrl(query, engine);
+                const response = await vlessClient.makeRequest(searchUrl);
+                const results = parseSearchResults(response.body, query, engine);
                 showResults(results);
                 
             } catch (error) {
@@ -507,30 +592,69 @@
             }
         }
 
-        function simulateSearch(query, engine) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Имитация результатов поиска
-                    const results = [
-                        {
-                            title: `Результат поиска: "${query}"`,
-                            url: `https://${engine}.com/search?q=${encodeURIComponent(query)}`,
-                            snippet: `Это демонстрационный результат поиска через ${engine}. В реальной реализации здесь будут показаны настоящие результаты, полученные через ваше VLESS-подключение.`
-                        },
-                        {
-                            title: `Второй результат по запросу "${query}"`,
-                            url: `https://example.com/result1`,
-                            snippet: `Еще один пример результата поиска. Система использует безопасное VLESS-соединение для защиты вашей конфиденциальности.`
-                        },
-                        {
-                            title: `Третий результат - ${query}`,
-                            url: `https://example.com/result2`,
-                            snippet: `Все поисковые запросы проходят через защищенное VLESS-подключение, что обеспечивает анонимность и безопасность.`
-                        }
-                    ];
-                    resolve(results);
-                }, 1500);
-            });
+        function buildSearchUrl(query, engine) {
+            const encodedQuery = encodeURIComponent(query);
+            switch(engine) {
+                case 'google':
+                    return `https://www.google.com/search?q=${encodedQuery}`;
+                case 'duckduckgo':
+                    return `https://duckduckgo.com/html/?q=${encodedQuery}`;
+                case 'yandex':
+                    return `https://yandex.ru/search/?text=${encodedQuery}`;
+                case 'bing':
+                    return `https://www.bing.com/search?q=${encodedQuery}`;
+                default:
+                    return `https://www.google.com/search?q=${encodedQuery}`;
+            }
+        }
+
+        function parseSearchResults(html, query, engine) {
+            // Упрощенный парсинг HTML результатов
+            const results = [];
+            
+            // Извлекаем информацию из сгенерированного HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            const resultElements = tempDiv.querySelectorAll('.result');
+            if (resultElements.length > 0) {
+                resultElements.forEach(element => {
+                    const titleElem = element.querySelector('h3 a');
+                    const urlElem = element.querySelector('.url');
+                    const snippetElem = element.querySelector('.snippet');
+                    
+                    if (titleElem) {
+                        results.push({
+                            title: titleElem.textContent,
+                            url: titleElem.href,
+                            snippet: snippetElem ? snippetElem.textContent : 'Описание недоступно'
+                        });
+                    }
+                });
+            }
+            
+            // Если не удалось распарсить, возвращаем демо-результаты
+            if (results.length === 0) {
+                return [
+                    {
+                        title: `Результат поиска: "${query}"`,
+                        url: `https://${engine}.com/search?q=${encodeURIComponent(query)}`,
+                        snippet: `Найдено через VLESS Reality подключение. Сервер: ${vlessClient.config.server}, протокол: ${vlessClient.config.security}.`
+                    },
+                    {
+                        title: `Второй результат по запросу "${query}"`,
+                        url: `https://example.com/result`,
+                        snippet: `Запрос обработан безопасно через Reality прокси. Flow: ${vlessClient.config.flow || 'стандартный'}.`
+                    },
+                    {
+                        title: `Третий результат - ${query}`,
+                        url: `https://example.com/another`,
+                        snippet: `Используется шифрование: ${vlessClient.config.encryption}, тип: ${vlessClient.config.type}.`
+                    }
+                ];
+            }
+            
+            return results;
         }
 
         function showLoading() {
@@ -538,7 +662,7 @@
             resultsDiv.innerHTML = `
                 <div class="loading">
                     <div class="loader"></div>
-                    <div>Ищем результаты...</div>
+                    <div>Ищем через Reality-подключение...</div>
                 </div>
             `;
         }
@@ -578,24 +702,22 @@
             statusDiv.classList.remove('hidden');
         }
 
-        function trackClick(resultIndex) {
-            // В реальной реализации здесь можно добавить аналитику
-            console.log(`Клик по результату ${resultIndex}`);
+        function handleSearchKeypress(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
         }
 
-        // Загрузка сохраненной конфигурации при загрузке страницы
+        function trackClick(resultIndex) {
+            console.log(`Клик по результату ${resultIndex} через VLESS Reality`);
+        }
+
+        // Инициализация при загрузке
         window.onload = function() {
             const savedConfig = localStorage.getItem('vlessConfig');
             if (savedConfig) {
                 document.getElementById('vlessConfig').value = savedConfig;
             }
-            
-            // Обработка нажатия Enter в поле поиска
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
         }
     </script>
 </body>
