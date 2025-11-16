@@ -356,7 +356,6 @@
                 return new Promise((resolve, reject) => {
                     try {
                         this.config = this.parseAdvancedConfig(configString);
-                        this.showConfigInfo();
                         
                         // Создаем виртуальное подключение через Reality
                         this.proxyConnection = this.createRealityConnection();
@@ -412,7 +411,6 @@
 
             createRealityConnection() {
                 // Создаем виртуальное Reality-подключение
-                // В реальной реализации здесь будет сложная логика handshake
                 return {
                     type: 'reality',
                     server: this.config.server,
@@ -487,50 +485,51 @@
                     shortId: this.config.sid || 'нет'
                 };
             }
+
+            // ДОБАВЛЕНО: Метод для показа информации о конфигурации
+            showConfigInfo() {
+                if (this.config) {
+                    const info = this.getConnectionInfo();
+                    const detailsDiv = document.getElementById('configDetails');
+                    
+                    detailsDiv.innerHTML = `
+                        <div class="config-row">
+                            <span class="config-key">Сервер:</span>
+                            <span class="config-value">${info.server}:${info.port}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">Протокол:</span>
+                            <span class="config-value">${info.protocol.toUpperCase()}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">Flow:</span>
+                            <span class="config-value">${info.flow || 'стандартный'}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">SNI:</span>
+                            <span class="config-value">${info.sni || 'не указан'}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">Fingerprint:</span>
+                            <span class="config-value">${info.fingerprint || 'стандартный'}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">Public Key:</span>
+                            <span class="config-value">${info.publicKey}</span>
+                        </div>
+                        <div class="config-row">
+                            <span class="config-key">Short ID:</span>
+                            <span class="config-value">${info.shortId}</span>
+                        </div>
+                    `;
+                    
+                    document.getElementById('configInfo').classList.remove('hidden');
+                }
+            }
         }
 
         // Глобальный экземпляр клиента
         const vlessClient = new AdvancedVlessClient();
-
-        function showConfigInfo() {
-            if (vlessClient.config) {
-                const info = vlessClient.getConnectionInfo();
-                const detailsDiv = document.getElementById('configDetails');
-                
-                detailsDiv.innerHTML = `
-                    <div class="config-row">
-                        <span class="config-key">Сервер:</span>
-                        <span class="config-value">${info.server}:${info.port}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">Протокол:</span>
-                        <span class="config-value">${info.protocol.toUpperCase()}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">Flow:</span>
-                        <span class="config-value">${info.flow || 'стандартный'}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">SNI:</span>
-                        <span class="config-value">${info.sni || 'не указан'}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">Fingerprint:</span>
-                        <span class="config-value">${info.fingerprint || 'стандартный'}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">Public Key:</span>
-                        <span class="config-value">${info.publicKey}</span>
-                    </div>
-                    <div class="config-row">
-                        <span class="config-key">Short ID:</span>
-                        <span class="config-value">${info.shortId}</span>
-                    </div>
-                `;
-                
-                document.getElementById('configInfo').classList.remove('hidden');
-            }
-        }
 
         async function connectVless() {
             const configInput = document.getElementById('vlessConfig');
@@ -546,6 +545,9 @@
             
             try {
                 await vlessClient.connect(config);
+                
+                // ПОСЛЕ подключения вызываем метод showConfigInfo
+                vlessClient.showConfigInfo();
                 
                 showStatus('✅ Успешно подключено через VLESS Reality!', 'success');
                 
