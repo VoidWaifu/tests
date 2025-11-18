@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статья | VoidWaifu</title>
+    <link rel="icon" type="image/png" href="../../../assets/icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-accent: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #bb86fc;
+            --accent-hover: #9d65d0;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent-hover);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            flex: 1;
+            padding: 3rem 0;
+        }
+
+        .article-header {
+            text-align: center;
+            padding: 4rem 0;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 3rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .article-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--accent), #03dac6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .article-meta {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .article-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+
+        .article-content h2 {
+            color: var(--accent);
+            margin: 2.5rem 0 1.5rem 0;
+            font-size: 1.8rem;
+        }
+
+        .highlight {
+            background-color: var(--bg-accent);
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent);
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 1rem;
+            }
+            
+            .article-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">VoidWaifu</div>
+                <nav>
+                    <ul>
+                        <li><a href="./../../../">Главная</a></li>
+                        <li><a href="./../../../blog/">Блог</a></li>
+                        <li><a href="./../../../channel/">Канал</a></li>
+                        <li><a href="./../../../notes/">Заметки</a></li>
+                        <li><a href="./../../../projects/">Другие проекты</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <section class="article-header">
+                <h1>Заголовок поста</h1>
+                <p class="article-meta">Дата публикации</p>
+            </section>
+            
+            <article class="article-content">
+                <h2>Дополнительное название 1</h2>
+
+                <p>Абзац 1.</p>
+                
+                <p>Абзац 2.</p>
+                
+                <p>Абзац 3.</p>
+
+                <h2>Дополнительное название 2</h2>
+                
+                <p>Абзац 4.</p>
+                
+                <p>Абзац 5.</p>
+                
+                <p>Абзац 6.</p>
+
+                <h2>Дополнительное название 3</h2>
+                
+                <p>Абзац 7.</p>
+
+                <p>Абзац 8.</p>
+
+                <p>Абзац 9.</p>
+            </article>
+        </div>
+    </main>
+</body>
+</html>
