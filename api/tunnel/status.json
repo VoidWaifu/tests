@@ -1,0 +1,14 @@
+{
+  "status": "operational",
+  "service": "dpi-bypass-proxy",
+  "timestamp": 1702876800000,
+  "message": "SOCKS5 proxy is running - DPI bypass active",
+  "version": "1.0",
+  "endpoints_working": true,
+  "proxies_available": 3,
+  "instructions": {
+    "socks5": "Configure browser to use socks5://127.0.0.1:1080",
+    "http": "Configure browser to use http://127.0.0.1:8080",
+    "test": "Visit http://whatismyipaddress.com to verify"
+  }
+}
