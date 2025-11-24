@@ -1,5 +1,5 @@
-// Enhanced Service Worker for DPI Tunnel - /tests/ directory
-const CACHE_NAME = 'dpi-tunnel-tests-v2';
+// Ultimate Service Worker for DPI Tunnel - /tests/ directory
+const CACHE_NAME = 'dpi-tunnel-ultimate-v3';
 const TUNNEL_PATH = '/tests/api/tunnel/';
 
 // Security configuration
@@ -10,11 +10,10 @@ const AUTH_TOKENS = [
 ];
 
 // Enhanced encryption
-class EnhancedCrypto {
+class UltimateCrypto {
     encrypt(text) {
-        // Simple XOR encryption for demo
         let result = '';
-        const key = 'dpi_tunnel_key_2024';
+        const key = 'dpi_tunnel_ultimate_key_2024';
         for (let i = 0; i < text.length; i++) {
             result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
         }
@@ -25,7 +24,7 @@ class EnhancedCrypto {
         try {
             const text = atob(encryptedText);
             let result = '';
-            const key = 'dpi_tunnel_key_2024';
+            const key = 'dpi_tunnel_ultimate_key_2024';
             for (let i = 0; i < text.length; i++) {
                 result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
@@ -36,56 +35,67 @@ class EnhancedCrypto {
     }
 }
 
-const crypto = new EnhancedCrypto();
+const crypto = new UltimateCrypto();
 
-// Service Worker lifecycle - FORCE activation
+// Service Worker lifecycle - ULTIMATE activation
 self.addEventListener('install', (event) => {
-    console.log('🛠️ DPI Tunnel Service Worker installing...');
-    self.skipWaiting(); // Force activation
+    console.log('🚀 Ultimate Service Worker installing...');
+    event.waitUntil(self.skipWaiting()); // Force immediate activation
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('🛠️ DPI Tunnel Service Worker activating...');
+    console.log('🚀 Ultimate Service Worker activating...');
     event.waitUntil(
         Promise.all([
-            self.clients.claim(), // Take control immediately
+            self.clients.claim(), // Control all clients immediately
             caches.keys().then(cacheNames => {
                 return Promise.all(
                     cacheNames.map(cacheName => {
                         if (cacheName !== CACHE_NAME) {
-                            console.log('🛠️ Deleting old cache:', cacheName);
+                            console.log('🗑️ Deleting old cache:', cacheName);
                             return caches.delete(cacheName);
                         }
                     })
                 );
             })
-        ])
+        ]).then(() => {
+            console.log('✅ Ultimate Service Worker fully activated!');
+            // Send message to all clients
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({
+                        type: 'SW_ACTIVATED',
+                        version: '3.0'
+                    });
+                });
+            });
+        })
     );
 });
 
-// Enhanced fetch handling - intercept ALL requests
+// ULTIMATE fetch handling - intercept EVERYTHING
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     const pathname = url.pathname;
     
     // Log all requests for debugging
-    console.log('🛠️ Intercepting request:', pathname, event.request.method);
+    console.log('🌐 Intercepting request:', pathname, event.request.method);
     
-    // Handle tunnel API requests
-    if (pathname.startsWith(TUNNEL_PATH)) {
-        console.log('🛠️ Processing tunnel request:', pathname);
+    // Handle ALL tunnel API requests
+    if (pathname.startsWith(TUNNEL_PATH) || pathname.includes('/api/tunnel/')) {
+        console.log('🚀 Processing tunnel request:', pathname);
         event.respondWith(handleTunnelRequest(event.request));
         return;
     }
     
-    // Handle direct API requests (without /tests/ prefix in some cases)
-    if (pathname.includes('/api/tunnel/')) {
-        console.log('🛠️ Processing direct API request:', pathname);
-        event.respondWith(handleTunnelRequest(event.request));
+    // Handle HTML pages with .html extension in API paths (our workaround)
+    if (pathname.includes('/api/tunnel/') && pathname.endsWith('.html')) {
+        console.log('🔄 Handling HTML workaround for:', pathname);
+        event.respondWith(handleHtmlWorkaround(event.request));
         return;
     }
     
-    // For HTML pages, use cache-first strategy
+    // For regular HTML pages, use cache-first strategy
     if (pathname.endsWith('.html') || pathname === '/tests/' || pathname === '/tests') {
         event.respondWith(handleHtmlRequest(event.request));
         return;
@@ -115,13 +125,59 @@ async function handleHtmlRequest(request) {
     }
 }
 
-// Enhanced tunnel request handler
+// Handle HTML workaround files
+async function handleHtmlWorkaround(request) {
+    const url = new URL(request.url);
+    const action = url.pathname.split('/').pop().replace('.html', '');
+    
+    console.log('🔄 Processing HTML workaround for action:', action);
+    
+    // Return a simple HTML page that will trigger the real API call
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>DPI Tunnel - ${action}</title>
+            <script>
+                // Auto-execute the API call
+                const action = '${action}';
+                const token = new URLSearchParams(window.location.search).get('token');
+                
+                fetch('/tests/api/tunnel/' + action, {
+                    method: 'POST',
+                    headers: token ? {'X-Auth-Token': token} : {}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.body.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    document.body.innerHTML = 'Error: ' + error;
+                });
+            </script>
+        </head>
+        <body>
+            Loading ${action} endpoint via Service Worker...
+        </body>
+        </html>
+    `;
+    
+    return new Response(htmlContent, {
+        status: 200,
+        headers: {
+            'Content-Type': 'text/html',
+            'X-Service-Worker': 'active'
+        }
+    });
+}
+
+// ULTIMATE tunnel request handler
 async function handleTunnelRequest(request) {
-    console.log('🛠️ Handling tunnel request:', request.url, request.method);
+    console.log('🚀 Handling tunnel request:', request.url, request.method);
     
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
-        console.log('🛠️ Handling CORS preflight');
+        console.log('🔄 Handling CORS preflight');
         return new Response(null, {
             status: 200,
             headers: {
@@ -138,14 +194,9 @@ async function handleTunnelRequest(request) {
         const url = new URL(request.url);
         let action = url.pathname.split('/').pop();
         
-        // Handle different path formats
-        if (url.pathname.includes('/api/tunnel/')) {
-            const parts = url.pathname.split('/');
-            action = parts[parts.length - 1];
-        }
-        
-        console.log(`🛠️ Processing tunnel action: ${action}`, {
+        console.log(`🚀 Processing tunnel action: ${action}`, {
             method: request.method,
+            url: request.url,
             headers: Object.fromEntries(request.headers.entries())
         });
 
@@ -162,28 +213,20 @@ async function handleTunnelRequest(request) {
             case 'test':
                 return await handleTest(request);
             default:
-                console.log('🛠️ Unknown action, trying fallback');
-                // Try to handle as connect if it's a POST request
-                if (request.method === 'POST') {
-                    return await handleConnect(request);
-                }
-                return createJsonResponse({ error: 'Unknown action: ' + action }, 404);
+                console.log('🔄 Unknown action, trying fallback to connect');
+                return await handleConnect(request);
         }
     } catch (error) {
-        console.error('🛠️ Tunnel request error:', error);
+        console.error('❌ Tunnel request error:', error);
         return createJsonResponse({ error: 'Internal server error: ' + error.message }, 500);
     }
 }
 
-// Enhanced connect handler
+// ULTIMATE connect handler
 async function handleConnect(request) {
-    console.log('🛠️ Handling connect request');
+    console.log('🚀 Handling connect request');
     
-    // Allow both POST and GET for connect
-    if (request.method !== 'POST' && request.method !== 'GET') {
-        return createJsonResponse({ error: 'Method not allowed' }, 405);
-    }
-
+    // Allow all methods for maximum compatibility
     let authToken;
     
     if (request.method === 'POST') {
@@ -194,10 +237,11 @@ async function handleConnect(request) {
             authToken = request.headers.get('X-Auth-Token');
         }
     } else {
-        authToken = request.headers.get('X-Auth-Token');
+        authToken = request.headers.get('X-Auth-Token') || 
+                   new URL(request.url).searchParams.get('token');
     }
 
-    console.log(`🛠️ Connect request with auth token: ${authToken ? authToken.substring(0, 10) + '...' : 'none'}`);
+    console.log(`🔐 Connect request with auth token: ${authToken ? authToken.substring(0, 10) + '...' : 'none'}`);
 
     if (!AUTH_TOKENS.includes(authToken)) {
         return createJsonResponse({ error: 'Authentication failed' }, 401);
@@ -208,22 +252,23 @@ async function handleConnect(request) {
     const responseData = {
         status: 'connected',
         sessionId: sessionId,
-        message: 'Tunnel service ready - Enhanced Service Worker',
+        message: 'Ultimate Tunnel Service Ready',
         timestamp: Date.now(),
-        version: '2.0',
+        version: '3.0',
         capabilities: ['proxy', 'health-check', 'status', 'test'],
         basePath: '/tests/',
         method: request.method,
-        swActive: true
+        swActive: true,
+        ultimate: true
     };
 
-    console.log(`🛠️ New session created: ${sessionId}`);
+    console.log(`✅ New session created: ${sessionId}`);
     return createJsonResponse(responseData);
 }
 
-// Enhanced proxy handler
+// ULTIMATE proxy handler
 async function handleProxy(request) {
-    console.log('🛠️ Handling proxy request');
+    console.log('🚀 Handling proxy request');
     
     if (request.method !== 'POST') {
         return createJsonResponse({ error: 'Method not allowed' }, 405);
@@ -243,7 +288,7 @@ async function handleProxy(request) {
             return createJsonResponse({ error: 'Invalid JSON in request body' }, 400);
         }
 
-        console.log(`🛠️ Proxy request for: ${target}`);
+        console.log(`🌐 Proxy request for: ${target}`);
 
         // Validate session
         if (!AUTH_TOKENS.includes(authToken)) {
@@ -282,29 +327,30 @@ async function handleProxy(request) {
             timestamp: Date.now(),
             target: target,
             encrypted: true,
-            swVersion: '2.0'
+            swVersion: '3.0',
+            ultimate: true
         };
 
-        console.log(`🛠️ Proxy successful: ${target} -> ${response.status}`);
+        console.log(`✅ Proxy successful: ${target} -> ${response.status}`);
         return createJsonResponse(proxyResponse);
 
     } catch (error) {
-        console.error('🛠️ Proxy error:', error);
+        console.error('❌ Proxy error:', error);
         return createJsonResponse({ error: 'Proxy error: ' + error.message }, 500);
     }
 }
 
-// Enhanced health check
+// ULTIMATE health check
 async function handleHealthCheck(request) {
-    console.log('🛠️ Handling health check');
+    console.log('❤️ Handling health check');
     
     const healthData = {
         status: 'operational',
-        service: 'dpi-tunnel-enhanced',
+        service: 'dpi-tunnel-ultimate',
         timestamp: Date.now(),
-        version: '2.0',
+        version: '3.0',
         uptime: Math.floor(performance.now() / 1000),
-        features: ['encryption', 'authentication', 'proxy', 'cors'],
+        features: ['encryption', 'authentication', 'proxy', 'cors', 'ultimate'],
         directory: '/tests/',
         endpoints: [
             '/tests/api/tunnel/connect',
@@ -314,37 +360,40 @@ async function handleHealthCheck(request) {
             '/tests/api/tunnel/test'
         ],
         swActive: true,
-        corsEnabled: true
+        corsEnabled: true,
+        ultimate: true
     };
 
     return createJsonResponse(healthData);
 }
 
-// Enhanced status
+// ULTIMATE status
 async function handleStatus(request) {
     const statusData = {
-        service: 'DPI Tunnel Enhanced Service Worker',
-        version: '2.0',
+        service: 'DPI Tunnel Ultimate Service Worker',
+        version: '3.0',
         timestamp: Date.now(),
         environment: 'production',
         baseUrl: 'https://voidwaifu.github.io/tests/',
         endpoints: ['connect', 'proxy', 'health-check', 'status', 'test'],
-        swActive: true
+        swActive: true,
+        ultimate: true
     };
 
     return createJsonResponse(statusData);
 }
 
-// Enhanced test endpoint
+// ULTIMATE test endpoint
 async function handleTest(request) {
     const testData = {
-        message: 'Enhanced test endpoint working!',
-        service: 'DPI Tunnel Enhanced',
+        message: 'Ultimate test endpoint working!',
+        service: 'DPI Tunnel Ultimate',
         directory: '/tests/',
         timestamp: Date.now(),
         randomId: Math.random().toString(36).substr(2, 9),
-        swVersion: '2.0',
-        corsTest: 'success'
+        swVersion: '3.0',
+        corsTest: 'success',
+        ultimate: true
     };
 
     return createJsonResponse(testData);
@@ -352,7 +401,7 @@ async function handleTest(request) {
 
 // Utility functions
 function createJsonResponse(data, status = 200) {
-    console.log(`🛠️ Creating JSON response: ${status}`, data);
+    console.log(`📦 Creating JSON response: ${status}`, data);
     return new Response(JSON.stringify(data), {
         status: status,
         headers: {
@@ -362,13 +411,14 @@ function createJsonResponse(data, status = 200) {
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Expose-Headers': '*',
             'X-Service-Worker': 'active',
-            'X-DPI-Tunnel': 'enabled'
+            'X-DPI-Tunnel': 'ultimate',
+            'X-Ultimate-Version': '3.0'
         }
     });
 }
 
 function generateSessionId() {
-    return 'enhanced_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 'ultimate_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 function isValidTarget(url) {
@@ -380,19 +430,21 @@ function isValidTarget(url) {
     }
 }
 
-// Background sync for updates
-self.addEventListener('sync', (event) => {
-    if (event.tag === 'background-sync') {
-        console.log('🛠️ Background sync triggered');
-    }
-});
-
-// Message handling for client communication
+// Enhanced message handling
 self.addEventListener('message', (event) => {
-    console.log('🛠️ Received message from client:', event.data);
+    console.log('📨 Received message from client:', event.data);
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
+    
+    // Respond to ping messages
+    if (event.data && event.data.type === 'PING') {
+        event.ports[0].postMessage({
+            type: 'PONG',
+            version: '3.0',
+            ultimate: true
+        });
+    }
 });
 
-console.log('🛠️ Enhanced DPI Tunnel Service Worker loaded successfully - /tests/ directory');
+console.log('🚀 Ultimate DPI Tunnel Service Worker loaded successfully!');
