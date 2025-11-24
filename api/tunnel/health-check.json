@@ -1,0 +1,8 @@
+{
+  "status": "operational",
+  "service": "dpi-tunnel-json",
+  "timestamp": 1702876800000,
+  "version": "json-file",
+  "message": "This is a STATIC JSON file - Service Worker should intercept but GitHub Pages is serving this directly",
+  "type": "static-json"
+}
