@@ -1,0 +1,31 @@
+{
+  "service": "dpi-bypass-proxy",
+  "version": "1.0",
+  "timestamp": 1702876800000,
+  "proxies": [
+    "https://corsproxy.io/?",
+    "https://api.codetabs.com/v1/proxy?quest=",
+    "https://cors-anywhere.herokuapp.com/"
+  ],
+  "settings": {
+    "socks_port": 1080,
+    "http_port": 8080,
+    "dns_port": 53,
+    "timeout": 30,
+    "max_retries": 3
+  },
+  "security": {
+    "auth_tokens": [
+      "digital_hub_secure_token_2024_ultra_v3",
+      "quantum_protection_key_advanced_2024",
+      "encrypted_tunnel_access_pro_max_2024"
+    ],
+    "encryption": "base64",
+    "compression": false
+  },
+  "endpoints": {
+    "health": "/tests/api/tunnel/health-check.json",
+    "config": "/tests/api/tunnel/config.json",
+    "status": "/tests/api/tunnel/status.json"
+  }
+}
