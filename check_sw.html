@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Worker & Tunnel Check</title>
+    <title>DPI Tunnel Test - /tests/ Directory</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
+            background: #f0f2f5;
         }
         .container {
             background: white;
@@ -19,82 +19,119 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #333;
-            border-bottom: 2px solid #007cba;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
             padding-bottom: 10px;
         }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
         .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            background: #f8f9fa;
         }
         .success {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            border-color: #27ae60;
+            background: #d5f4e6;
         }
         .error {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            border-color: #e74c3c;
+            background: #fadbd8;
         }
         .warning {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
+            border-color: #f39c12;
+            background: #fef9e7;
         }
         .info {
-            background: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
+            border-color: #3498db;
+            background: #d6eaf8;
         }
         button {
-            background: #007cba;
+            background: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 6px;
             cursor: pointer;
-            margin: 5px;
+            margin: 8px 5px;
+            font-size: 14px;
+            transition: background 0.3s;
         }
         button:hover {
-            background: #005a87;
+            background: #2980b9;
         }
         button:disabled {
-            background: #6c757d;
+            background: #95a5a6;
             cursor: not-allowed;
         }
         .log {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background: #2c3e50;
+            color: #ecf0f1;
             border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            max-height: 200px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
             overflow-y: auto;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-size: 13px;
+            line-height: 1.4;
         }
         .status {
             font-weight: bold;
-            margin: 10px 0;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .result-item {
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            background: #ecf0f1;
+        }
+        .success-item {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        .error-item {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔧 Service Worker & Tunnel Check</h1>
+        <h1>🔧 DPI Tunnel Test - /tests/ Directory</h1>
+        <p><strong>Base URL:</strong> <code>https://voidwaifu.github.io/tests/</code></p>
         
         <div class="test-section info">
             <h3>ℹ️ About This Test</h3>
-            <p>This page tests if the Service Worker is properly registered and if the tunnel API endpoints are working correctly.</p>
+            <p>This page tests the DPI Tunnel Service Worker in the <code>/tests/</code> directory.</p>
+            <p><strong>Service Worker URL:</strong> <code>/tests/sw.js</code></p>
+            <p><strong>API Base:</strong> <code>/tests/api/tunnel/</code></p>
         </div>
 
         <!-- Service Worker Test -->
         <div class="test-section">
             <h3>1. Service Worker Registration</h3>
             <button onclick="testServiceWorker()">Test Service Worker</button>
+            <button onclick="unregisterServiceWorker()">Unregister SW</button>
             <div id="swStatus" class="status">Click button to test</div>
             <div id="swLog" class="log"></div>
         </div>
@@ -102,9 +139,11 @@
         <!-- API Endpoints Test -->
         <div class="test-section">
             <h3>2. Tunnel API Endpoints</h3>
+            <p><strong>Base Path:</strong> <code>/tests/api/tunnel/</code></p>
             <button onclick="testConnectEndpoint()">Test /connect</button>
             <button onclick="testHealthEndpoint()">Test /health-check</button>
             <button onclick="testProxyEndpoint()">Test /proxy</button>
+            <button onclick="testTestEndpoint()">Test /test</button>
             <button onclick="testAllEndpoints()">Test All Endpoints</button>
             <div id="apiStatus" class="status">Click buttons to test endpoints</div>
             <div id="apiLog" class="log"></div>
@@ -122,8 +161,10 @@
         <div class="test-section">
             <h3>4. Test Results</h3>
             <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="clearAllLogs()">Clear All Logs</button>
             <div id="resultsStatus" class="status">Click button to run all tests</div>
             <div id="resultsLog" class="log"></div>
+            <div id="resultsGrid" class="result-grid"></div>
         </div>
 
         <!-- Debug Information -->
@@ -134,13 +175,14 @@
     </div>
 
     <script>
-        // Auth tokens for testing
+        // Auth tokens for testing - MUST MATCH those in sw.js
         const AUTH_TOKENS = [
             'digital_hub_secure_token_2024_ultra_v3',
             'quantum_protection_key_advanced_2024',
             'encrypted_tunnel_access_pro_max_2024'
         ];
 
+        const API_BASE = '/tests/api/tunnel/';
         let currentSessionId = null;
         let testResults = {};
 
@@ -149,14 +191,22 @@
             const element = document.getElementById(elementId);
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
-            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            
+            let icon = '📝';
+            if (type === 'error') icon = '❌';
+            else if (type === 'success') icon = '✅';
+            else if (type === 'warning') icon = '⚠️';
+            
+            logEntry.innerHTML = `<span style="color: #7f8c8d;">[${timestamp}]</span> ${icon} ${message}`;
             
             if (type === 'error') {
-                logEntry.style.color = '#dc3545';
+                logEntry.style.color = '#e74c3c';
             } else if (type === 'success') {
-                logEntry.style.color = '#28a745';
+                logEntry.style.color = '#27ae60';
             } else if (type === 'warning') {
-                logEntry.style.color = '#ffc107';
+                logEntry.style.color = '#f39c12';
+            } else {
+                logEntry.style.color = '#3498db';
             }
             
             element.appendChild(logEntry);
@@ -169,13 +219,21 @@
             element.className = 'status ' + type;
         }
 
+        function clearAllLogs() {
+            document.getElementById('swLog').innerHTML = '';
+            document.getElementById('apiLog').innerHTML = '';
+            document.getElementById('configLog').innerHTML = '';
+            document.getElementById('resultsLog').innerHTML = '';
+            document.getElementById('resultsGrid').innerHTML = '';
+        }
+
         // Test Service Worker
         async function testServiceWorker() {
             const logId = 'swLog';
             const statusId = 'swStatus';
             
             setStatus(statusId, 'Testing Service Worker...', 'info');
-            document.getElementById(logId).innerHTML = '';
+            logTo(logId, 'Starting Service Worker test...');
             
             if (!('serviceWorker' in navigator)) {
                 setStatus(statusId, '❌ Service Workers not supported', 'error');
@@ -185,8 +243,8 @@
             }
 
             try {
-                logTo(logId, 'Registering Service Worker...');
-                const registration = await navigator.serviceWorker.register('/sw.js');
+                logTo(logId, 'Registering Service Worker from: /tests/sw.js');
+                const registration = await navigator.serviceWorker.register('/tests/sw.js');
                 
                 logTo(logId, `✅ Service Worker registered successfully`, 'success');
                 logTo(logId, `Scope: ${registration.scope}`);
@@ -202,21 +260,35 @@
                     logTo(logId, `Active: ${registration.active.state}`);
                 }
 
-                setStatus(statusId, '✅ Service Worker Registered', 'success');
-                testResults.serviceWorker = true;
-
                 // Test if Service Worker controls this page
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
                 if (navigator.serviceWorker.controller) {
                     logTo(logId, '✅ Service Worker is controlling this page', 'success');
                 } else {
                     logTo(logId, '⚠️ Service Worker is not controlling this page (reload may be needed)', 'warning');
                 }
 
+                setStatus(statusId, '✅ Service Worker Registered', 'success');
+                testResults.serviceWorker = true;
+
             } catch (error) {
                 setStatus(statusId, '❌ Service Worker Registration Failed', 'error');
                 logTo(logId, `ERROR: ${error.message}`, 'error');
-                logTo(logId, 'Check that sw.js exists in the root directory', 'error');
+                logTo(logId, 'Check that /tests/sw.js exists and is accessible', 'error');
                 testResults.serviceWorker = false;
+            }
+        }
+
+        // Unregister Service Worker
+        async function unregisterServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            
+            const registration = await navigator.serviceWorker.getRegistration('/tests/sw.js');
+            if (registration) {
+                await registration.unregister();
+                logTo('swLog', 'Service Worker unregistered', 'warning');
+                setStatus('swStatus', 'Service Worker Unregistered', 'warning');
             }
         }
 
@@ -226,12 +298,12 @@
             const statusId = 'apiStatus';
             
             setStatus(statusId, 'Testing /connect endpoint...', 'info');
-            logTo(logId, 'Testing /api/tunnel/connect...');
+            logTo(logId, `Testing ${API_BASE}connect...`);
 
             const authToken = AUTH_TOKENS[0];
 
             try {
-                const response = await fetch('/api/tunnel/connect', {
+                const response = await fetch(API_BASE + 'connect', {
                     method: 'POST',
                     headers: {
                         'X-Auth-Token': authToken,
@@ -247,17 +319,15 @@
                     logTo(logId, `Status: ${data.status}`);
                     logTo(logId, `Session ID: ${data.sessionId || 'N/A'}`);
                     logTo(logId, `Version: ${data.version || 'N/A'}`);
+                    logTo(logId, `Base Path: ${data.basePath || 'N/A'}`);
                     
                     currentSessionId = data.sessionId;
                     setStatus(statusId, '✅ /connect endpoint working', 'success');
                     testResults.connectEndpoint = true;
                 } else {
                     logTo(logId, `❌ Connect endpoint failed: ${response.status}`, 'error');
-                    if (response.status === 404) {
-                        logTo(logId, 'Endpoint not found - check Service Worker code', 'error');
-                    } else if (response.status === 401) {
-                        logTo(logId, 'Authentication failed - check AUTH_TOKENS', 'error');
-                    }
+                    const errorText = await response.text();
+                    logTo(logId, `Error response: ${errorText}`, 'error');
                     setStatus(statusId, `❌ /connect failed: ${response.status}`, 'error');
                     testResults.connectEndpoint = false;
                 }
@@ -275,10 +345,10 @@
             const statusId = 'apiStatus';
             
             setStatus(statusId, 'Testing /health-check endpoint...', 'info');
-            logTo(logId, 'Testing /api/tunnel/health-check...');
+            logTo(logId, `Testing ${API_BASE}health-check...`);
 
             try {
-                const response = await fetch('/api/tunnel/health-check');
+                const response = await fetch(API_BASE + 'health-check');
 
                 logTo(logId, `Response status: ${response.status}`);
 
@@ -287,6 +357,7 @@
                     logTo(logId, `✅ Health endpoint working`, 'success');
                     logTo(logId, `Service: ${data.service || 'N/A'}`);
                     logTo(logId, `Status: ${data.status || 'N/A'}`);
+                    logTo(logId, `Directory: ${data.directory || 'N/A'}`);
                     logTo(logId, `Uptime: ${data.uptime || 'N/A'} seconds`);
                     setStatus(statusId, '✅ /health-check working', 'success');
                     testResults.healthEndpoint = true;
@@ -315,18 +386,18 @@
             }
 
             setStatus(statusId, 'Testing /proxy endpoint...', 'info');
-            logTo(logId, 'Testing /api/tunnel/proxy...');
+            logTo(logId, `Testing ${API_BASE}proxy...`);
 
             const authToken = AUTH_TOKENS[0];
             const testData = {
-                target: 'http://httpbin.org/ip',
+                target: 'https://httpbin.org/ip',
                 method: 'GET',
                 sessionId: currentSessionId,
                 authToken: authToken
             };
 
             try {
-                const response = await fetch('/api/tunnel/proxy', {
+                const response = await fetch(API_BASE + 'proxy', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -340,7 +411,9 @@
                     const data = await response.json();
                     logTo(logId, `✅ Proxy endpoint working`, 'success');
                     logTo(logId, `Target status: ${data.status}`);
-                    logTo(logId, `Data received: ${data.data ? 'Yes' : 'No'}`);
+                    logTo(logId, `Target: ${data.target}`);
+                    logTo(logId, `Encrypted: ${data.encrypted ? 'Yes' : 'No'}`);
+                    logTo(logId, `Data length: ${data.data ? data.data.length : 0} chars`);
                     setStatus(statusId, '✅ /proxy endpoint working', 'success');
                     testResults.proxyEndpoint = true;
                 } else {
@@ -358,6 +431,40 @@
             }
         }
 
+        // Test Test Endpoint
+        async function testTestEndpoint() {
+            const logId = 'apiLog';
+            const statusId = 'apiStatus';
+            
+            setStatus(statusId, 'Testing /test endpoint...', 'info');
+            logTo(logId, `Testing ${API_BASE}test...`);
+
+            try {
+                const response = await fetch(API_BASE + 'test');
+
+                logTo(logId, `Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    logTo(logId, `✅ Test endpoint working`, 'success');
+                    logTo(logId, `Message: ${data.message}`);
+                    logTo(logId, `Directory: ${data.directory}`);
+                    logTo(logId, `Random ID: ${data.randomId}`);
+                    setStatus(statusId, '✅ /test endpoint working', 'success');
+                    testResults.testEndpoint = true;
+                } else {
+                    logTo(logId, `❌ Test endpoint failed: ${response.status}`, 'error');
+                    setStatus(statusId, `❌ /test failed: ${response.status}`, 'error');
+                    testResults.testEndpoint = false;
+                }
+
+            } catch (error) {
+                logTo(logId, `❌ Test endpoint error: ${error.message}`, 'error');
+                setStatus(statusId, '❌ /test endpoint error', 'error');
+                testResults.testEndpoint = false;
+            }
+        }
+
         // Test all endpoints
         async function testAllEndpoints() {
             await testConnectEndpoint();
@@ -365,6 +472,8 @@
             await testHealthEndpoint();
             await new Promise(resolve => setTimeout(resolve, 500));
             await testProxyEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testTestEndpoint();
         }
 
         // Check configuration
@@ -377,11 +486,14 @@
             
             logTo(logId, '🔧 Configuration Check');
             logTo(logId, `AUTH_TOKENS configured: ${AUTH_TOKENS.length} tokens`);
-            logTo(logId, `Current URL: ${window.location.origin}`);
+            logTo(logId, `API Base: ${API_BASE}`);
+            logTo(logId, `Current URL: ${window.location.href}`);
             logTo(logId, `Service Worker support: ${'serviceWorker' in navigator ? 'Yes' : 'No'}`);
+            logTo(logId, `HTTPS: ${window.location.protocol === 'https:' ? 'Yes' : 'No'}`);
+            logTo(logId, `Directory: /tests/`);
             
             // Check if we're on HTTPS
-            if (window.location.protocol !== 'https:') {
+            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
                 logTo(logId, '⚠️ Service Workers require HTTPS (except localhost)', 'warning');
             }
             
@@ -392,13 +504,15 @@
         async function runAllTests() {
             const logId = 'resultsLog';
             const statusId = 'resultsStatus';
+            const gridId = 'resultsGrid';
             
             setStatus(statusId, 'Running all tests...', 'info');
             document.getElementById(logId).innerHTML = '';
+            document.getElementById(gridId).innerHTML = '';
             
             testResults = {};
             
-            logTo(logId, '🚀 Starting Comprehensive Test Suite');
+            logTo(logId, '🚀 Starting Comprehensive Test Suite - /tests/ directory');
             
             // Test Service Worker
             await testServiceWorker();
@@ -407,6 +521,31 @@
             // Test API endpoints
             await testAllEndpoints();
             
+            // Display results in grid
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = `
+                <div class="result-item ${testResults.serviceWorker ? 'success-item' : 'error-item'}">
+                    <h4>Service Worker</h4>
+                    <div>${testResults.serviceWorker ? '✅' : '❌'}</div>
+                </div>
+                <div class="result-item ${testResults.connectEndpoint ? 'success-item' : 'error-item'}">
+                    <h4>Connect Endpoint</h4>
+                    <div>${testResults.connectEndpoint ? '✅' : '❌'}</div>
+                </div>
+                <div class="result-item ${testResults.healthEndpoint ? 'success-item' : 'error-item'}">
+                    <h4>Health Endpoint</h4>
+                    <div>${testResults.healthEndpoint ? '✅' : '❌'}</div>
+                </div>
+                <div class="result-item ${testResults.proxyEndpoint ? 'success-item' : 'error-item'}">
+                    <h4>Proxy Endpoint</h4>
+                    <div>${testResults.proxyEndpoint ? '✅' : '❌'}</div>
+                </div>
+                <div class="result-item ${testResults.testEndpoint ? 'success-item' : 'error-item'}">
+                    <h4>Test Endpoint</h4>
+                    <div>${testResults.testEndpoint ? '✅' : '❌'}</div>
+                </div>
+            `;
+            
             // Summary
             logTo(logId, '');
             logTo(logId, '📊 TEST SUMMARY:', 'info');
@@ -414,16 +553,19 @@
             logTo(logId, `Connect Endpoint: ${testResults.connectEndpoint ? '✅' : '❌'}`);
             logTo(logId, `Health Endpoint: ${testResults.healthEndpoint ? '✅' : '❌'}`);
             logTo(logId, `Proxy Endpoint: ${testResults.proxyEndpoint ? '✅' : '❌'}`);
+            logTo(logId, `Test Endpoint: ${testResults.testEndpoint ? '✅' : '❌'}`);
             
             const allPassed = testResults.serviceWorker && testResults.connectEndpoint && 
-                            testResults.healthEndpoint && testResults.proxyEndpoint;
+                            testResults.healthEndpoint && testResults.proxyEndpoint && testResults.testEndpoint;
             
             if (allPassed) {
-                setStatus(statusId, '🎉 ALL TESTS PASSED!', 'success');
-                logTo(logId, '🎉 Your DPI tunnel is properly configured!', 'success');
+                setStatus(statusId, '🎉 ALL TESTS PASSED! DPI Tunnel is working!', 'success');
+                logTo(logId, '🎉 Your DPI tunnel in /tests/ directory is properly configured!', 'success');
+                logTo(logId, '🚀 You can now use the Python client to test the full functionality.', 'success');
             } else {
                 setStatus(statusId, '❌ SOME TESTS FAILED', 'error');
                 logTo(logId, '🔧 Check the individual test sections for details', 'warning');
+                logTo(logId, '💡 Make sure Service Worker is properly registered and AUTH_TOKENS match', 'warning');
             }
         }
 
@@ -434,8 +576,10 @@
                 <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
                 <p><strong>Platform:</strong> ${navigator.platform}</p>
                 <p><strong>HTTPS:</strong> ${window.location.protocol === 'https:' ? 'Yes' : 'No'}</p>
-                <p><strong>Origin:</strong> ${window.location.origin}</p>
+                <p><strong>Full URL:</strong> ${window.location.href}</p>
                 <p><strong>Service Worker:</strong> ${'serviceWorker' in navigator ? 'Supported' : 'Not Supported'}</p>
+                <p><strong>API Base:</strong> ${API_BASE}</p>
+                <p><strong>Auth Tokens:</strong> ${AUTH_TOKENS.length} configured</p>
             `;
         }
 
@@ -446,12 +590,12 @@
             logTo('apiLog', 'Ready to test API endpoints.');
             logTo('configLog', 'Ready to check configuration.');
             logTo('resultsLog', 'Click "Run All Tests" for comprehensive testing.');
+            
+            // Auto-register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/tests/sw.js').catch(console.error);
+            }
         });
-
-        // Register service worker on load
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(console.error);
-        }
     </script>
 </body>
 </html>
