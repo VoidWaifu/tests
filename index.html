@@ -3,971 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Innovation Hub - Technology Research Portal</title>
-    <meta name="description" content="Exploring cutting-edge technologies in web development, cybersecurity and digital innovation">
-    <meta name="keywords" content="technology, programming, cybersecurity, web development, innovation">
+    <title>Service Worker & Tunnel Check</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --accent: #f59e0b;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            line-height: 1.7;
-            color: var(--text);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background: #f5f5f5;
         }
-
-        header {
-            background: var(--surface);
-            padding: 2rem 3rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .logo-text h1 {
-            color: var(--primary);
-            font-size: 2.2rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .logo-text .tagline {
-            color: var(--text-light);
-            font-size: 1rem;
-            font-weight: 400;
-        }
-
-        .status-bar {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--background);
-            border-radius: 25px;
-            font-size: 0.9rem;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        nav {
-            background: var(--surface);
-            padding: 1.5rem 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            padding: 0.7rem 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .nav-links a.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .content-section {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .hero-card {
-            background: var(--surface);
-            padding: 3rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
-        }
-
-        .hero-card h2 {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero-card p {
-            color: var(--text-light);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .stat-card {
+        .container {
             background: white;
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            border-left: 4px solid var(--primary);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .stat-number {
-            font-size: 2rem;
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .status {
             font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin: 10px 0;
         }
-
-        .stat-label {
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-
-        .article-card {
-            background: var(--surface);
-            padding: 2.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border);
-        }
-
-        .article-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .article-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        .article-title {
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .article-meta {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .article-content {
-            margin-bottom: 1.5rem;
-        }
-
-        .article-content p {
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        code {
-            background: var(--background);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
-            font-size: 0.9em;
-            color: var(--primary-dark);
-        }
-
-        .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            overflow-x: auto;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .widget {
-            background: var(--surface);
-            padding: 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .widget-title {
-            color: var(--primary);
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .activity-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--background);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .activity-item:hover .activity-meta {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-text {
-            margin-bottom: 0.3rem;
-            font-weight: 500;
-        }
-
-        .activity-meta {
-            color: var(--text-light);
-            font-size: 0.8rem;
-        }
-
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
-
-        .tech-item {
-            background: var(--background);
-            padding: 0.8rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: var(--text);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.05);
-        }
-
-        footer {
-            background: var(--surface);
-            padding: 3rem 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            margin-top: 3rem;
-        }
-
-        .footer-content {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        .copyright {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --background: #0f172a;
-                --surface: #1e293b;
-                --text: #f1f5f9;
-                --text-light: #94a3b8;
-                --border: #334155;
-            }
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .status-bar {
-                justify-content: center;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .hero-card {
-                padding: 2rem 1.5rem;
-            }
-
-            .hero-card h2 {
-                font-size: 2rem;
-            }
-
-            .article-card {
-                padding: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Loading animations */
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, #f0f0f0 63%);
-            background-size: 400% 100%;
-            animation: skeleton-loading 1.4s ease infinite;
-        }
-
-        @keyframes skeleton-loading {
-            0% { background-position: 100% 50%; }
-            100% { background-position: 0 50%; }
-        }
-
-        /* Utility classes */
-        .text-center { text-align: center; }
-        .mt-1 { margin-top: 1rem; }
-        .mt-2 { margin-top: 2rem; }
-        .mb-1 { margin-bottom: 1rem; }
-        .mb-2 { margin-bottom: 2rem; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">DH</div>
-                <div class="logo-text">
-                    <h1>Digital Hub</h1>
-                    <div class="tagline">Technology Research & Innovation Portal</div>
-                </div>
-            </div>
-            <div class="status-bar">
-                <div class="status-item">
-                    <div class="status-dot"></div>
-                    <span>Systems Operational</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot" style="background: var(--accent);"></div>
-                    <span id="visitorCount">1,847 Visitors</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot" style="background: var(--success);"></div>
-                    <span id="responseTime">Response: 142ms</span>
-                </div>
-            </div>
-        </header>
-
-        <nav>
-            <ul class="nav-links">
-                <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#research">Research</a></li>
-                <li><a href="#technology">Technology</a></li>
-                <li><a href="#security">Security</a></li>
-                <li><a href="#development">Development</a></li>
-                <li><a href="#innovation">Innovation</a></li>
-                <li><a href="#resources">Resources</a></li>
-                <li><a href="#community">Community</a></li>
-            </ul>
-        </nav>
-
-        <div class="main-grid">
-            <div class="content-section">
-                <div class="hero-card">
-                    <h2>Advancing Digital Innovation</h2>
-                    <p>Exploring the intersection of cutting-edge technology, cybersecurity, and modern software development practices</p>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="articlesCount">284</div>
-                            <div class="stat-label">Research Articles</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="technologiesCount">156</div>
-                            <div class="stat-label">Technologies</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="contributorsCount">89</div>
-                            <div class="stat-label">Contributors</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="projectsCount">42</div>
-                            <div class="stat-label">Active Projects</div>
-                        </div>
-                    </div>
-                </div>
-
-                <article class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <h3 class="article-title">Revolutionizing Web Security with Advanced Encryption Protocols</h3>
-                            <div class="article-meta">
-                                <span>Published: December 18, 2024</span>
-                                <span>Author: Dr. Sarah Chen</span>
-                                <span>Read time: 8 minutes</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="tag">Security</span>
-                            <span class="tag">Encryption</span>
-                        </div>
-                    </div>
-                    <div class="article-content">
-                        <p>Modern web applications require robust security measures to protect sensitive data in transit. The evolution of encryption protocols has led to significant improvements in both performance and security.</p>
-                        
-                        <p>Recent advancements in post-quantum cryptography and homomorphic encryption are paving the way for a new era of secure communications. These technologies ensure that data remains protected even against future computational threats.</p>
-
-                        <div class="code-block">
-// Advanced encryption implementation
-const crypto = await import('./advanced-crypto.js');
-const secureChannel = new crypto.SecureTunnel({
-    algorithm: 'AES-256-GCM',
-    keyExchange: 'ECDH',
-    authentication: 'HMAC-SHA256'
-});
-                        </div>
-
-                        <p>Implementation of these protocols requires careful consideration of performance impacts and compatibility across different platforms and devices.</p>
-                    </div>
-                </article>
-
-                <article class="article-card">
-                    <div class="article-header">
-                        <div>
-                            <h3 class="article-title">The Future of Real-time Communication Technologies</h3>
-                            <div class="article-meta">
-                                <span>Published: December 15, 2024</span>
-                                <span>Author: Marcus Johnson</span>
-                                <span>Read time: 6 minutes</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="tag">WebRTC</span>
-                            <span class="tag">Real-time</span>
-                            <span class="tag">Networking</span>
-                        </div>
-                    </div>
-                    <div class="article-content">
-                        <p>Real-time communication has become essential for modern web applications. From video conferencing to live streaming, the demand for low-latency, high-quality communication continues to grow.</p>
-                        
-                        <p>WebRTC technology has matured significantly, offering native browser support for peer-to-peer communication without plugins. This has opened up new possibilities for collaborative applications and media streaming.</p>
-
-                        <p>Emerging standards and improvements in network protocols are further enhancing the capabilities and reliability of real-time communication systems.</p>
-                    </div>
-                </article>
-
-                <div id="dynamicContent">
-                    <!-- Dynamic content will be loaded here -->
-                </div>
-            </div>
-
-            <div class="sidebar">
-                <div class="widget">
-                    <h4 class="widget-title">Recent Activity</h4>
-                    <div class="activity-list" id="recentActivity">
-                        <div class="activity-item">
-                            <div class="activity-icon">MJ</div>
-                            <div class="activity-content">
-                                <div class="activity-text">New research published on WebAssembly security</div>
-                                <div class="activity-meta">2 minutes ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">SC</div>
-                            <div class="activity-content">
-                                <div class="activity-text">Updated encryption protocols documentation</div>
-                                <div class="activity-meta">15 minutes ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">TJ</div>
-                            <div class="activity-content">
-                                <div class="activity-text">Added new performance benchmarks</div>
-                                <div class="activity-meta">1 hour ago</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <h4 class="widget-title">Technology Stack</h4>
-                    <div class="tech-stack">
-                        <div class="tech-item">JavaScript</div>
-                        <div class="tech-item">TypeScript</div>
-                        <div class="tech-item">React</div>
-                        <div class="tech-item">Node.js</div>
-                        <div class="tech-item">Python</div>
-                        <div class="tech-item">WebAssembly</div>
-                        <div class="tech-item">Docker</div>
-                        <div class="tech-item">Kubernetes</div>
-                        <div class="tech-item">TensorFlow</div>
-                        <div class="tech-item">PostgreSQL</div>
-                        <div class="tech-item">Redis</div>
-                        <div class="tech-item">WebRTC</div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <h4 class="widget-title">System Status</h4>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon" style="background: var(--success);">✓</div>
-                            <div class="activity-content">
-                                <div class="activity-text">API Services</div>
-                                <div class="activity-meta">Operational</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon" style="background: var(--success);">✓</div>
-                            <div class="activity-content">
-                                <div class="activity-text">Database Cluster</div>
-                                <div class="activity-meta">Optimal Performance</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon" style="background: var(--warning);">⚠</div>
-                            <div class="activity-content">
-                                <div class="activity-text">CDN Network</div>
-                                <div class="activity-meta">Minor Latency</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h1>🔧 Service Worker & Tunnel Check</h1>
+        
+        <div class="test-section info">
+            <h3>ℹ️ About This Test</h3>
+            <p>This page tests if the Service Worker is properly registered and if the tunnel API endpoints are working correctly.</p>
         </div>
 
-        <footer>
-            <div class="footer-content">
-                <h3>Digital Innovation Hub</h3>
-                <p>Advancing technology research and development through collaborative innovation</p>
-                <div class="footer-links">
-                    <a href="#privacy">Privacy Policy</a>
-                    <a href="#terms">Terms of Service</a>
-                    <a href="#contact">Contact</a>
-                    <a href="#careers">Careers</a>
-                    <a href="#github">GitHub</a>
-                </div>
-                <div class="copyright">
-                    &copy; 2024 Digital Innovation Hub. All rights reserved.
-                </div>
-            </div>
-        </footer>
+        <!-- Service Worker Test -->
+        <div class="test-section">
+            <h3>1. Service Worker Registration</h3>
+            <button onclick="testServiceWorker()">Test Service Worker</button>
+            <div id="swStatus" class="status">Click button to test</div>
+            <div id="swLog" class="log"></div>
+        </div>
+
+        <!-- API Endpoints Test -->
+        <div class="test-section">
+            <h3>2. Tunnel API Endpoints</h3>
+            <button onclick="testConnectEndpoint()">Test /connect</button>
+            <button onclick="testHealthEndpoint()">Test /health-check</button>
+            <button onclick="testProxyEndpoint()">Test /proxy</button>
+            <button onclick="testAllEndpoints()">Test All Endpoints</button>
+            <div id="apiStatus" class="status">Click buttons to test endpoints</div>
+            <div id="apiLog" class="log"></div>
+        </div>
+
+        <!-- Configuration Check -->
+        <div class="test-section">
+            <h3>3. Configuration Check</h3>
+            <button onclick="checkConfiguration()">Check Config</button>
+            <div id="configStatus" class="status">Click button to check configuration</div>
+            <div id="configLog" class="log"></div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-section">
+            <h3>4. Test Results</h3>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <div id="resultsStatus" class="status">Click button to run all tests</div>
+            <div id="resultsLog" class="log"></div>
+        </div>
+
+        <!-- Debug Information -->
+        <div class="test-section info">
+            <h3>🔍 Debug Information</h3>
+            <div id="debugInfo"></div>
+        </div>
     </div>
 
     <script>
-        // Advanced Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            const registerServiceWorker = async () => {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    
-                    console.log('Service Worker registered successfully:', registration);
-                    
-                    // Initialize advanced blog functionality
-                    initializeAdvancedFeatures();
-                    
-                    // Notify all clients about successful registration
-                    if (registration.active) {
-                        registration.active.postMessage({
-                            type: 'SW_REGISTERED',
-                            timestamp: Date.now()
-                        });
-                    }
-                    
-                } catch (error) {
-                    console.error('Service Worker registration failed:', error);
-                    // Fallback: initialize features anyway
-                    initializeAdvancedFeatures();
-                }
-            };
+        // Auth tokens for testing
+        const AUTH_TOKENS = [
+            'digital_hub_secure_token_2024_ultra_v3',
+            'quantum_protection_key_advanced_2024',
+            'encrypted_tunnel_access_pro_max_2024'
+        ];
 
-            // Advanced feature initialization
-            function initializeAdvancedFeatures() {
-                // Real-time statistics updates
-                initializeStatistics();
-                
-                // Dynamic content loading
-                initializeDynamicContent();
-                
-                // Activity simulation
-                initializeActivitySimulation();
-                
-                // Performance monitoring
-                initializePerformanceMonitoring();
+        let currentSessionId = null;
+        let testResults = {};
+
+        // Logging functions
+        function logTo(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            
+            if (type === 'error') {
+                logEntry.style.color = '#dc3545';
+            } else if (type === 'success') {
+                logEntry.style.color = '#28a745';
+            } else if (type === 'warning') {
+                logEntry.style.color = '#ffc107';
             }
-
-            function initializeStatistics() {
-                // Update visitor count with realistic fluctuations
-                setInterval(() => {
-                    const current = parseInt(document.getElementById('visitorCount').textContent.replace(/,/g, ''));
-                    const change = Math.floor(Math.random() * 20) - 8; // -8 to +12
-                    const newCount = Math.max(current + change, 1500);
-                    document.getElementById('visitorCount').textContent = 
-                        newCount.toLocaleString() + ' Visitors';
-                }, 30000);
-
-                // Update response time
-                setInterval(() => {
-                    const times = [142, 138, 145, 156, 132, 148, 139];
-                    const randomTime = times[Math.floor(Math.random() * times.length)];
-                    document.getElementById('responseTime').textContent = 
-                        `Response: ${randomTime}ms`;
-                }, 15000);
-
-                // Update other statistics
-                setInterval(() => {
-                    const stats = {
-                        articlesCount: Math.floor(Math.random() * 50) + 250,
-                        technologiesCount: Math.floor(Math.random() * 30) + 140,
-                        contributorsCount: Math.floor(Math.random() * 20) + 75,
-                        projectsCount: Math.floor(Math.random() * 10) + 35
-                    };
-
-                    for (const [key, value] of Object.entries(stats)) {
-                        const element = document.getElementById(key);
-                        if (element) {
-                            // Smooth counting animation
-                            const current = parseInt(element.textContent);
-                            if (current !== value) {
-                                animateCount(element, current, value, 1000);
-                            }
-                        }
-                    }
-                }, 45000);
-            }
-
-            function animateCount(element, start, end, duration) {
-                const startTime = performance.now();
-                const step = (currentTime) => {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    const currentValue = Math.floor(start + (end - start) * progress);
-                    element.textContent = currentValue;
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(step);
-                    }
-                };
-                requestAnimationFrame(step);
-            }
-
-            function initializeDynamicContent() {
-                const dynamicArticles = [
-                    {
-                        title: "Breaking New Ground in Machine Learning Optimization",
-                        content: "Recent breakthroughs in neural network optimization are enabling unprecedented performance in real-time AI applications...",
-                        author: "Dr. Alex Rivera",
-                        tags: ["AI", "Machine Learning", "Optimization"],
-                        readTime: "7 min read"
-                    },
-                    {
-                        title: "The Evolution of Container Security in Cloud Environments",
-                        content: "As container adoption grows, new security challenges and solutions are emerging to protect distributed applications...",
-                        author: "Security Team",
-                        tags: ["Security", "Docker", "Kubernetes"],
-                        readTime: "9 min read"
-                    },
-                    {
-                        title: "Revolutionizing Data Processing with Stream Computing",
-                        content: "Stream processing technologies are transforming how we handle real-time data at scale...",
-                        author: "Data Engineering",
-                        tags: ["Data", "Streaming", "Performance"],
-                        readTime: "6 min read"
-                    }
-                ];
-
-                const loadRandomArticle = () => {
-                    const article = dynamicArticles[Math.floor(Math.random() * dynamicArticles.length)];
-                    const dynamicDiv = document.getElementById('dynamicContent');
-                    
-                    if (!dynamicDiv.querySelector('.article-card') || Math.random() > 0.6) {
-                        dynamicDiv.innerHTML = `
-                            <article class="article-card">
-                                <div class="article-header">
-                                    <div>
-                                        <h3 class="article-title">${article.title}</h3>
-                                        <div class="article-meta">
-                                            <span>Published: Just now</span>
-                                            <span>Author: ${article.author}</span>
-                                            <span>Read time: ${article.readTime}</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                                    </div>
-                                </div>
-                                <div class="article-content">
-                                    <p>${article.content}</p>
-                                </div>
-                            </article>
-                        `;
-                    }
-                };
-
-                // Load initial article
-                loadRandomArticle();
-                
-                // Refresh article periodically
-                setInterval(loadRandomArticle, 60000);
-            }
-
-            function initializeActivitySimulation() {
-                const activities = [
-                    { user: "AK", text: "Commented on Web Security article", time: "just now" },
-                    { user: "LR", text: "Published new research on Quantum Computing", time: "3 mins ago" },
-                    { user: "PT", text: "Updated performance benchmarks", time: "12 mins ago" },
-                    { user: "MJ", text: "Added new encryption protocol documentation", time: "25 mins ago" },
-                    { user: "SC", text: "Merged pull request for security patches", time: "45 mins ago" }
-                ];
-
-                setInterval(() => {
-                    const activityList = document.getElementById('recentActivity');
-                    const newActivity = activities[Math.floor(Math.random() * activities.length)];
-                    
-                    const activityItem = document.createElement('div');
-                    activityItem.className = 'activity-item';
-                    activityItem.innerHTML = `
-                        <div class="activity-icon">${newActivity.user}</div>
-                        <div class="activity-content">
-                            <div class="activity-text">${newActivity.text}</div>
-                            <div class="activity-meta">${newActivity.time}</div>
-                        </div>
-                    `;
-                    
-                    activityList.insertBefore(activityItem, activityList.firstChild);
-                    
-                    // Keep only 5 most recent activities
-                    while (activityList.children.length > 5) {
-                        activityList.removeChild(activityList.lastChild);
-                    }
-                }, 45000);
-            }
-
-            function initializePerformanceMonitoring() {
-                // Monitor and report performance metrics
-                const observePerformance = () => {
-                    const observer = new PerformanceObserver((list) => {
-                        for (const entry of list.getEntries()) {
-                            if (entry.entryType === 'navigation') {
-                                console.log('Page load performance:', {
-                                    loadTime: entry.loadEventEnd - entry.loadEventStart,
-                                    domContentLoaded: entry.domContentLoadedEventEnd - entry.domContentLoadedEventStart
-                                });
-                            }
-                        }
-                    });
-                    
-                    observer.observe({ entryTypes: ['navigation', 'paint'] });
-                };
-
-                if (window.PerformanceObserver) {
-                    observePerformance();
-                }
-            }
-
-            // Initialize when DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', registerServiceWorker);
-            } else {
-                registerServiceWorker();
-            }
-        } else {
-            // Fallback for browsers without Service Worker support
-            console.log('Service Workers not supported');
-            initializeAdvancedFeatures();
+            
+            element.appendChild(logEntry);
+            element.scrollTop = element.scrollHeight;
         }
 
-        // Additional interactive features
-        document.addEventListener('DOMContentLoaded', () => {
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
+        function setStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'status ' + type;
+        }
+
+        // Test Service Worker
+        async function testServiceWorker() {
+            const logId = 'swLog';
+            const statusId = 'swStatus';
+            
+            setStatus(statusId, 'Testing Service Worker...', 'info');
+            document.getElementById(logId).innerHTML = '';
+            
+            if (!('serviceWorker' in navigator)) {
+                setStatus(statusId, '❌ Service Workers not supported', 'error');
+                logTo(logId, 'ERROR: Service Workers are not supported in this browser', 'error');
+                testResults.serviceWorker = false;
+                return;
+            }
+
+            try {
+                logTo(logId, 'Registering Service Worker...');
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                
+                logTo(logId, `✅ Service Worker registered successfully`, 'success');
+                logTo(logId, `Scope: ${registration.scope}`);
+                logTo(logId, `State: ${registration.active ? registration.active.state : 'not active'}`);
+                
+                if (registration.installing) {
+                    logTo(logId, `Installing: ${registration.installing.state}`);
+                }
+                if (registration.waiting) {
+                    logTo(logId, `Waiting: ${registration.waiting.state}`);
+                }
+                if (registration.active) {
+                    logTo(logId, `Active: ${registration.active.state}`);
+                }
+
+                setStatus(statusId, '✅ Service Worker Registered', 'success');
+                testResults.serviceWorker = true;
+
+                // Test if Service Worker controls this page
+                if (navigator.serviceWorker.controller) {
+                    logTo(logId, '✅ Service Worker is controlling this page', 'success');
+                } else {
+                    logTo(logId, '⚠️ Service Worker is not controlling this page (reload may be needed)', 'warning');
+                }
+
+            } catch (error) {
+                setStatus(statusId, '❌ Service Worker Registration Failed', 'error');
+                logTo(logId, `ERROR: ${error.message}`, 'error');
+                logTo(logId, 'Check that sw.js exists in the root directory', 'error');
+                testResults.serviceWorker = false;
+            }
+        }
+
+        // Test Connect Endpoint
+        async function testConnectEndpoint() {
+            const logId = 'apiLog';
+            const statusId = 'apiStatus';
+            
+            setStatus(statusId, 'Testing /connect endpoint...', 'info');
+            logTo(logId, 'Testing /api/tunnel/connect...');
+
+            const authToken = AUTH_TOKENS[0];
+
+            try {
+                const response = await fetch('/api/tunnel/connect', {
+                    method: 'POST',
+                    headers: {
+                        'X-Auth-Token': authToken,
+                        'Content-Type': 'application/json'
                     }
                 });
-            });
 
-            // Add loading states for better UX
-            document.querySelectorAll('.article-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    this.style.opacity = '0.9';
-                    setTimeout(() => {
-                        this.style.opacity = '1';
-                    }, 150);
+                logTo(logId, `Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    logTo(logId, `✅ Connect endpoint working`, 'success');
+                    logTo(logId, `Status: ${data.status}`);
+                    logTo(logId, `Session ID: ${data.sessionId || 'N/A'}`);
+                    logTo(logId, `Version: ${data.version || 'N/A'}`);
+                    
+                    currentSessionId = data.sessionId;
+                    setStatus(statusId, '✅ /connect endpoint working', 'success');
+                    testResults.connectEndpoint = true;
+                } else {
+                    logTo(logId, `❌ Connect endpoint failed: ${response.status}`, 'error');
+                    if (response.status === 404) {
+                        logTo(logId, 'Endpoint not found - check Service Worker code', 'error');
+                    } else if (response.status === 401) {
+                        logTo(logId, 'Authentication failed - check AUTH_TOKENS', 'error');
+                    }
+                    setStatus(statusId, `❌ /connect failed: ${response.status}`, 'error');
+                    testResults.connectEndpoint = false;
+                }
+
+            } catch (error) {
+                logTo(logId, `❌ Connect endpoint error: ${error.message}`, 'error');
+                setStatus(statusId, '❌ /connect endpoint error', 'error');
+                testResults.connectEndpoint = false;
+            }
+        }
+
+        // Test Health Endpoint
+        async function testHealthEndpoint() {
+            const logId = 'apiLog';
+            const statusId = 'apiStatus';
+            
+            setStatus(statusId, 'Testing /health-check endpoint...', 'info');
+            logTo(logId, 'Testing /api/tunnel/health-check...');
+
+            try {
+                const response = await fetch('/api/tunnel/health-check');
+
+                logTo(logId, `Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    logTo(logId, `✅ Health endpoint working`, 'success');
+                    logTo(logId, `Service: ${data.service || 'N/A'}`);
+                    logTo(logId, `Status: ${data.status || 'N/A'}`);
+                    logTo(logId, `Uptime: ${data.uptime || 'N/A'} seconds`);
+                    setStatus(statusId, '✅ /health-check working', 'success');
+                    testResults.healthEndpoint = true;
+                } else {
+                    logTo(logId, `❌ Health endpoint failed: ${response.status}`, 'error');
+                    setStatus(statusId, `❌ /health-check failed: ${response.status}`, 'error');
+                    testResults.healthEndpoint = false;
+                }
+
+            } catch (error) {
+                logTo(logId, `❌ Health endpoint error: ${error.message}`, 'error');
+                setStatus(statusId, '❌ /health-check endpoint error', 'error');
+                testResults.healthEndpoint = false;
+            }
+        }
+
+        // Test Proxy Endpoint
+        async function testProxyEndpoint() {
+            const logId = 'apiLog';
+            const statusId = 'apiStatus';
+            
+            if (!currentSessionId) {
+                setStatus(statusId, 'Need session ID first - test /connect', 'warning');
+                logTo(logId, '⚠️ No session ID available. Test /connect endpoint first.', 'warning');
+                return;
+            }
+
+            setStatus(statusId, 'Testing /proxy endpoint...', 'info');
+            logTo(logId, 'Testing /api/tunnel/proxy...');
+
+            const authToken = AUTH_TOKENS[0];
+            const testData = {
+                target: 'http://httpbin.org/ip',
+                method: 'GET',
+                sessionId: currentSessionId,
+                authToken: authToken
+            };
+
+            try {
+                const response = await fetch('/api/tunnel/proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
                 });
-            });
+
+                logTo(logId, `Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    logTo(logId, `✅ Proxy endpoint working`, 'success');
+                    logTo(logId, `Target status: ${data.status}`);
+                    logTo(logId, `Data received: ${data.data ? 'Yes' : 'No'}`);
+                    setStatus(statusId, '✅ /proxy endpoint working', 'success');
+                    testResults.proxyEndpoint = true;
+                } else {
+                    logTo(logId, `❌ Proxy endpoint failed: ${response.status}`, 'error');
+                    const errorText = await response.text();
+                    logTo(logId, `Error details: ${errorText.substring(0, 200)}`, 'error');
+                    setStatus(statusId, `❌ /proxy failed: ${response.status}`, 'error');
+                    testResults.proxyEndpoint = false;
+                }
+
+            } catch (error) {
+                logTo(logId, `❌ Proxy endpoint error: ${error.message}`, 'error');
+                setStatus(statusId, '❌ /proxy endpoint error', 'error');
+                testResults.proxyEndpoint = false;
+            }
+        }
+
+        // Test all endpoints
+        async function testAllEndpoints() {
+            await testConnectEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testHealthEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testProxyEndpoint();
+        }
+
+        // Check configuration
+        function checkConfiguration() {
+            const logId = 'configLog';
+            const statusId = 'configStatus';
+            
+            setStatus(statusId, 'Checking configuration...', 'info');
+            document.getElementById(logId).innerHTML = '';
+            
+            logTo(logId, '🔧 Configuration Check');
+            logTo(logId, `AUTH_TOKENS configured: ${AUTH_TOKENS.length} tokens`);
+            logTo(logId, `Current URL: ${window.location.origin}`);
+            logTo(logId, `Service Worker support: ${'serviceWorker' in navigator ? 'Yes' : 'No'}`);
+            
+            // Check if we're on HTTPS
+            if (window.location.protocol !== 'https:') {
+                logTo(logId, '⚠️ Service Workers require HTTPS (except localhost)', 'warning');
+            }
+            
+            setStatus(statusId, '✅ Configuration check complete', 'success');
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            const logId = 'resultsLog';
+            const statusId = 'resultsStatus';
+            
+            setStatus(statusId, 'Running all tests...', 'info');
+            document.getElementById(logId).innerHTML = '';
+            
+            testResults = {};
+            
+            logTo(logId, '🚀 Starting Comprehensive Test Suite');
+            
+            // Test Service Worker
+            await testServiceWorker();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Test API endpoints
+            await testAllEndpoints();
+            
+            // Summary
+            logTo(logId, '');
+            logTo(logId, '📊 TEST SUMMARY:', 'info');
+            logTo(logId, `Service Worker: ${testResults.serviceWorker ? '✅' : '❌'}`);
+            logTo(logId, `Connect Endpoint: ${testResults.connectEndpoint ? '✅' : '❌'}`);
+            logTo(logId, `Health Endpoint: ${testResults.healthEndpoint ? '✅' : '❌'}`);
+            logTo(logId, `Proxy Endpoint: ${testResults.proxyEndpoint ? '✅' : '❌'}`);
+            
+            const allPassed = testResults.serviceWorker && testResults.connectEndpoint && 
+                            testResults.healthEndpoint && testResults.proxyEndpoint;
+            
+            if (allPassed) {
+                setStatus(statusId, '🎉 ALL TESTS PASSED!', 'success');
+                logTo(logId, '🎉 Your DPI tunnel is properly configured!', 'success');
+            } else {
+                setStatus(statusId, '❌ SOME TESTS FAILED', 'error');
+                logTo(logId, '🔧 Check the individual test sections for details', 'warning');
+            }
+        }
+
+        // Initialize debug info
+        function initDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.innerHTML = `
+                <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+                <p><strong>Platform:</strong> ${navigator.platform}</p>
+                <p><strong>HTTPS:</strong> ${window.location.protocol === 'https:' ? 'Yes' : 'No'}</p>
+                <p><strong>Origin:</strong> ${window.location.origin}</p>
+                <p><strong>Service Worker:</strong> ${'serviceWorker' in navigator ? 'Supported' : 'Not Supported'}</p>
+            `;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initDebugInfo();
+            logTo('swLog', 'Page loaded. Click "Test Service Worker" to begin.');
+            logTo('apiLog', 'Ready to test API endpoints.');
+            logTo('configLog', 'Ready to check configuration.');
+            logTo('resultsLog', 'Click "Run All Tests" for comprehensive testing.');
         });
+
+        // Register service worker on load
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
     </script>
 </body>
 </html>
