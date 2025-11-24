@@ -1,189 +1,244 @@
-// FINAL Service Worker for DPI Tunnel - Simple and Reliable
-const CACHE_NAME = 'dpi-tunnel-final-v1';
+// ULTIMATE Service Worker - Guaranteed to Work
+const CACHE_NAME = 'dpi-tunnel-ultimate-final';
 const TUNNEL_PATH = '/tests/api/tunnel/';
 
-// Security configuration
+// Security
 const AUTH_TOKENS = [
     'digital_hub_secure_token_2024_ultra_v3',
     'quantum_protection_key_advanced_2024',
     'encrypted_tunnel_access_pro_max_2024'
 ];
 
-// Service Worker lifecycle - SIMPLE and RELIABLE
+// ULTIMATE Activation
 self.addEventListener('install', (event) => {
-    console.log('🛠️ FINAL Service Worker installing...');
-    self.skipWaiting();
+    console.log('🚀 ULTIMATE Service Worker INSTALLING...');
+    event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('🛠️ FINAL Service Worker activating...');
-    event.waitUntil(self.clients.claim());
+    console.log('🚀 ULTIMATE Service Worker ACTIVATING...');
+    event.waitUntil(
+        Promise.all([
+            self.clients.claim(),
+            // Cache critical files
+            caches.open(CACHE_NAME).then(cache => {
+                return cache.addAll([
+                    '/tests/',
+                    '/tests/activate.html'
+                ]);
+            })
+        ]).then(() => {
+            console.log('✅ ULTIMATE Service Worker READY!');
+            // Notify all clients
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({
+                        type: 'SW_ULTIMATE_ACTIVE',
+                        version: 'ultimate'
+                    });
+                });
+            });
+        })
+    );
 });
 
-// SIMPLE fetch handling - only handle API requests
+// INTERCEPT EVERYTHING
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     const pathname = url.pathname;
     
-    // ONLY handle tunnel API requests
-    if (pathname.startsWith(TUNNEL_PATH)) {
-        console.log('🛠️ Intercepting tunnel request:', pathname);
-        event.respondWith(handleTunnelRequest(event.request));
+    console.log('🌐 Intercepting:', pathname);
+    
+    // Handle ALL tunnel requests
+    if (pathname.includes('/api/tunnel/')) {
+        console.log('🚀 INTERCEPTING API REQUEST:', pathname);
+        event.respondWith(handleUltimateRequest(event.request));
         return;
     }
     
-    // For all other requests, let them through
-    return;
+    // Let all other requests through
 });
 
-// SIMPLE tunnel request handler
-async function handleTunnelRequest(request) {
-    // Handle CORS preflight
+// ULTIMATE Request Handler
+async function handleUltimateRequest(request) {
+    console.log('🚀 Processing:', request.url, request.method);
+    
+    // CORS headers for ALL responses
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+    };
+    
+    // Handle preflight
     if (request.method === 'OPTIONS') {
-        return new Response(null, {
-            status: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
-                'Access-Control-Max-Age': '86400'
-            }
-        });
+        return new Response(null, { status: 200, headers: corsHeaders });
     }
-
+    
+    const url = new URL(request.url);
+    const action = url.pathname.split('/').pop().replace('.json', '');
+    
+    console.log('🎯 Action:', action, 'Method:', request.method);
+    
     try {
-        const action = new URL(request.url).pathname.split('/').pop();
-        console.log('🛠️ Processing action:', action);
-
+        let response;
+        
         switch (action) {
-            case 'connect':
-                return await handleConnect(request);
             case 'health-check':
-                return await handleHealthCheck(request);
+                response = await handleHealthCheck(request, corsHeaders);
+                break;
             case 'test':
-                return await handleTest(request);
+                response = await handleTest(request, corsHeaders);
+                break;
+            case 'connect':
+                response = await handleConnect(request, corsHeaders);
+                break;
             case 'simple-proxy':
-                return await handleSimpleProxy(request);
+                response = await handleSimpleProxy(request, corsHeaders);
+                break;
             default:
-                return createJsonResponse({ error: 'Unknown action' }, 404);
+                response = createJsonResponse({
+                    error: 'Unknown endpoint',
+                    available: ['health-check', 'test', 'connect', 'simple-proxy'],
+                    method: request.method,
+                    url: request.url
+                }, 404, corsHeaders);
         }
+        
+        console.log('✅ Response ready for:', action);
+        return response;
+        
     } catch (error) {
-        console.error('🛠️ Tunnel error:', error);
-        return createJsonResponse({ error: 'Server error' }, 500);
+        console.error('❌ Handler error:', error);
+        return createJsonResponse({
+            error: 'Handler failed',
+            message: error.message
+        }, 500, corsHeaders);
     }
 }
 
-// SIMPLE connect handler
-async function handleConnect(request) {
-    // Allow both GET and POST
+// Health Check - DYNAMIC
+async function handleHealthCheck(request, corsHeaders) {
+    const data = {
+        status: 'operational',
+        service: 'dpi-tunnel-ultimate',
+        timestamp: Date.now(),
+        version: 'ultimate',
+        message: 'DYNAMIC RESPONSE - Service Worker is ACTIVE!',
+        method: request.method,
+        dynamic: true,
+        sw: 'ACTIVE'
+    };
+    
+    return createJsonResponse(data, 200, corsHeaders);
+}
+
+// Test Endpoint - DYNAMIC  
+async function handleTest(request, corsHeaders) {
+    const data = {
+        message: 'DYNAMIC test endpoint - Service Worker WORKING!',
+        timestamp: Date.now(),
+        success: true,
+        dynamic: true,
+        random: Math.random().toString(36).substring(7),
+        method: request.method
+    };
+    
+    return createJsonResponse(data, 200, corsHeaders);
+}
+
+// Connect Endpoint - WITH AUTH
+async function handleConnect(request, corsHeaders) {
     let authToken;
     
-    if (request.method === 'POST') {
+    if (request.method === 'GET') {
+        authToken = new URL(request.url).searchParams.get('token');
+    } else if (request.method === 'POST') {
         try {
-            const data = await request.json();
-            authToken = data.authToken;
+            const body = await request.json();
+            authToken = body.authToken;
         } catch (e) {
             authToken = request.headers.get('X-Auth-Token');
         }
-    } else if (request.method === 'GET') {
-        const url = new URL(request.url);
-        authToken = url.searchParams.get('token');
-    } else {
-        return createJsonResponse({ error: 'Method not allowed' }, 405);
     }
-
-    console.log('🛠️ Connect attempt with token:', authToken ? 'provided' : 'missing');
-
-    if (!AUTH_TOKENS.includes(authToken)) {
-        return createJsonResponse({ error: 'Authentication failed' }, 401);
-    }
-
-    const responseData = {
-        status: 'connected',
-        sessionId: 'final_session_' + Date.now(),
-        message: 'FINAL Tunnel Service Ready',
+    
+    console.log('🔐 Auth token:', authToken ? 'provided' : 'missing');
+    
+    const isValid = AUTH_TOKENS.includes(authToken);
+    
+    const data = {
+        status: isValid ? 'connected' : 'auth_failed',
+        sessionId: isValid ? 'ultimate_session_' + Date.now() : null,
+        message: isValid ? 'Authentication SUCCESSFUL!' : 'Authentication FAILED',
         timestamp: Date.now(),
-        version: 'final',
-        method: request.method
+        method: request.method,
+        tokenProvided: !!authToken,
+        tokenValid: isValid,
+        dynamic: true
     };
-
-    return createJsonResponse(responseData);
+    
+    return createJsonResponse(data, isValid ? 200 : 401, corsHeaders);
 }
 
-// SIMPLE health check
-async function handleHealthCheck(request) {
-    const healthData = {
-        status: 'operational',
-        service: 'dpi-tunnel-final',
-        timestamp: Date.now(),
-        version: 'final',
-        message: 'Service Worker is ACTIVE and responding'
-    };
-
-    return createJsonResponse(healthData);
-}
-
-// SIMPLE test endpoint
-async function handleTest(request) {
-    const testData = {
-        message: 'FINAL test endpoint working!',
-        timestamp: Date.now(),
-        success: true,
-        simple: true
-    };
-
-    return createJsonResponse(testData);
-}
-
-// SIMPLE proxy handler
-async function handleSimpleProxy(request) {
+// Simple Proxy
+async function handleSimpleProxy(request, corsHeaders) {
     if (request.method !== 'GET') {
-        return createJsonResponse({ error: 'Only GET supported' }, 405);
+        return createJsonResponse({ error: 'Only GET supported' }, 405, corsHeaders);
     }
-
+    
+    const target = new URL(request.url).searchParams.get('url');
+    
+    if (!target) {
+        return createJsonResponse({ error: 'No URL parameter' }, 400, corsHeaders);
+    }
+    
     try {
-        const url = new URL(request.url);
-        const target = url.searchParams.get('url');
+        console.log('🌐 Proxying to:', target);
         
-        if (!target) {
-            return createJsonResponse({ error: 'No URL provided' }, 400);
-        }
-
-        console.log('🛠️ Proxying to:', target);
-        
-        const response = await fetch(target, {
+        const proxyResponse = await fetch(target, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         });
         
-        const text = await response.text();
+        const text = await proxyResponse.text();
         
-        const proxyResponse = {
-            status: response.status,
-            data: btoa(unescape(encodeURIComponent(text))), // Simple base64
+        const data = {
+            status: 'proxy_success',
             target: target,
+            originalStatus: proxyResponse.status,
+            data: btoa(unescape(encodeURIComponent(text))),
             timestamp: Date.now(),
-            encoded: true
+            encoded: true,
+            dynamic: true
         };
-
-        return createJsonResponse(proxyResponse);
-
+        
+        return createJsonResponse(data, 200, corsHeaders);
+        
     } catch (error) {
-        return createJsonResponse({ error: 'Proxy failed: ' + error.message }, 500);
+        return createJsonResponse({
+            error: 'Proxy failed',
+            message: error.message,
+            target: target
+        }, 500, corsHeaders);
     }
 }
 
-// SIMPLE JSON response
-function createJsonResponse(data, status = 200) {
+// Response helper
+function createJsonResponse(data, status = 200, corsHeaders = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Service-Worker': 'ultimate',
+        'X-Dynamic': 'true',
+        ...corsHeaders
+    };
+    
+    console.log('📦 Sending JSON response:', status, data);
+    
     return new Response(JSON.stringify(data, null, 2), {
         status: status,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'X-Service-Worker': 'final'
-        }
+        headers: headers
     });
 }
 
-console.log('🛠️ FINAL Service Worker loaded successfully!');
+console.log('🚀 ULTIMATE Service Worker LOADED!');
