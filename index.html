@@ -449,10 +449,10 @@
                         key: publicKey,
                         install_id: installId,
                         fcm_token: fcmToken,
-                        tos: new Date().toISOString().split('T')[0],
+                        tos: new Date().toISOString(),
                         model: 'PC',
                         serial_number: installId,
-                        locale: 'en_US'
+                        locale: 'ru_RU',
                     };
                     
                     console.log('Registering WARP account with data:', requestData);
@@ -461,6 +461,8 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'User-Agent': 'okhttp/3.12.1',
+                            'CF-Client-Version': 'a-6.10-2158',
                         },
                         body: JSON.stringify(requestData)
                     });
