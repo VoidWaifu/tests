@@ -1,582 +1,351 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Void WARP Generator</title>
+    <title>WARP Key Generator</title>
     <style>
-        :root {
-            --bg-color: #0a0a14;
-            --container-bg: rgba(30, 30, 46, 0.8);
-            --text-color: #e2e2f5;
-            --accent-color: #7e57c2;
-            --accent-gradient: linear-gradient(135deg, #7e57c2, #5e35b1);
-            --button-bg: linear-gradient(135deg, #7e57c2, #5e35b1);
-            --button-hover: linear-gradient(135deg, #8f67d2, #6f45c1);
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --border: 1px solid rgba(126, 87, 194, 0.3);
-        }
-        
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(126, 87, 194, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(94, 53, 177, 0.15) 0%, transparent 40%);
         }
-        
-        header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-        }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .my-site-btn {
-            background: rgba(126, 87, 194, 0.1);
-            color: var(--text-color);
-            border: var(--border);
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .my-site-btn:hover {
-            background: rgba(126, 87, 194, 0.2);
-            border-color: rgba(126, 87, 194, 0.5);
-            transform: translateY(-2px);
-        }
-        
+
         .container {
-            background: var(--container-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: var(--shadow);
-            border: var(--border);
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
         }
-        
-        h1 {
-            margin-bottom: 16px;
-            font-size: 2.2rem;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
         }
-        
-        .subtitle {
-            margin-bottom: 30px;
-            font-size: 1.1rem;
+
+        .header p {
             opacity: 0.9;
-            color: #b8b8d6;
+            font-size: 1.1em;
         }
-        
-        .warning {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.4);
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-            color: #ff8a8a;
+
+        .content {
+            padding: 30px;
         }
-        
-        .generate-btn {
-            background: var(--button-bg);
-            color: white;
-            border: var(--border);
-            padding: 16px 24px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-size: 1.1rem;
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .license-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            box-shadow: 0 6px 20px rgba(126, 87, 194, 0.3);
         }
-        
-        .generate-btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(126, 87, 194, 0.4);
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
         }
-        
-        .generate-btn:disabled {
-            background: #555;
-            border-color: #666;
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button:disabled {
+            background: #ccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
-        .progress-container {
+
+        .result {
             margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #4facfe;
             display: none;
         }
-        
-        .progress-bar {
-            height: 8px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            border: var(--border);
+
+        .result.success {
+            border-color: #28a745;
+            background: #f8fff9;
         }
-        
-        .progress {
-            height: 100%;
-            background: var(--accent-gradient);
-            width: 0%;
-            transition: width 0.3s;
-            border-radius: 10px;
+
+        .result.error {
+            border-color: #dc3545;
+            background: #fff8f8;
         }
-        
-        .progress-text {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+
+        .result h3 {
+            margin-bottom: 15px;
+            color: #333;
         }
-        
-        .instructions {
-            margin-top: 35px;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 20px;
-            border: var(--border);
+
+        .config-block {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
-        
-        .instructions h3 {
-            margin-bottom: 12px;
-            color: #7e57c2;
-            font-size: 1.2rem;
-        }
-        
-        .instructions p {
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #d0d0e7;
-        }
-        
-        .instructions a {
-            color: #7e57c2;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .instructions a:hover {
-            text-decoration: underline;
-        }
-        
-        .amnezia-section {
-            margin-top: 30px;
+
+        .loading {
+            display: none;
             text-align: center;
+            padding: 20px;
         }
-        
-        .amnezia-btn {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-color);
-            border: var(--border);
-            padding: 12px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
-            backdrop-filter: blur(10px);
-            width: 100%;
-        }
-        
-        .amnezia-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(126, 87, 194, 0.5);
-            transform: translateY(-2px);
-        }
-        
-        .amnezia-text {
-            font-style: italic;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 25px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            header {
-                padding: 15px;
-            }
-        }
-        
-        .button--loading {
-            position: relative;
-            color: transparent;
-        }
-        
-        .button--loading::after {
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin: auto;
-            border: 2px solid transparent;
-            border-top-color: white;
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
             border-radius: 50%;
-            animation: button-loading-spinner 1s ease infinite;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
-        
-        @keyframes button-loading-spinner {
-            from { transform: rotate(0turn); }
-            to { transform: rotate(1turn); }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        .popup-message {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: var(--accent-gradient);
-            color: white;
-            padding: 14px 22px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            animation: fadeInOut 2.5s ease;
-            font-weight: 500;
-            border: var(--border);
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
         }
-        
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; transform: translateY(-10px); }
-            10%, 90% { opacity: 1; transform: translateY(0); }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.none {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+            color: #666;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">Void WARP Generator</div>
-        <button class="my-site-btn" onclick="window.open('https://voidwaifu.github.io/VoidWaifu/', '_blank')">Мой сайт</button>
-    </header>
-    
     <div class="container">
-        <h1>Void WARP Generator</h1>
-        <div class="subtitle">Amnezia wg 1.5 WARP</div>
-        
-        <div class="warning">Для работы сайта в России требуется VPN</div>
-        
-        <button id="generateButton" class="generate-btn">Сгенерировать конфигурацию</button>
-        
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar">
-                <div class="progress" id="progressBar"></div>
+        <div class="header">
+            <h1>🌐 WARP Key Generator</h1>
+            <p>Generate WARP configuration for your applications</p>
+        </div>
+
+        <div class="content">
+            <div class="form-group">
+                <label for="licenseKey">License Key (Optional):</label>
+                <input type="text" id="licenseKey" placeholder="Enter your WARP+ license key or leave empty for regular WARP">
+                <div class="license-note">
+                    Leave empty to generate regular WARP configuration. For WARP+, provide your license key.
+                </div>
             </div>
-            <div class="progress-text" id="progressText">Создаём вселенную...</div>
+
+            <button class="button" onclick="generateConfig()" id="generateBtn">
+                Generate WARP Configuration
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your WARP configuration...</p>
+            </div>
+
+            <div class="result" id="result">
+                <!-- Result content will be inserted here -->
+            </div>
         </div>
-        
-        <div class="instructions">
-            <h3>Инструкция по использованию:</h3>
-            <p>Сгенерированную конфигурацию нужно загрузить в приложение "AmneziaVPN" начиная с версии 4.8.8.1 и выше.</p>
-        </div>
-        
-        <div class="amnezia-section">
-            <button class="amnezia-btn" onclick="window.open('https://amnezia.org/ru/downloads', '_blank')">Скачать AmneziaVPN</button>
-            <button class="amnezia-btn" onclick="window.open('https://amnezia.org', '_blank')">Amnezia.org</button>
-            <div class="amnezia-text">Amnezia является замечательным проектом, который однозначно заслуживает вашего внимания и благодарности им</div>
+
+        <div class="footer">
+            <p>This tool generates WARP configuration using Cloudflare Worker</p>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const generateButton = document.getElementById('generateButton');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            
-            let iList = [];
-            
-            // Загружаем I-list.json
-            fetch('I-list.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    iList = data;
-                    console.log('Loaded I-list with', iList.length, 'items');
-                })
-                .catch(error => {
-                    console.error('Error loading I-list.json:', error);
-                    showPopup('Ошибка загрузки данных I-list', 'error');
-                });
-            
-            generateButton.addEventListener('click', async function() {
-                if (iList.length === 0) {
-                    showPopup('Данные ещё не загружены, попробуйте позже', 'error');
-                    return;
+        async function generateConfig() {
+            const licenseKey = document.getElementById('licenseKey').value;
+            const generateBtn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            // Показываем загрузку
+            generateBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                // Формируем URL для Worker
+                let workerUrl = 'https://warp-keygen.voidwaifu.workers.dev';
+                if (licenseKey.trim()) {
+                    workerUrl += `?license=${encodeURIComponent(licenseKey.trim())}`;
                 }
-                
-                const button = this;
-                button.disabled = true;
-                button.classList.add("button--loading");
-                progressContainer.style.display = 'block';
-                
-                try {
-                    const phrases = [
-                        "Создаём вселенную...",
-                        "Генерируем ключи...",
-                        "Регистрируем в WARP...",
-                        "Получаем конфигурацию...",
-                        "Завершаем..."
-                    ];
-                    
-                    for (let i = 0; i < phrases.length; i++) {
-                        progressBar.style.width = `${(i + 1) * 20}%`;
-                        progressText.textContent = phrases[i];
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-                    
-                    // Получаем ключи WireGuard
-                    const { privateKey, publicKey } = await fetchKeysFromWorker();
-                    console.log('Generated keys:', { privateKey, publicKey });
-                    
-                    // Регистрируем аккаунт в WARP
-                    const accountData = await registerWarpAccount(publicKey);
-                    console.log('WARP account data:', accountData);
-                    
-                    // Получаем случайные I значения
-                    const selectedIs = getRandomIs(5);
-                    console.log('Selected I values:', selectedIs);
-                    
-                    // Генерируем конфигурацию
-                    const config = generateConfig(privateKey, accountData, selectedIs);
-                    const fileName = generateFileName() + '-VoidWARP.conf';
-                    
-                    // Скачиваем конфиг
-                    downloadConfig(fileName, config);
-                    showPopup('Конфигурация успешно сгенерирована и скачана!');
-                    
-                } catch (error) {
-                    console.error('Error generating configuration:', error);
-                    showPopup('Ошибка при генерации конфигурации: ' + error.message, 'error');
-                } finally {
-                    button.disabled = false;
-                    button.classList.remove("button--loading");
-                    progressContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
-                }
-            });
-            
-            // Функция для получения ключей WireGuard
-            async function fetchKeysFromWorker() {
-                try {
-                    console.log('Fetching keys from worker...');
-                    const response = await fetch('https://warp-keygen.voidwaifu.workers.dev/');
-                    
-                    if (!response.ok) {
-                        throw new Error(`Worker error ${response.status}`);
-                    }
-                    
-                    const data = await response.text();
-                    console.log('Worker response:', data);
-                    
-                    const privateKey = extractKey(data, 'PrivateKey');
-                    const publicKey = extractKey(data, 'PublicKey');
-                    
-                    if (!privateKey || !publicKey) {
-                        throw new Error('Invalid keys format received from worker');
-                    }
-                    
-                    return { privateKey, publicKey };
-                } catch (error) {
-                    console.error('Error fetching from worker:', error);
-                    throw new Error('Не удалось получить ключи от сервера: ' + error.message);
-                }
-            }
-            
-            // Функция для регистрации в WARP
-            async function registerWarpAccount(publicKey) {
-                try {
-                    const installId = generateRandomString(22);
-                    const fcmToken = `${installId}:APA91b${generateRandomString(134)}`;
-                    
-                    const requestData = {
-                        key: publicKey,
-                        install_id: installId,
-                        fcm_token: fcmToken,
-                        tos: new Date().toISOString(),
-                        model: 'PC',
-                        serial_number: installId,
-                        locale: 'ru_RU',
-                    };
-                    
-                    console.log('Registering WARP account with data:', requestData);
-                    
-                    const response = await fetch('https://warp-keygen.voidwaifu.workers.dev/wg', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'User-Agent': 'okhttp/3.12.1',
-                            'CF-Client-Version': 'a-6.10-2158',
-                        },
-                        body: JSON.stringify(requestData)
-                    });
-                    
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`WARP registration failed: ${response.status} - ${errorText}`);
-                    }
-                    
-                    return await response.json();
-                } catch (error) {
-                    console.error('Error registering WARP account:', error);
-                    throw new Error('Не удалось зарегистрировать аккаунт в WARP: ' + error.message);
-                }
-            }
-            
-            function extractKey(data, keyName) {
-                const lines = data.split('\n');
-                for (const line of lines) {
-                    if (line.startsWith(keyName + ': ')) {
-                        return line.substring(keyName.length + 2).trim();
-                    }
-                }
-                return null;
-            }
-            
-            function generateRandomString(length) {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                let result = '';
-                for (let i = 0; i < length; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return result;
-            }
-            
-            function getRandomIs(count) {
-                if (iList.length === 0) return Array(count).fill('undefined');
-                
-                const shuffled = [...iList].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, count);
-                
-                return selected.map(item => {
-                    if (item && item.I !== undefined) {
-                        return item.I;
-                    }
-                    return 'undefined';
-                });
-            }
-            
-            function generateConfig(privateKey, accountData, selectedIs) {
-                // Используем данные из ответа WARP
-                const addresses = accountData.config.interface.addresses;
-                const peer = accountData.config.peers[0];
-                
-                return `[Interface]
+
+                // Вызываем Worker
+                const response = await fetch(workerUrl);
+                const data = await response.json();
+
+                // Обрабатываем результат
+                if (data.success) {
+                    // Генерируем приватный ключ для WireGuard (клиентский)
+                    const privateKey = await generatePrivateKey();
+                    const publicKey = await generatePublicKey(privateKey);
+
+                    // Формируем конфиг WireGuard
+                    const wireguardConfig = `[Interface]
 PrivateKey = ${privateKey}
-Address = ${addresses.v4}, ${addresses.v6}
-DNS = 1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001	
-MTU = 1280
-S1 = 0
-S2 = 0
-Jc = 4
-Jmin = 40
-Jmax = 70
-H1 = 1
-H2 = 2
-H3 = 3
-H4 = 4
-I1 = ${selectedIs[0]}
-I2 = ${selectedIs[1]}
-I3 = ${selectedIs[2]}
-I4 = ${selectedIs[3]}
-I5 = ${selectedIs[4]}
+Address = 172.16.0.2/32
+DNS = 1.1.1.1
 
 [Peer]
-PublicKey = ${peer.public_key}
-AllowedIPs = 0.0.0.0/0, ::/0
-Endpoint = engage.cloudflareclient.com:2408`;
-            }
-            
-            function generateFileName() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-                let result = '';
-                for (let i = 0; i < 7; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+PublicKey = ${data.server_public_key}
+Endpoint = engage.cloudflareclient.com:2408
+AllowedIPs = 0.0.0.0/0`;
+
+                    // Показываем успешный результат
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ WARP Configuration Generated Successfully!</h3>
+                        <div class="status ${data.license_status}">
+                            License: ${data.license_status}
+                        </div>
+                        <p><strong>Account ID:</strong> ${data.account_id}</p>
+                        <p><strong>Install ID:</strong> ${data.install_id}</p>
+                        
+                        <h4>WireGuard Configuration:</h4>
+                        <div class="config-block">${wireguardConfig}</div>
+                        
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                            Copy this configuration and use it in your WireGuard client or 3x-ui panel.
+                        </p>
+                    `;
+                } else {
+                    // Показываем ошибку
+                    result.className = 'result error';
+                    result.innerHTML = `
+                        <h3>❌ Error Generating Configuration</h3>
+                        <p>${data.error || 'Unknown error occurred'}</p>
+                    `;
                 }
-                return result;
+            } catch (error) {
+                // Показываем ошибку сети
+                result.className = 'result error';
+                result.innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <p>Failed to connect to the service: ${error.message}</p>
+                    <p>Please check your internet connection and try again.</p>
+                `;
+            } finally {
+                // Скрываем загрузку и показываем результат
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                generateBtn.disabled = false;
             }
-            
-            function downloadConfig(fileName, content) {
-                const element = document.createElement('a');
-                const file = new Blob([content], { type: 'text/plain' });
-                element.href = URL.createObjectURL(file);
-                element.download = fileName;
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
+        }
+
+        // Генерация приватного ключа WireGuard
+        async function generatePrivateKey() {
+            const key = crypto.getRandomValues(new Uint8Array(32));
+            return base64Encode(key).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
+        // Генерация публичного ключа из приватного (упрощенная версия)
+        async function generatePublicKey(privateKey) {
+            // В реальной реализации здесь должна быть криптография Curve25519
+            // Для демонстрации возвращаем заглушку
+            return "server_public_key_will_be_here";
+        }
+
+        // Base64 кодирование
+        function base64Encode(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
             }
-            
-            function showPopup(message, type = 'success') {
-                const popup = document.createElement('div');
-                popup.className = 'popup-message';
-                popup.textContent = message;
-                
-                if (type === 'error') {
-                    popup.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
-                }
-                
-                document.body.appendChild(popup);
-                setTimeout(() => {
-                    if (popup.parentNode) {
-                        popup.parentNode.removeChild(popup);
-                    }
-                }, 2500);
+            return btoa(binary);
+        }
+
+        // Генерация конфига при загрузке страницы (опционально)
+        document.getElementById('licenseKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateConfig();
             }
         });
     </script>
