@@ -1,8 +1,0 @@
-{
-  "status": "static-connected",
-  "sessionId": "static_session_12345",
-  "message": "Static connect endpoint - use token parameter",
-  "timestamp": 1702876800000,
-  "type": "static-json",
-  "note": "Add ?token=your_token to test authentication"
-}
