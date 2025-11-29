@@ -1,353 +1,613 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARP Key Generator</title>
+    <title>Special Junk Packet List</title>
+    <link rel="icon" type="image/png" href="../icon.png">
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0c0c0c, #1a1a2e);
+            color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
+        }
+
+        .site-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .site-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            padding: 60px 20px 40px;
         }
 
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 30px;
+        .title {
+            font-size: 2.2rem;
             text-align: center;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            line-height: 1.2;
         }
 
-        .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
+        .instruction-btn {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
-
-        .license-note {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .button {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            margin: 0 auto 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
             padding: 14px 28px;
-            font-size: 16px;
-            font-weight: 600;
             border-radius: 8px;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: bold;
+            max-width: 280px;
             width: 100%;
         }
 
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        .instruction-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .button:active {
-            transform: translateY(0);
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #b0b0b0;
+            font-size: 1rem;
+            padding: 0 10px;
         }
 
-        .button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 35px;
         }
 
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 8px;
-            background: #f8f9fa;
-            border-left: 4px solid #4facfe;
-            display: none;
+        .image-container img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .result.success {
-            border-color: #28a745;
-            background: #f8fff9;
+        .input-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .result.error {
-            border-color: #dc3545;
-            background: #fff8f8;
-        }
-
-        .result h3 {
+        .input-group {
+            display: flex;
+            align-items: center;
             margin-bottom: 15px;
-            color: #333;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .config-block {
-            background: white;
-            padding: 15px;
+        .input-label {
+            min-width: 40px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            outline: none;
+            min-width: 200px;
+        }
+
+        .copy-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            padding: 8px 16px;
             border-radius: 6px;
-            border: 1px solid #e1e5e9;
-            margin-top: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-break: break-all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
-        .loading {
+        .copy-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
             display: none;
-            text-align: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
 
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4facfe;
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            transition: all 0.3s ease;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .status {
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 10px;
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            padding-right: 40px;
         }
 
-        .status.success {
-            background: #d4edda;
-            color: #155724;
+        .modal-subtitle {
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+            color: #667eea;
+            font-weight: bold;
         }
 
-        .status.failed {
-            background: #f8d7da;
-            color: #721c24;
+        .modal-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-weight: normal;
         }
 
-        .status.none {
-            background: #e2e3e5;
-            color: #383d41;
+        .modal-list {
+            margin-left: 20px;
+            margin-bottom: 15px;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5e9;
-            color: #666;
-            font-size: 0.9em;
+        .modal-list li {
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 70px 15px 30px;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+                margin-bottom: 12px;
+            }
+            
+            .instruction-btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
+            
+            .subtitle {
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
+            
+            .image-container img {
+                max-width: 220px;
+            }
+            
+            .input-section {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+            
+            .input-group {
+                padding: 10px 12px;
+                margin-bottom: 12px;
+            }
+            
+            .input-field {
+                min-width: 150px;
+                font-size: 0.9rem;
+            }
+            
+            .site-btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .footer-btn {
+                min-width: 140px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-content {
+                padding: 25px 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
+            }
+            
+            .modal-subtitle {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 65px 10px 25px;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+            }
+            
+            .instruction-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .image-container img {
+                max-width: 180px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .input-field {
+                min-width: 100%;
+                width: 100%;
+            }
+            
+            .copy-btn {
+                align-self: flex-end;
+            }
+            
+            .footer-buttons {
+                flex-direction: column;
+            }
+            
+            .footer-btn {
+                min-width: 100%;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+            }
+            
+            .modal-title {
+                font-size: 1.3rem;
+            }
+            
+            .modal-subtitle {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <a href="https://voidwaifu.github.io/VoidWaifu/" target="_blank" class="site-btn">Мой сайт</a>
+
     <div class="container">
-        <div class="header">
-            <h1>🌐 WARP Key Generator</h1>
-            <p>Generate WARP configuration for your applications</p>
+        <h1 class="title">Это тестовая страница</h1>
+        <button class="instruction-btn" id="instructionBtn">Инструкция по настройке AmneziaWG 1.5</button>
+        <p class="subtitle">Данная страница создана только для тестирования новых udp пакетов</p>
+        <p class="subtitle">Не используйте её как основную, пакеты тут могут быть нерабочими!</p>
+
+        <div class="image-container">
+            <img src="SpecialJunkPacket.jpg" alt="Special Junk Packet">
         </div>
 
-        <div class="content">
-            <div class="form-group">
-                <label for="licenseKey">License Key (Optional):</label>
-                <input type="text" id="licenseKey" placeholder="Enter your WARP+ license key or leave empty for regular WARP">
-                <div class="license-note">
-                    Leave empty to generate regular WARP configuration. For WARP+, provide your license key.
-                </div>
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-label">I1</div>
+                <input type="text" class="input-field" id="i1" readonly>
+                <button class="copy-btn" data-target="i1">Копировать</button>
             </div>
-
-            <button class="button" onclick="generateConfig()" id="generateBtn">
-                Generate WARP Configuration
-            </button>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Generating your WARP configuration...</p>
+            <div class="input-group">
+                <div class="input-label">I2</div>
+                <input type="text" class="input-field" id="i2" readonly>
+                <button class="copy-btn" data-target="i2">Копировать</button>
             </div>
-
-            <div class="result" id="result">
-                <!-- Result content will be inserted here -->
+            <div class="input-group">
+                <div class="input-label">I3</div>
+                <input type="text" class="input-field" id="i3" readonly>
+                <button class="copy-btn" data-target="i3">Копировать</button>
+            </div>
+            <div class="input-group">
+                <div class="input-label">I4</div>
+                <input type="text" class="input-field" id="i4" readonly>
+                <button class="copy-btn" data-target="i4">Копировать</button>
+            </div>
+            <div class="input-group">
+                <div class="input-label">I5</div>
+                <input type="text" class="input-field" id="i5" readonly>
+                <button class="copy-btn" data-target="i5">Копировать</button>
             </div>
         </div>
 
-        <div class="footer">
-            <p>This tool generates WARP configuration using Cloudflare Worker</p>
+        <button class="refresh-btn" id="refreshBtn">Получить новые значения</button>
+
+        <div class="footer-buttons">
+            <a href="https://amnezia.org/" target="_blank" class="footer-btn">Amnezia.org</a>
+            <a href="https://amnezia.org/downloads" target="_blank" class="footer-btn">Скачать AmneziaVPN</a>
+            <a href="https://docs.amnezia.org/ru/documentation/instructions/new-amneziawg-selfhosted/" target="_blank" class="footer-btn">Документация по awg 1.5</a>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="instructionModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Инструкция по настройке AmneziaWG 1.5</h2>
+            
+            <h3 class="modal-subtitle">WG 1.5</h3>
+            <p class="modal-text">Приложение AmneziaVPN поддерживает протокол WG 1.5, но по умолчанию он не включен, для его работы нужно провести небольшие настройки</p>
+            
+            <h3 class="modal-subtitle">Системные требования</h3>
+            <p class="modal-text">Для работы WG 1.5 требуется приложение AmneziaVPN версии 4.8.8.1 и выше</p>
+            <p class="modal-text">Проверить версию вашего приложения:</p>
+            <p class="modal-text">Перейдите в приложение → нажмите на значок шестеренки → нажмите "Об AmneziaVPN" → в самом низу будет строчка "Версия ПО: x.x.x.x".</p>
+            <p class="modal-text">(Для работы WG 1.5 ничего на сервере проверять не нужно)</p>
+            
+            <h3 class="modal-subtitle">Настройка</h3>
+            <ol class="modal-list">
+                <li>Перейдите в приложение → нажмите на значок шестеренки → нажмите на "Серверы" → нажмите на ваш сервер → нажмите на "AmneziaWG" → нажмите на "Настройки подключения AmneziaWG" → там будут поля с названиями "Special junk packet" пронумерованные от 1 до 5.</li>
+                <li>На сайте где вы сейчас читаете этот текст, если выйти из инструкции по настройке AmneziaWG 1.5, будут поля с названиями I1 I2 I3 I4 I5, напротив каждого поля есть кнопка "Копировать" → скопируйте текст в поле I1 и вставьте его в приложении в поле "I1 - special junk packet"</li>
+                <li>Нажмите "Сохранить" → в уведомлении "Сохранить настройки" выберите "Продолжить" → нажмите на значок домика внизу экрана и пробуйте подключиться к VPN.</li>
+                <li>Если подключение не устанавливается, вернитесь на сайт → нажмите копировать в поле с I2 → вставьте скопированный текст в поле "I2 - special junk packet" в вашем приложении, как вы это уже делали в пункте 2, затем снова пробуйте подключиться.</li>
+                <li>Если всё ещё не удается подключиться, повторите пункт 4, заполнив поля I3, и продолжайте заполнять поля, пока не получится подключиться.</li>
+            </ol>
+            
+            <h3 class="modal-subtitle">Ответы на вопросы</h3>
+            <ol class="modal-list">
+                <li>"Если я заполнил поля "Special junk packet" на главном устройстве и затем поделился подключением, то на другом устройстве они будут заполнены?" - Нет, в AmneziaVPN отсутствует функционал, чтобы эти поля заполнялись, если поделиться подключением</li>
+                <li>"На другом устройстве, с которым я поделился подключением, в поля "Special junk packet" нужно вписать те же значения, что и на основном устройстве?" - Не обязательно, вы можете просто открыть этот сайт и взять значения с него, снова заполнив поля "Special junk packet"</li>
+                <li>"Что делать с AndroidTV и другими устройствами, где нельзя просто взять, скопировать и вставить?" - Для этого зайдите в приложение AmneziaVPN → нажмите на значок поделиться внизу экрана → задайте имя пользователя, сервер, выберите протокол "AmneziaWG" и обязательно формат подключения "Оригинальный формат AmneziaWG" → нажмите "Поделиться" → затем в уведомлении, которое открылось, снова выберите "Поделиться" и сохраните файл в удобное для вас место → найдите сохранённый файл и откройте его через блокнот или любой другой текстовый редактор → вы увидите строчки H1 H2 H3 H4, под этими строчками вам необходимо создать строчку "I1 =", после = сделайте пробел и откройте этот сайт → скопируйте I1 и вставьте его после = → у вас должна получиться такая запись: "I1 = 0xd9ea01000001000..." → сохраните изменения в файле → скиньте его на флешку или любым другим удобным способом отправьте на AndroidTV или ваше устройство → зайдите на устройстве, где хотите добавить сделанный конфиг, в приложение AmneziaVPN → нажмите на значок плюсика внизу экрана → нажмите на пункт "Файл с настройками подключения" → выберите ваш файл → подключайтесь к VPN</li>
+                <li>"Что это за значения, которые нужно скопировать и вставить в AmneziaVPN?" - Это UDP пакеты, чтобы DPI (система блокировок) распознавала ваше VPN подключение не как VPN, а как другой UDP трафик, например DNS или SIP трафик</li>
+            </ol>
+            
+            <h3 class="modal-subtitle">Послесловие</h3>
+            <ol class="modal-list">
+                <li>Данная инструкция актуальна на 30.10.2025</li>
+                <li>Это не гайд по настройке VPN, весь вышесказанный текст - просто опыт автора, которым он делится, это ни в коем случае не призыв к действию!</li>
+                <li>Все действия вы делаете на свой страх и риск, автор не несёт ответственности, если у вас что-то не заработает</li>
+                <li>Весь код этого сайта есть на GitHub и находится в открытом доступе, вы также можете ознакомиться со скриптом для генерации этих UDP пакетов на главной странице GitHub репозитория, где размещен этот сайт</li>
+                <li>Данная инструкция пишется из моего личного опыта использования self-hosted, так что если у вас что-то отличается, я об этом знать не могу :)</li>
+            </ol>
+            
+            <p class="modal-text">Буду очень рад, если вы нажмёте на кнопку "Мой сайт" справа сверху и посмотрите мои другие проекты и возможно почитаете блог</p>
         </div>
     </div>
 
     <script>
-        async function generateConfig() {
-            const licenseKey = document.getElementById('licenseKey').value;
-            const generateBtn = document.getElementById('generateBtn');
-            const loading = document.getElementById('loading');
-            const result = document.getElementById('result');
+        let availableFiles = [1, 2, 3, 4, 5];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            detectAvailableFiles().then(() => {
+                loadRandomValues();
+            });
+            
+            document.getElementById('refreshBtn').addEventListener('click', loadRandomValues);
+            
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const inputField = document.getElementById(targetId);
+                    const fullValue = inputField.getAttribute('data-full-value');
+                    
+                    navigator.clipboard.writeText(fullValue).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Скопировано!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
+                });
+            });
 
-            // Показываем загрузку
-            generateBtn.disabled = true;
-            loading.style.display = 'block';
-            result.style.display = 'none';
+            const instructionBtn = document.getElementById('instructionBtn');
+            const instructionModal = document.getElementById('instructionModal');
+            const modalClose = document.getElementById('modalClose');
 
-            try {
-                // Формируем URL для Worker
-                let workerUrl = 'https://warp-keygen.voidwaifu.workers.dev';
-                if (licenseKey.trim()) {
-                    workerUrl += `?license=${encodeURIComponent(licenseKey.trim())}`;
+            instructionBtn.addEventListener('click', function() {
+                instructionModal.style.display = 'flex';
+            });
+
+            modalClose.addEventListener('click', function() {
+                instructionModal.style.display = 'none';
+            });
+
+            instructionModal.addEventListener('click', function(e) {
+                if (e.target === instructionModal) {
+                    instructionModal.style.display = 'none';
                 }
+            });
+        });
 
-                // Вызываем Worker
-                const response = await fetch(workerUrl);
+        async function detectAvailableFiles() {
+            const checkPromises = availableFiles.map(index => {
+                return fetch(`I-list${index}.json`)
+                    .then(response => response.ok ? index : null)
+                    .catch(() => null);
+            });
+
+            const results = await Promise.all(checkPromises);
+            availableFiles = results.filter(index => index !== null);
+            
+            if (availableFiles.length === 0) {
+                console.error('Нет доступных JSON файлов');
+                return;
+            }
+        }
+
+        async function loadRandomValues() {
+            if (availableFiles.length === 0) {
+                await detectAvailableFiles();
+            }
+            
+            const randomFileIndex = availableFiles[Math.floor(Math.random() * availableFiles.length)];
+            const fileName = `I-list${randomFileIndex}.json`;
+            
+            try {
+                const response = await fetch(fileName);
                 const data = await response.json();
-
-                // Обрабатываем результат
-                if (data.success) {
-                    // Генерируем приватный ключ для WireGuard (клиентский)
-                    const privateKey = await generatePrivateKey();
-                    const publicKey = await generatePublicKey(privateKey);
-
-                    // Формируем конфиг WireGuard
-                    const wireguardConfig = `[Interface]
-PrivateKey = ${privateKey}
-Address = 172.16.0.2/32
-DNS = 1.1.1.1
-
-[Peer]
-PublicKey = ${data.server_public_key}
-Endpoint = engage.cloudflareclient.com:2408
-AllowedIPs = 0.0.0.0/0`;
-
-                    // Показываем успешный результат
-                    result.className = 'result success';
-                    result.innerHTML = `
-                        <h3>✅ WARP Configuration Generated Successfully!</h3>
-                        <div class="status ${data.license_status}">
-                            License: ${data.license_status}
-                        </div>
-                        <p><strong>Account ID:</strong> ${data.account_id}</p>
-                        <p><strong>Install ID:</strong> ${data.install_id}</p>
+                
+                const packets = data.packets;
+                const cycles = data.cycles;
+                
+                for (let i = 1; i <= 5; i++) {
+                    const inputField = document.getElementById(`i${i}`);
+                    const randomCycle = Math.floor(Math.random() * cycles) + 1;
+                    const packetKey = `I${i}_c${randomCycle}`;
+                    
+                    if (packets[packetKey]) {
+                        const fullValue = packets[packetKey];
+                        const displayValue = fullValue.substring(0, 20) + '...';
                         
-                        <h4>WireGuard Configuration:</h4>
-                        <div class="config-block">${wireguardConfig}</div>
-                        
-                        <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
-                            Copy this configuration and use it in your WireGuard client or 3x-ui panel.
-                        </p>
-                    `;
-                } else {
-                    // Показываем ошибку
-                    result.className = 'result error';
-                    result.innerHTML = `
-                        <h3>❌ Error Generating Configuration</h3>
-                        <p>${data.error || 'Unknown error occurred'}</p>
-                    `;
+                        inputField.value = displayValue;
+                        inputField.setAttribute('data-full-value', fullValue);
+                    }
                 }
             } catch (error) {
-                // Показываем ошибку сети
-                result.className = 'result error';
-                result.innerHTML = `
-                    <h3>❌ Network Error</h3>
-                    <p>Failed to connect to the service: ${error.message}</p>
-                    <p>Please check your internet connection and try again.</p>
-                `;
-            } finally {
-                // Скрываем загрузку и показываем результат
-                loading.style.display = 'none';
-                result.style.display = 'block';
-                generateBtn.disabled = false;
+                console.error('Ошибка загрузки данных:', error);
             }
         }
-
-        // Генерация приватного ключа WireGuard
-        async function generatePrivateKey() {
-            const key = crypto.getRandomValues(new Uint8Array(32));
-            return base64Encode(key).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        }
-
-        // Генерация публичного ключа из приватного (упрощенная версия)
-        async function generatePublicKey(privateKey) {
-            // В реальной реализации здесь должна быть криптография Curve25519
-            // Для демонстрации возвращаем заглушку
-            return "server_public_key_will_be_here";
-        }
-
-        // Base64 кодирование
-        function base64Encode(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return btoa(binary);
-        }
-
-        // Генерация конфига при загрузке страницы (опционально)
-        document.getElementById('licenseKey').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateConfig();
-            }
-        });
     </script>
 </body>
 </html>
