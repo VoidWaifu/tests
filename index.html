@@ -41,10 +41,16 @@
             position: relative;
         }
 
-        .my-site-btn {
+        .header-buttons {
             position: absolute;
             top: 0;
+            left: 0;
             right: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .my-site-btn, .info-btn {
             background: var(--accent-primary);
             color: white;
             border: none;
@@ -58,7 +64,11 @@
             display: inline-block;
         }
 
-        .my-site-btn:hover {
+        .info-btn {
+            white-space: nowrap;
+        }
+
+        .my-site-btn:hover, .info-btn:hover {
             background: var(--accent-secondary);
             transform: translateY(-2px);
         }
@@ -333,6 +343,122 @@
             margin-top: 15px;
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--bg-tertiary);
+            position: relative;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .modal-content {
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-section h3 {
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .modal-section p {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .modal-section ul {
+            margin: 0 auto 10px auto;
+            padding-left: 20px;
+            color: var(--text-secondary);
+            display: inline-block;
+            text-align: left;
+            max-width: 500px;
+        }
+
+        .modal-section ol {
+            margin: 0 auto 10px auto;
+            padding-left: 20px;
+            color: var(--text-secondary);
+            display: inline-block;
+            text-align: left;
+            max-width: 500px;
+        }
+
+        .modal-section li {
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .highlight {
+            color: var(--text-primary);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 12px;
@@ -344,6 +470,14 @@
             
             .result-box {
                 padding: 16px;
+            }
+            
+            .modal {
+                padding: 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
             }
             
             h1 {
@@ -365,6 +499,22 @@
                 width: 30px;
                 font-size: 1rem;
             }
+            
+            .info-btn {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+            
+            .my-site-btn {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+            
+            .modal-section ul,
+            .modal-section ol {
+                padding-left: 15px;
+                max-width: 100%;
+            }
         }
 
         @media (max-width: 360px) {
@@ -374,8 +524,13 @@
                 padding: 8px 4px;
             }
             
+            .info-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
             .my-site-btn {
-                padding: 8px 16px;
+                padding: 8px 12px;
                 font-size: 0.8rem;
             }
         }
@@ -383,7 +538,10 @@
 </head>
 <body>
     <div class="container">
-        <a href="https://voidwaifu.github.io" target="_blank" class="my-site-btn">Мой сайт</a>
+        <div class="header-buttons">
+            <button class="info-btn" id="infoBtn">Как это работает?</button>
+            <a href="https://voidwaifu.github.io" target="_blank" class="my-site-btn">Мой сайт</a>
+        </div>
         
         <header>
             <h1>Стеганографическое шифрование</h1>
@@ -457,6 +615,69 @@
                 <h3 class="section-title">Расшифрованный текст:</h3>
                 <div class="result-box" id="decryptedResult"></div>
                 <button class="copy-btn" id="copyDecryptedBtn">Копировать текст</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Как работает этот сайт</h2>
+            <div class="modal-content">
+                <div class="modal-section">
+                    <h3>Основная идея</h3>
+                    <p>Этот инструмент позволяет <span class="highlight">скрывать секретные сообщения</span> внутри обычных текстов так, что их невозможно обнаружить при беглом просмотре.</p>
+                    <p>Вы можете отправлять такие тексты публично, и только человек с правильным паролем сможет извлечь скрытое сообщение.</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Процесс шифрования</h3>
+                    <ol>
+                        <li>Вводите секретный текст, который хотите скрыть</li>
+                        <li>Вводите обычный текст, который будет служить маскировкой</li>
+                        <li>Задаете пароль для защиты</li>
+                        <li>Нажимаете "Зашифровать и скрыть текст"</li>
+                    </ol>
+                    <p>Результат выглядит как обычный текст, но содержит ваше скрытое сообщение.</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Процесс расшифровки</h3>
+                    <ol>
+                        <li>Вставляете текст со скрытым сообщением</li>
+                        <li>Вводите тот же пароль, что использовался при шифровании</li>
+                        <li>Нажимаете "Расшифровать скрытый текст"</li>
+                    </ol>
+                    <p>Сайт извлечет и покажет исходное секретное сообщение.</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Технические особенности</h3>
+                    <ul>
+                        <li><span class="highlight">Всё работает в вашем браузере</span> — данные никуда не отправляются</li>
+                        <li>Используется <span class="highlight">военная криптография AES-256</span></li>
+                        <li>Пароль защищен 100,000 итерациями PBKDF2</li>
+                        <li>Скрытое сообщение маскируется с помощью <span class="highlight">невидимых символов Unicode</span></li>
+                        <li>Результат выглядит абсолютно естественно</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Примеры использования</h3>
+                    <ul>
+                        <li>Передача конфиденциальной информации в публичных каналах</li>
+                        <li>Создание секретных посланий в соцсетях и мессенджерах</li>
+                        <li>Защита личных заметок от случайного прочтения</li>
+                        <li>Обмен паролями и ключами через открытые каналы</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Важная информация</h3>
+                    <p><span class="highlight">Запомните или сохраните пароль!</span> Без него невозможно восстановить скрытое сообщение.</p>
+                    <p>Текст-маскировка должен быть достаточно длинным, чтобы вместить зашифрованные данные.</p>
+                    <p>Сайт совместим с русским и английским языками, а также их комбинациями.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -698,6 +919,9 @@
                 this.decryptedResult = document.getElementById('decryptedResult');
                 this.copyEncryptedBtn = document.getElementById('copyEncryptedBtn');
                 this.copyDecryptedBtn = document.getElementById('copyDecryptedBtn');
+                this.infoBtn = document.getElementById('infoBtn');
+                this.modalOverlay = document.getElementById('modalOverlay');
+                this.modalClose = document.getElementById('modalClose');
             }
 
             bindEvents() {
@@ -707,6 +931,11 @@
                 this.coverText.addEventListener('input', () => this.updateCharCounts());
                 this.encryptBtn.addEventListener('click', () => this.performEncryption());
                 this.decryptBtn.addEventListener('click', () => this.performDecryption());
+                this.infoBtn.addEventListener('click', () => this.openModal());
+                this.modalClose.addEventListener('click', () => this.closeModal());
+                this.modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === this.modalOverlay) this.closeModal();
+                });
                 
                 this.modeBtns.forEach(btn => {
                     btn.addEventListener('click', (e) => this.switchMode(e.target.dataset.mode));
@@ -714,6 +943,12 @@
 
                 this.copyEncryptedBtn.addEventListener('click', () => this.copyToClipboard(this.encryptedResult.textContent));
                 this.copyDecryptedBtn.addEventListener('click', () => this.copyToClipboard(this.decryptedResult.textContent));
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.modalOverlay.classList.contains('active')) {
+                        this.closeModal();
+                    }
+                });
             }
 
             togglePasswordVisibility() {
@@ -725,6 +960,16 @@
                     this.passwordInput.style.webkitTextSecurity = 'none';
                     this.togglePasswordBtn.textContent = '○';
                 }
+            }
+
+            openModal() {
+                this.modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeModal() {
+                this.modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
             }
 
             generatePassword() {
