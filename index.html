@@ -3,740 +3,904 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Junk Packet List</title>
-    <link rel="icon" type="image/png" href="../icon.png">
+    <title>Стеганографическое шифрование</title>
     <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-radius: 12px;
+            --transition: all 0.2s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0c0c0c, #1a1a2e);
-            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
-            line-height: 1.6;
-        }
-
-        .site-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .site-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 60px 20px 40px;
+            position: relative;
         }
 
-        .title {
-            font-size: 2.2rem;
-            text-align: center;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-            line-height: 1.2;
-        }
-
-        .instruction-btn {
-            display: block;
-            margin: 0 auto 30px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+        .my-site-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-primary);
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            max-width: 280px;
-            width: 100%;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .instruction-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        .my-site-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 50px;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            word-break: break-word;
         }
 
         .subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #b0b0b0;
-            font-size: 1rem;
-            padding: 0 10px;
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            line-height: 1.5;
         }
 
-        .image-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 35px;
-        }
-
-        .image-container img {
-            max-width: 280px;
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 25px;
+        .password-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
             margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--bg-tertiary);
         }
 
-        .input-group {
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 12px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            flex-wrap: wrap;
             gap: 10px;
+            word-break: break-word;
         }
 
-        .input-label {
-            min-width: 40px;
-            font-weight: bold;
-            color: #667eea;
-            font-size: 1.1rem;
+        .password-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
-        .input-field {
+        @media (min-width: 640px) {
+            .password-input-group {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .password-wrapper {
+            position: relative;
             flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 14px 40px 14px 14px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            -webkit-appearance: none;
+            -webkit-text-security: disc;
+        }
+
+        .password-input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 0;
+            bottom: 0;
             background: transparent;
             border: none;
-            color: #e0e0e0;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            font-size: 1.1rem;
+            font-family: monospace;
+            width: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-primary);
+        }
+
+        button {
+            padding: 14px 24px;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            button {
+                width: auto;
+            }
+        }
+
+        button:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 12px 8px;
+            background: transparent;
+            color: var(--text-secondary);
             font-size: 0.95rem;
-            padding: 8px 0;
-            outline: none;
-            min-width: 200px;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-group {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .char-count {
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .char-count.warning {
+            color: var(--warning);
+        }
+
+        .char-count.error {
+            color: var(--danger);
+        }
+
+        .result-section {
+            margin-top: 25px;
+        }
+
+        .result-box {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border: 2px solid var(--bg-tertiary);
+            min-height: 100px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 1rem;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
 
         .copy-btn {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            border: 1px solid rgba(102, 126, 234, 0.4);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            white-space: nowrap;
+            margin-top: 15px;
+            background: var(--success);
         }
 
         .copy-btn:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
+            background: #0da271;
         }
 
-        .refresh-btn {
-            display: block;
-            width: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            font-weight: bold;
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
-        .refresh-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .footer-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .footer-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            text-align: center;
-            flex: 1;
-            min-width: 160px;
-            display: flex;
+        .security-badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-        }
-
-        .footer-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .modal-content::-webkit-scrollbar {
-            display: none;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #e0e0e0;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-            padding-right: 40px;
-        }
-
-        .modal-subtitle {
-            font-size: 1.3rem;
-            margin: 25px 0 15px;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .modal-text {
-            margin-bottom: 15px;
-            line-height: 1.6;
-            font-weight: normal;
-        }
-
-        .modal-list {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        .modal-list li {
-            margin-bottom: 10px;
-            font-weight: normal;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 70px 15px 30px;
-            }
-            
-            .title {
-                font-size: 1.8rem;
-                margin-bottom: 12px;
-            }
-            
-            .instruction-btn {
-                padding: 12px 24px;
-                font-size: 0.95rem;
-                margin-bottom: 25px;
-            }
-            
-            .subtitle {
-                font-size: 0.95rem;
-                margin-bottom: 25px;
-            }
-            
-            .image-container img {
-                max-width: 220px;
-            }
-            
-            .input-section {
-                padding: 20px 15px;
-                margin-bottom: 20px;
-            }
-            
-            .input-group {
-                padding: 10px 12px;
-                margin-bottom: 12px;
-            }
-            
-            .input-field {
-                min-width: 150px;
-                font-size: 0.9rem;
-            }
-            
-            .site-btn {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-                top: 15px;
-                right: 15px;
-            }
-            
-            .footer-btn {
-                min-width: 140px;
-                padding: 10px 16px;
-                font-size: 0.9rem;
-            }
-            
-            .modal-content {
-                padding: 25px 20px;
-            }
-            
-            .modal-title {
-                font-size: 1.5rem;
-            }
-            
-            .modal-subtitle {
-                font-size: 1.2rem;
-            }
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 15px;
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 65px 10px 25px;
+            body {
+                padding: 12px;
             }
             
-            .title {
+            .password-section, .text-group {
+                padding: 16px;
+            }
+            
+            .result-box {
+                padding: 16px;
+            }
+            
+            h1 {
                 font-size: 1.6rem;
             }
             
-            .instruction-btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-            
-            .subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .image-container img {
-                max-width: 180px;
-            }
-            
-            .input-group {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .input-field {
-                min-width: 100%;
-                width: 100%;
-            }
-            
-            .copy-btn {
-                align-self: flex-end;
-            }
-            
-            .footer-buttons {
-                flex-direction: column;
-            }
-            
-            .footer-btn {
-                min-width: 100%;
-            }
-            
-            .modal-content {
-                padding: 20px 15px;
-            }
-            
-            .modal-title {
-                font-size: 1.3rem;
-            }
-            
-            .modal-subtitle {
+            .section-title {
                 font-size: 1.1rem;
+            }
+            
+            .mode-btn {
+                min-width: 100px;
+                padding: 10px 6px;
+                font-size: 0.9rem;
+            }
+            
+            .toggle-password {
+                right: 6px;
+                width: 30px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .mode-btn {
+                min-width: 90px;
+                font-size: 0.85rem;
+                padding: 8px 4px;
+            }
+            
+            .my-site-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <a href="https://voidwaifu.github.io/VoidWaifu/" target="_blank" class="site-btn">Мой сайт</a>
-
     <div class="container">
-        <h1 class="title">Special Junk Packet List</h1>
-        <button class="instruction-btn" id="instructionBtn">Инструкция по настройке AmneziaWG 1.5</button>
-        <p class="subtitle">Эта страница для заполнения полей special junk packet для amneziaVPN WG 1.5</p>
+        <a href="https://voidwaifu.github.io" target="_blank" class="my-site-btn">Мой сайт</a>
+        
+        <header>
+            <h1>Стеганографическое шифрование</h1>
+            <p class="subtitle">Шифруйте текст, скрывая его в обычных сообщениях</p>
+        </header>
 
-        <div class="image-container">
-            <img src="SpecialJunkPacket.jpg" alt="Special Junk Packet">
+        <section class="password-section">
+            <h2 class="section-title">
+                <span>🔐</span>
+                Пароль для шифрования
+            </h2>
+            <div class="password-input-group">
+                <div class="password-wrapper">
+                    <input type="text" id="passwordInput" class="password-input" placeholder="Введите или создайте пароль" autocomplete="off">
+                    <button class="toggle-password" id="togglePasswordBtn">●</button>
+                </div>
+                <button id="generatePasswordBtn">Создать пароль</button>
+            </div>
+            <div class="security-badge">
+                <span>✓</span>
+                Ваши данные шифруются локально в браузере
+            </div>
+        </section>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="encrypt">Зашифровать</button>
+            <button class="mode-btn" data-mode="decrypt">Расшифровать</button>
         </div>
 
-        <div class="input-section">
-            <div class="input-group">
-                <div class="input-label">I1</div>
-                <input type="text" class="input-field" id="i1" readonly>
-                <button class="copy-btn" data-target="i1">Копировать</button>
+        <div id="encryptSection" class="content-section active">
+            <div class="text-group">
+                <label for="secretText">Текст для шифрования:</label>
+                <textarea id="secretText" placeholder="Введите секретный текст, который нужно скрыть..."></textarea>
+                <div class="char-count" id="secretCharCount">0 символов</div>
             </div>
-            <div class="input-group">
-                <div class="input-label">I2</div>
-                <input type="text" class="input-field" id="i2" readonly>
-                <button class="copy-btn" data-target="i2">Копировать</button>
+
+            <div class="text-group">
+                <label for="coverText">Обычный текст (маскировка):</label>
+                <textarea id="coverText" placeholder="Введите обычный текст, в который будет скрыт секретный текст..."></textarea>
+                <div class="char-count" id="coverCharCount">
+                    Введите минимум <span id="minChars">0</span> символов
+                </div>
             </div>
-            <div class="input-group">
-                <div class="input-label">I3</div>
-                <input type="text" class="input-field" id="i3" readonly>
-                <button class="copy-btn" data-target="i3">Копировать</button>
+
+            <div class="info-box">
+                <strong>Как это работает:</strong> Секретный текст шифруется с использованием пароля, затем скрывается в обычном тексте с помощью специальных невидимых символов. Для расшифровки нужен тот же пароль.
             </div>
-            <div class="input-group">
-                <div class="input-label">I4</div>
-                <input type="text" class="input-field" id="i4" readonly>
-                <button class="copy-btn" data-target="i4">Копировать</button>
-            </div>
-            <div class="input-group">
-                <div class="input-label">I5</div>
-                <input type="text" class="input-field" id="i5" readonly>
-                <button class="copy-btn" data-target="i5">Копировать</button>
+
+            <button id="encryptBtn" class="btn-primary">Зашифровать и скрыть текст</button>
+
+            <div class="result-section" id="encryptResult" style="display: none;">
+                <h3 class="section-title">Результат:</h3>
+                <div class="result-box" id="encryptedResult"></div>
+                <button class="copy-btn" id="copyEncryptedBtn">Копировать результат</button>
             </div>
         </div>
 
-        <button class="refresh-btn" id="refreshBtn">Получить новые значения</button>
+        <div id="decryptSection" class="content-section">
+            <div class="text-group">
+                <label for="encryptedInput">Текст с скрытым сообщением:</label>
+                <textarea id="encryptedInput" placeholder="Вставьте текст, в котором скрыто сообщение..."></textarea>
+            </div>
 
-        <div class="footer-buttons">
-            <a href="https://amnezia.org/" target="_blank" class="footer-btn">Amnezia.org</a>
-            <a href="https://amnezia.org/downloads" target="_blank" class="footer-btn">Скачать AmneziaVPN</a>
-            <a href="https://docs.amnezia.org/ru/documentation/instructions/new-amneziawg-selfhosted/" target="_blank" class="footer-btn">Документация по awg 1.5</a>
+            <div class="info-box">
+                <strong>Важно:</strong> Для расшифровки используйте тот же пароль, который использовался при шифровании.
+            </div>
+
+            <button id="decryptBtn" class="btn-primary">Расшифровать скрытый текст</button>
+
+            <div class="result-section" id="decryptResult" style="display: none;">
+                <h3 class="section-title">Расшифрованный текст:</h3>
+                <div class="result-box" id="decryptedResult"></div>
+                <button class="copy-btn" id="copyDecryptedBtn">Копировать текст</button>
+            </div>
         </div>
     </div>
-
-    <div class="modal-overlay" id="instructionModal">
-    <div class="modal-content">
-        <button class="modal-close" id="modalClose">&times;</button>
-        
-        <h2 class="modal-title" style="text-align: center; padding-right: 0;">Инструкция по настройке AmneziaWG 1.5</h2>
-        
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.3rem;">WG 1.5</h3>
-            <p class="modal-text">Приложение AmneziaVPN поддерживает протокол WG 1.5, но по умолчанию он не включен.</p>
-            <p class="modal-text">Для его работы нужно провести небольшие настройки.</p>
-        </div>
-        
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.3rem;">Системные требования</h3>
-            <p class="modal-text" style="margin-bottom: 20px;"><strong>Требуемая версия:</strong> AmneziaVPN 4.8.8.1 или выше</p>
-            
-            <p class="modal-text" style="margin-bottom: 10px; font-weight: bold;">Проверить версию вашего приложения:</p>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin: 15px auto; max-width: 500px; text-align: left;">
-                <div style="margin-bottom: 8px; padding-left: 10px; border-left: 2px solid #667eea;">
-                    <p class="modal-text">➤ Перейдите в приложение</p>
-                </div>
-                <div style="margin-bottom: 8px; padding-left: 10px; border-left: 2px solid #667eea;">
-                    <p class="modal-text">➤ Нажмите на значок шестеренки</p>
-                </div>
-                <div style="margin-bottom: 8px; padding-left: 10px; border-left: 2px solid #667eea;">
-                    <p class="modal-text">➤ Нажмите "Об AmneziaVPN"</p>
-                </div>
-                <div style="padding-left: 10px; border-left: 2px solid #667eea;">
-                    <p class="modal-text">➤ В самом низу будет строчка "Версия ПО: x.x.x.x"</p>
-                </div>
-            </div>
-            
-            <p class="modal-text" style="color: #667eea; font-style: italic; margin-top: 15px;">
-                Для работы WG 1.5 ничего на сервере проверять и настраивать не нужно.
-            </p>
-        </div>
-        
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #667eea; margin-bottom: 25px; font-size: 1.3rem;">Настройка подключения</h3>
-            
-            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px;">
-                <h4 style="color: #e0e0e0; margin-bottom: 20px; font-size: 1.1rem; text-align: left;">Шаг 1: Открываем настройки Special junk packet</h4>
-                <div style="text-align: left; margin-left: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Перейдите в приложение</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на значок шестеренки</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на "Серверы"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на ваш сервер</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на "AmneziaWG"</p>
-                    <p class="modal-text" style="margin-bottom: 15px;">➤ Нажмите на "Настройки подключения AmneziaWG"</p>
-                    <p class="modal-text" style="color: #b0b0b0; font-style: italic;">Там будут поля с названиями "Special junk packet" пронумерованные от 1 до 5.</p>
-                </div>
-            </div>
-            
-            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px;">
-                <h4 style="color: #e0e0e0; margin-bottom: 20px; font-size: 1.1rem; text-align: left;">Шаг 2: Копируем первый параметр I1</h4>
-                <div style="text-align: left; margin-left: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ На сайте где вы сейчас читаете этот текст, если выйти из инструкции по настройке AmneziaWG 1.5, будут поля с названиями I1 I2 I3 I4 I5</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Напротив каждого поля есть кнопка "Копировать"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Скопируйте текст в поле I1</p>
-                    <p class="modal-text">➤ Вставьте его в приложении в поле "I1 - special junk packet"</p>
-                </div>
-            </div>
-            
-            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px;">
-                <h4 style="color: #e0e0e0; margin-bottom: 20px; font-size: 1.1rem; text-align: left;">Шаг 3: Сохраняем и пробуем подключиться</h4>
-                <div style="text-align: left; margin-left: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите "Сохранить"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ В уведомлении "Сохранить настройки" выберите "Продолжить"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на значок домика внизу экрана</p>
-                    <p class="modal-text">➤ Пробуйте подключиться к VPN</p>
-                </div>
-            </div>
-            
-            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px;">
-                <h4 style="color: #e0e0e0; margin-bottom: 20px; font-size: 1.1rem; text-align: left;">Шаг 4: Если подключение не устанавливается</h4>
-                <div style="text-align: left; margin-left: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Вернитесь на сайт</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите копировать в поле с I2</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Вставьте скопированный текст в поле "I2 - special junk packet" в вашем приложении, как вы это уже делали в пункте 2</p>
-                    <p class="modal-text">➤ Затем снова пробуйте подключиться</p>
-                </div>
-            </div>
-            
-            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px;">
-                <h4 style="color: #e0e0e0; margin-bottom: 20px; font-size: 1.1rem; text-align: left;">Шаг 5: Если всё ещё не удается подключиться</h4>
-                <div style="text-align: left; margin-left: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Повторите шаг 4, заполнив поля I3</p>
-                    <p class="modal-text">➤ Продолжайте заполнять поля, пока не получится подключиться</p>
-                </div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #667eea; margin-bottom: 25px; font-size: 1.3rem;">Ответы на вопросы</h3>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px; text-align: left;">
-                <h4 style="color: #e0e0e0; margin-bottom: 10px; font-size: 1.1rem;">Вопрос 1: "Если я заполнил поля "Special junk packet" на главном устройстве и затем поделился подключением, то на другом устройстве они будут заполнены?"</h4>
-                <p class="modal-text" style="margin-left: 20px; margin-bottom: 20px;">
-                    ● <strong>Нет</strong>, в AmneziaVPN отсутствует функционал, чтобы эти поля заполнялись, если поделиться подключением.
-                </p>
-            </div>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px; text-align: left;">
-                <h4 style="color: #e0e0e0; margin-bottom: 10px; font-size: 1.1rem;">Вопрос 2: "На другом устройстве, с которым я поделился подключением, в поля "Special junk packet" нужно вписать те же значения, что и на основном устройстве?"</h4>
-                <p class="modal-text" style="margin-left: 20px; margin-bottom: 20px;">
-                    ● <strong>Не обязательно</strong>, вы можете просто открыть этот сайт и взять значения с него, снова заполнив поля "Special junk packet".
-                </p>
-            </div>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px; text-align: left;">
-                <h4 style="color: #e0e0e0; margin-bottom: 10px; font-size: 1.1rem;">Вопрос 3: "Что делать с AndroidTV и другими устройствами, где нельзя просто взять, скопировать и вставить?"</h4>
-                <div style="margin-left: 15px; margin-top: 15px;">
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Для этого зайдите в приложение AmneziaVPN</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на значок поделиться внизу экрана</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Задайте имя пользователя, сервер, выберите протокол "AmneziaWG" и обязательно формат подключения "Оригинальный формат AmneziaWG"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите "Поделиться"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Затем в уведомлении, которое открылось, снова выберите "Поделиться" и сохраните файл в удобное для вас место</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Найдите сохранённый файл и откройте его через блокнот или любой другой текстовый редактор</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Вы увидите строчки H1 H2 H3 H4, под этими строчками вам необходимо создать строчку "I1 ="</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ После = сделайте пробел и откройте этот сайт</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Скопируйте I1 и вставьте его после =</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ У вас должна получиться такая запись: "I1 = 0xd9ea01000001000..."</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Сохраните изменения в файле</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Скиньте его на флешку или любым другим удобным способом отправьте на AndroidTV или ваше устройство</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Зайдите на устройстве, где хотите добавить сделанный конфиг, в приложение AmneziaVPN</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на значок плюсика внизу экрана</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Нажмите на пункт "Файл с настройками подключения"</p>
-                    <p class="modal-text" style="margin-bottom: 8px;">➤ Выберите ваш файл</p>
-                    <p class="modal-text">➤ Подключайтесь к VPN</p>
-                </div>
-            </div>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 600px; text-align: left;">
-                <h4 style="color: #e0e0e0; margin-bottom: 10px; font-size: 1.1rem;">Вопрос 4: "Что это за значения, которые нужно скопировать и вставить в AmneziaVPN?"</h4>
-                <p class="modal-text" style="margin-left: 20px;">
-                    ● Это UDP пакеты, чтобы DPI (система блокировок) распознавала ваше VPN подключение не как VPN, а как другой UDP трафик, например DNS или SIP трафик.
-                </p>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #667eea; margin-bottom: 25px; font-size: 1.3rem;">Послесловие</h3>
-            
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 8px; margin: 0 auto; max-width: 600px; text-align: left;">
-                <div style="margin-bottom: 15px; padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.3);">
-                    <p class="modal-text">● Данная инструкция актуальна на 30.10.2025</p>
-                </div>
-                <div style="margin-bottom: 15px; padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.3);">
-                    <p class="modal-text">● Это не гайд по настройке VPN, весь вышесказанный текст - просто опыт автора, которым он делится, это ни в коем случае не призыв к действию!</p>
-                </div>
-                <div style="margin-bottom: 15px; padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.3);">
-                    <p class="modal-text">● Все действия вы делаете на свой страх и риск, автор не несёт ответственности, если у вас что-то не заработает</p>
-                </div>
-                <div style="margin-bottom: 15px; padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.3);">
-                    <p class="modal-text">● Весь код этого сайта есть на GitHub и находится в открытом доступе, вы также можете ознакомиться со скриптом для генерации этих UDP пакетов на главной странице GitHub репозитория, где размещен этот сайт</p>
-                </div>
-                <div style="padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.3);">
-                    <p class="modal-text">● Данная инструкция пишется из моего личного опыта использования self-hosted, так что если у вас что-то отличается, я об этом знать не могу :)</p>
-                </div>
-            </div>
-        </div>
-        
-        <div style="background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2)); padding: 25px; border-radius: 8px; margin-top: 30px; text-align: center;">
-            <p class="modal-text" style="font-size: 1.1rem; margin-bottom: 15px;">
-                🌟 <strong>Буду очень рад, если вы:</strong>
-            </p>
-            <p class="modal-text">
-                Нажмёте на кнопку "Мой сайт" справа сверху и посмотрите мои другие проекты и возможно почитаете блог
-            </p>
-        </div>
-    </div>
-</div>
 
     <script>
-        let availableFiles = [1, 2, 3, 4, 5];
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            detectAvailableFiles().then(() => {
-                loadRandomValues();
-            });
-            
-            document.getElementById('refreshBtn').addEventListener('click', loadRandomValues);
-            
-            document.querySelectorAll('.copy-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const inputField = document.getElementById(targetId);
-                    const fullValue = inputField.getAttribute('data-full-value');
-                    
-                    navigator.clipboard.writeText(fullValue).then(() => {
-                        const originalText = this.textContent;
-                        this.textContent = 'Скопировано!';
-                        setTimeout(() => {
-                            this.textContent = originalText;
-                        }, 2000);
-                    });
-                });
-            });
+        class SteganographyCrypto {
+            constructor() {
+                this.INVISIBLE_CHARS = [
+                    '\u200B', '\u200C', '\u200D', '\u2060',
+                    '\u2061', '\u2062', '\u2063', '\u2064'
+                ];
+            }
 
-            const instructionBtn = document.getElementById('instructionBtn');
-            const instructionModal = document.getElementById('instructionModal');
-            const modalClose = document.getElementById('modalClose');
+            async deriveKey(password, salt) {
+                const encoder = new TextEncoder();
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(password),
+                    { name: 'PBKDF2' },
+                    false,
+                    ['deriveKey']
+                );
 
-            instructionBtn.addEventListener('click', function() {
-                instructionModal.style.display = 'flex';
-            });
+                return crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt', 'decrypt']
+                );
+            }
 
-            modalClose.addEventListener('click', function() {
-                instructionModal.style.display = 'none';
-            });
+            async encrypt(plaintext, password) {
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const key = await this.deriveKey(password, salt);
 
-            instructionModal.addEventListener('click', function(e) {
-                if (e.target === instructionModal) {
-                    instructionModal.style.display = 'none';
+                const encoder = new TextEncoder();
+                const data = encoder.encode(plaintext);
+
+                const encrypted = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    data
+                );
+
+                const encryptedArray = new Uint8Array(encrypted);
+                const result = new Uint8Array(salt.length + iv.length + encryptedArray.length);
+                result.set(salt);
+                result.set(iv, salt.length);
+                result.set(encryptedArray, salt.length + iv.length);
+
+                return btoa(String.fromCharCode(...result));
+            }
+
+            async decrypt(encryptedData, password) {
+                const binaryString = atob(encryptedData);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
                 }
-            });
-        });
 
-        async function detectAvailableFiles() {
-            const checkPromises = availableFiles.map(index => {
-                return fetch(`I-list${index}.json`)
-                    .then(response => response.ok ? index : null)
-                    .catch(() => null);
-            });
+                const salt = bytes.slice(0, 16);
+                const iv = bytes.slice(16, 28);
+                const encrypted = bytes.slice(28);
 
-            const results = await Promise.all(checkPromises);
-            availableFiles = results.filter(index => index !== null);
-            
-            if (availableFiles.length === 0) {
-                console.error('Нет доступных JSON файлов');
-                return;
+                const key = await this.deriveKey(password, salt);
+
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    encrypted
+                );
+
+                const decoder = new TextDecoder();
+                return decoder.decode(decrypted);
             }
-        }
 
-        async function loadRandomValues() {
-            if (availableFiles.length === 0) {
-                await detectAvailableFiles();
+            textToBinary(text) {
+                let binary = '';
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i);
+                    binary += charCode.toString(2).padStart(8, '0');
+                }
+                return binary;
             }
-            
-            const randomFileIndex = availableFiles[Math.floor(Math.random() * availableFiles.length)];
-            const fileName = `I-list${randomFileIndex}.json`;
-            
-            try {
-                const response = await fetch(fileName);
-                const data = await response.json();
-                
-                const packets = data.packets;
-                const cycles = data.cycles;
-                
-                for (let i = 1; i <= 5; i++) {
-                    const inputField = document.getElementById(`i${i}`);
-                    const randomCycle = Math.floor(Math.random() * cycles) + 1;
-                    const packetKey = `I${i}_c${randomCycle}`;
-                    
-                    if (packets[packetKey]) {
-                        const fullValue = packets[packetKey];
-                        const displayValue = fullValue.substring(0, 20) + '...';
-                        
-                        inputField.value = displayValue;
-                        inputField.setAttribute('data-full-value', fullValue);
+
+            binaryToText(binary) {
+                let text = '';
+                for (let i = 0; i < binary.length; i += 8) {
+                    const byte = binary.substr(i, 8);
+                    if (byte.length === 8) {
+                        text += String.fromCharCode(parseInt(byte, 2));
                     }
                 }
-            } catch (error) {
-                console.error('Ошибка загрузки данных:', error);
+                return text;
+            }
+
+            binaryToInvisible(binary) {
+                let invisible = '';
+                for (let i = 0; i < binary.length; i += 3) {
+                    const chunk = binary.substr(i, 3).padEnd(3, '0');
+                    const index = parseInt(chunk, 2);
+                    invisible += this.INVISIBLE_CHARS[index % this.INVISIBLE_CHARS.length];
+                }
+                return invisible;
+            }
+
+            invisibleToBinary(invisible) {
+                let binary = '';
+                for (let char of invisible) {
+                    const index = this.INVISIBLE_CHARS.indexOf(char);
+                    if (index !== -1) {
+                        binary += index.toString(2).padStart(3, '0');
+                    }
+                }
+                return binary;
+            }
+
+            insertInvisible(coverText, invisibleData) {
+                if (coverText.length === 0) return invisibleData;
+                
+                const positions = [];
+                const textChars = coverText.split('');
+                
+                for (let i = 0; i < invisibleData.length; i++) {
+                    let pos;
+                    if (textChars.length < 100) {
+                        pos = Math.floor(Math.random() * (textChars.length + 1));
+                    } else {
+                        const segmentSize = Math.floor(textChars.length / invisibleData.length);
+                        const offset = Math.floor(Math.random() * Math.max(1, segmentSize / 3));
+                        pos = Math.min(i * segmentSize + offset, textChars.length);
+                    }
+                    positions.push(pos);
+                }
+                
+                positions.sort((a, b) => a - b);
+                
+                let result = textChars;
+                let offset = 0;
+                
+                for (let i = 0; i < positions.length; i++) {
+                    const pos = positions[i] + offset;
+                    const invisibleChar = invisibleData[i];
+                    
+                    if (pos >= result.length) {
+                        result.push(invisibleChar);
+                    } else {
+                        result.splice(pos, 0, invisibleChar);
+                    }
+                    offset++;
+                }
+                
+                return result.join('');
+            }
+
+            extractInvisible(text) {
+                let invisible = '';
+                for (let char of text) {
+                    if (this.INVISIBLE_CHARS.includes(char)) {
+                        invisible += char;
+                    }
+                }
+                return invisible;
+            }
+
+            cleanText(text) {
+                return text.split('').filter(char => !this.INVISIBLE_CHARS.includes(char)).join('');
+            }
+
+            async hideText(secretText, coverText, password) {
+                if (!secretText || !coverText || !password) {
+                    throw new Error('Все поля должны быть заполнены');
+                }
+                
+                const cleanedCover = this.cleanText(coverText);
+                const encryptedData = await this.encrypt(secretText, password);
+                const binaryData = this.textToBinary(encryptedData);
+                const invisibleData = this.binaryToInvisible(binaryData);
+                return this.insertInvisible(cleanedCover, invisibleData);
+            }
+
+            async revealText(stegoText, password) {
+                if (!stegoText || !password) {
+                    throw new Error('Все поля должны быть заполнены');
+                }
+                
+                const invisibleData = this.extractInvisible(stegoText);
+                if (!invisibleData) {
+                    throw new Error('Не найдено скрытых данных');
+                }
+                
+                const binaryData = this.invisibleToBinary(invisibleData);
+                const encryptedData = this.binaryToText(binaryData);
+                return await this.decrypt(encryptedData, password);
+            }
+
+            calculateRequiredLength(secretText) {
+                const byteLength = new TextEncoder().encode(secretText).length;
+                const encryptedLength = 44 + byteLength;
+                const binaryLength = encryptedLength * 8;
+                const invisibleLength = Math.ceil(binaryLength / 3);
+                return Math.max(invisibleLength * 2, 10);
             }
         }
+
+        class App {
+            constructor() {
+                this.crypto = new SteganographyCrypto();
+                this.initElements();
+                this.bindEvents();
+                this.updateCharCounts();
+            }
+
+            initElements() {
+                this.passwordInput = document.getElementById('passwordInput');
+                this.togglePasswordBtn = document.getElementById('togglePasswordBtn');
+                this.generatePasswordBtn = document.getElementById('generatePasswordBtn');
+                this.secretText = document.getElementById('secretText');
+                this.coverText = document.getElementById('coverText');
+                this.secretCharCount = document.getElementById('secretCharCount');
+                this.coverCharCount = document.getElementById('coverCharCount');
+                this.minCharsSpan = document.getElementById('minChars');
+                this.encryptBtn = document.getElementById('encryptBtn');
+                this.decryptBtn = document.getElementById('decryptBtn');
+                this.modeBtns = document.querySelectorAll('.mode-btn');
+                this.encryptSection = document.getElementById('encryptSection');
+                this.decryptSection = document.getElementById('decryptSection');
+                this.encryptedInput = document.getElementById('encryptedInput');
+                this.encryptResult = document.getElementById('encryptResult');
+                this.decryptResult = document.getElementById('decryptResult');
+                this.encryptedResult = document.getElementById('encryptedResult');
+                this.decryptedResult = document.getElementById('decryptedResult');
+                this.copyEncryptedBtn = document.getElementById('copyEncryptedBtn');
+                this.copyDecryptedBtn = document.getElementById('copyDecryptedBtn');
+            }
+
+            bindEvents() {
+                this.togglePasswordBtn.addEventListener('click', () => this.togglePasswordVisibility());
+                this.generatePasswordBtn.addEventListener('click', () => this.generatePassword());
+                this.secretText.addEventListener('input', () => this.updateCharCounts());
+                this.coverText.addEventListener('input', () => this.updateCharCounts());
+                this.encryptBtn.addEventListener('click', () => this.performEncryption());
+                this.decryptBtn.addEventListener('click', () => this.performDecryption());
+                
+                this.modeBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => this.switchMode(e.target.dataset.mode));
+                });
+
+                this.copyEncryptedBtn.addEventListener('click', () => this.copyToClipboard(this.encryptedResult.textContent));
+                this.copyDecryptedBtn.addEventListener('click', () => this.copyToClipboard(this.decryptedResult.textContent));
+            }
+
+            togglePasswordVisibility() {
+                const currentSecurity = this.passwordInput.style.webkitTextSecurity;
+                if (currentSecurity === 'none') {
+                    this.passwordInput.style.webkitTextSecurity = 'disc';
+                    this.togglePasswordBtn.textContent = '●';
+                } else {
+                    this.passwordInput.style.webkitTextSecurity = 'none';
+                    this.togglePasswordBtn.textContent = '○';
+                }
+            }
+
+            generatePassword() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+                let password = '';
+                const array = new Uint8Array(16);
+                crypto.getRandomValues(array);
+                for (let i = 0; i < 16; i++) {
+                    password += chars[array[i] % chars.length];
+                }
+                this.passwordInput.value = password;
+                this.showNotification('Пароль создан', 'success');
+            }
+
+            updateCharCounts() {
+                const secretLength = this.secretText.value.length;
+                this.secretCharCount.textContent = `${secretLength} символов`;
+                
+                const requiredLength = this.crypto.calculateRequiredLength(this.secretText.value);
+                this.minCharsSpan.textContent = requiredLength;
+                
+                const coverLength = this.coverText.value.length;
+                this.coverCharCount.textContent = `Введите минимум ${requiredLength} символов (сейчас: ${coverLength})`;
+                
+                this.coverCharCount.className = 'char-count';
+                if (coverLength > 0 && coverLength < requiredLength) {
+                    this.coverCharCount.classList.add('error');
+                } else if (coverLength >= requiredLength) {
+                    this.coverCharCount.classList.add('success');
+                }
+            }
+
+            async performEncryption() {
+                if (!this.validateInputs(true)) return;
+
+                try {
+                    this.showLoading(true);
+                    const stegoText = await this.crypto.hideText(
+                        this.secretText.value,
+                        this.coverText.value,
+                        this.passwordInput.value
+                    );
+
+                    this.encryptedResult.textContent = stegoText;
+                    this.encryptResult.style.display = 'block';
+                    this.showNotification('Текст успешно зашифрован и скрыт', 'success');
+                } catch (error) {
+                    this.showNotification('Ошибка при шифровании: ' + error.message, 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async performDecryption() {
+                if (!this.validateInputs(false)) return;
+
+                try {
+                    this.showLoading(true);
+                    const revealedText = await this.crypto.revealText(
+                        this.encryptedInput.value,
+                        this.passwordInput.value
+                    );
+
+                    this.decryptedResult.textContent = revealedText;
+                    this.decryptResult.style.display = 'block';
+                    this.showNotification('Текст успешно расшифрован', 'success');
+                } catch (error) {
+                    this.showNotification('Ошибка при расшифровке: ' + error.message, 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            validateInputs(isEncrypt) {
+                if (!this.passwordInput.value.trim()) {
+                    this.showNotification('Введите пароль', 'error');
+                    return false;
+                }
+
+                if (isEncrypt) {
+                    if (!this.secretText.value.trim()) {
+                        this.showNotification('Введите текст для шифрования', 'error');
+                        return false;
+                    }
+
+                    const requiredLength = this.crypto.calculateRequiredLength(this.secretText.value);
+                    if (this.coverText.value.length < requiredLength) {
+                        this.showNotification(`Текст-маскировка должен содержать минимум ${requiredLength} символов`, 'error');
+                        return false;
+                    }
+                } else {
+                    if (!this.encryptedInput.value.trim()) {
+                        this.showNotification('Введите текст для расшифровки', 'error');
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            switchMode(mode) {
+                this.modeBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+
+                this.encryptSection.classList.toggle('active', mode === 'encrypt');
+                this.decryptSection.classList.toggle('active', mode === 'decrypt');
+                
+                this.encryptResult.style.display = 'none';
+                this.decryptResult.style.display = 'none';
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 25px;
+                    background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                    color: white;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            showLoading(show) {
+                const buttons = [this.encryptBtn, this.decryptBtn];
+                buttons.forEach(btn => {
+                    if (btn) {
+                        btn.disabled = show;
+                        btn.textContent = show ? 'Обработка...' : (btn === this.encryptBtn ? 'Зашифровать и скрыть текст' : 'Расшифровать скрытый текст');
+                    }
+                });
+            }
+
+            async copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    this.showNotification('Скопировано в буфер обмена', 'success');
+                } catch (err) {
+                    this.showNotification('Ошибка копирования', 'error');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new App();
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .success { color: #10b981 !important; }
+            .error { color: #ef4444 !important; }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
