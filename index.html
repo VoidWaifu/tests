@@ -1140,6 +1140,7 @@
                         const startBtn = timerElement.querySelector('.start');
                         const pauseBtn = timerElement.querySelector('.pause');
                         
+                        startBtn.textContent = "▶ Возобновить";
                         startBtn.classList.add('hidden');
                         pauseBtn.classList.remove('hidden');
                         
@@ -1156,6 +1157,7 @@
                         endTimeDisplay.textContent = '';
                         display.style.color = '#ff4444';
                         display.style.animation = 'pulse 0.5s infinite alternate';
+                        startBtn.textContent = "▶ Старт";
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
                         timerElement.isRunning = false;
@@ -1472,39 +1474,66 @@
                 
                 if (timer.isRunning) return;
                 
-                const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
-                const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
-                const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
-                
-                if (newTotalSeconds <= 0) return;
-                
-                timer.isRunning = true;
-                timer.startTime = Date.now();
-                timer.totalSeconds = newTotalSeconds;
-                timer.originalTotalSeconds = newTotalSeconds;
-                startBtn.textContent = "▶ Возобновить";
-                startBtn.classList.add('hidden');
-                pauseBtn.classList.remove('hidden');
-                
-                const saveContainer = timer.querySelector('.save-container');
-                if (saveContainer.classList.contains('saved')) {
-                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
-                    if (savedTimers[id]) {
-                        savedTimers[id].isRunning = true;
-                        savedTimers[id].startTime = timer.startTime;
-                        savedTimers[id].totalSeconds = newTotalSeconds;
-                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                if (timer.totalSeconds > 0 && !timer.isRunning) {
+                    timer.isRunning = true;
+                    timer.startTime = Date.now() - (timer.originalTotalSeconds - timer.totalSeconds) * 1000;
+                    startBtn.textContent = "▶ Возобновить";
+                    startBtn.classList.add('hidden');
+                    pauseBtn.classList.remove('hidden');
+                    
+                    const saveContainer = timer.querySelector('.save-container');
+                    if (saveContainer.classList.contains('saved')) {
+                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                        if (savedTimers[id]) {
+                            savedTimers[id].isRunning = true;
+                            savedTimers[id].startTime = timer.startTime;
+                            savedTimers[id].totalSeconds = timer.totalSeconds;
+                            localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                        }
                     }
+                    
+                    startBtn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        startBtn.style.transform = '';
+                    }, 150);
+                    
+                    updateEndTimeDisplay(id, timer.startTime, timer.originalTotalSeconds);
+                    startTimerInterval(id, timer.totalSeconds, timer.startTime);
+                } else {
+                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                    const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+                    
+                    if (newTotalSeconds <= 0) return;
+                    
+                    timer.isRunning = true;
+                    timer.startTime = Date.now();
+                    timer.totalSeconds = newTotalSeconds;
+                    timer.originalTotalSeconds = newTotalSeconds;
+                    startBtn.textContent = "▶ Возобновить";
+                    startBtn.classList.add('hidden');
+                    pauseBtn.classList.remove('hidden');
+                    
+                    const saveContainer = timer.querySelector('.save-container');
+                    if (saveContainer.classList.contains('saved')) {
+                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                        if (savedTimers[id]) {
+                            savedTimers[id].isRunning = true;
+                            savedTimers[id].startTime = timer.startTime;
+                            savedTimers[id].totalSeconds = newTotalSeconds;
+                            localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                        }
+                    }
+                    
+                    startBtn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        startBtn.style.transform = '';
+                    }, 150);
+                    
+                    updateEndTimeDisplay(id, timer.startTime, timer.totalSeconds);
+                    startTimerInterval(id, timer.totalSeconds, timer.startTime);
                 }
-                
-                startBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    startBtn.style.transform = '';
-                }, 150);
-                
-                updateEndTimeDisplay(id, timer.startTime, timer.totalSeconds);
-                startTimerInterval(id, timer.totalSeconds, timer.startTime);
             };
 
             function startTimerInterval(id, totalSeconds, startTime) {
@@ -1521,6 +1550,7 @@
                     if (remainingSeconds <= 0) {
                         clearInterval(timer.intervalId);
                         timer.isRunning = false;
+                        timer.totalSeconds = 0;
                         startBtn.textContent = "▶ Старт";
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
@@ -1557,12 +1587,7 @@
                 if (timer.isRunning && timer.startTime) {
                     const now = Date.now();
                     const elapsedSeconds = Math.floor((now - timer.startTime) / 1000);
-                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
-                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
-                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                    const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
-                    
-                    timer.totalSeconds = Math.max(0, newTotalSeconds - elapsedSeconds);
+                    timer.totalSeconds = Math.max(0, timer.originalTotalSeconds - elapsedSeconds);
                 }
                 
                 timer.isRunning = false;
@@ -1600,6 +1625,7 @@
                 timer.isRunning = false;
                 timer.startTime = null;
                 timer.totalSeconds = null;
+                timer.originalTotalSeconds = null;
                 startBtn.textContent = "▶ Старт";
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
@@ -1686,6 +1712,7 @@
                             const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
                             const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
                             timerDiv.totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                            timerDiv.originalTotalSeconds = timerDiv.totalSeconds;
                         }
                         
                         const saveContainer = timerDiv.querySelector('.save-container');
