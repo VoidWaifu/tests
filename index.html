@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Таймеры и часы</title>
+    <link rel="icon" type="image/png" href="../assets/icon.png">
     <style>
         * {
             margin: 0;
@@ -223,25 +224,6 @@
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
             border-color: #444;
-        }
-
-        .timer.removing, .stopwatch.removing, .city-card.removing {
-            animation: cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes cardRemove {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            70% {
-                opacity: 0.3;
-                transform: translateY(-10px) scale(0.95);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(30px) scale(0.9);
-            }
         }
 
         .timer-header, .stopwatch-header, .city-header {
@@ -607,20 +589,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0);
-            display: flex;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.3s ease;
         }
 
         .city-list-modal.active {
-            background: rgba(0, 0, 0, 0.9);
-            opacity: 1;
-            visibility: visible;
+            display: flex;
         }
 
         .city-list-content {
@@ -633,14 +611,6 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transform: scale(0.9) translateY(20px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .city-list-modal.active .city-list-content {
-            transform: scale(1) translateY(0);
-            opacity: 1;
         }
 
         .city-list-header {
@@ -689,13 +659,11 @@
             border-radius: 12px;
             color: #ffeb3b;
             font-size: 16px;
-            transition: all 0.3s;
         }
 
         .city-list-search input:focus {
             outline: none;
             border-color: #ffeb3b;
-            box-shadow: 0 0 15px rgba(255, 235, 59, 0.2);
         }
 
         .city-list-items {
@@ -721,7 +689,6 @@
             background: #2a2a2a;
             border-color: #ffeb3b;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 235, 59, 0.1);
         }
 
         .city-list-item-name {
@@ -748,6 +715,17 @@
             font-size: 14px;
             color: #2196F3;
             font-family: 'Courier New', monospace;
+        }
+
+        .card-remove {
+            animation: cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes cardRemove {
+            to {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
         }
 
         .milliseconds {
@@ -953,7 +931,6 @@
             .city-list-content {
                 width: 95%;
                 max-height: 90vh;
-                margin: 10px;
             }
             
             .city-list-items {
@@ -2133,7 +2110,7 @@
                 const timer = document.getElementById(`timer-${id}`);
                 if (timer) {
                     clearInterval(timer.intervalId);
-                    timer.classList.add('removing');
+                    timer.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                     setTimeout(() => {
                         timer.remove();
                         
@@ -2148,7 +2125,7 @@
                 const stopwatch = document.getElementById(`stopwatch-${id}`);
                 if (stopwatch) {
                     clearInterval(stopwatch.intervalId);
-                    stopwatch.classList.add('removing');
+                    stopwatch.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                     setTimeout(() => {
                         stopwatch.remove();
                         
@@ -2163,7 +2140,7 @@
                 const city = document.getElementById(`city-${id}`);
                 if (city) {
                     clearInterval(city.updateInterval);
-                    city.classList.add('removing');
+                    city.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                     setTimeout(() => {
                         city.remove();
                         
