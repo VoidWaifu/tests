@@ -1067,9 +1067,9 @@
                 timerDiv.className = 'timer';
                 timerDiv.id = `timer-${id}`;
                 
-                const hoursValue = Math.floor(timerData.totalSeconds / 3600);
-                const minutesValue = Math.floor((timerData.totalSeconds % 3600) / 60);
-                const secondsValue = timerData.totalSeconds % 60;
+                const hoursValue = timerData.initialHours || Math.floor(timerData.initialTotalSeconds / 3600);
+                const minutesValue = timerData.initialMinutes || Math.floor((timerData.initialTotalSeconds % 3600) / 60);
+                const secondsValue = timerData.initialSeconds || timerData.initialTotalSeconds % 60;
                 
                 timerDiv.innerHTML = `
                     <div class="timer-header">
@@ -1103,7 +1103,7 @@
                         </div>
                     </div>
                     <div class="time-display">
-                        ${formatTime(timerData.totalSeconds)}
+                        ${formatTime(timerData.initialTotalSeconds)}
                         <div class="end-time" id="end-time-${id}"></div>
                     </div>
                     <div class="controls">
@@ -1126,17 +1126,21 @@
                 initDropdown(timerElement.querySelector('.minutes-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 initDropdown(timerElement.querySelector('.seconds-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 
-                if (timerData.isRunning && timerData.startTime) {
+                timerElement.initialTotalSeconds = timerData.initialTotalSeconds;
+                timerElement.initialHours = hoursValue;
+                timerElement.initialMinutes = minutesValue;
+                timerElement.initialSeconds = secondsValue;
+                
+                if (timerData.isRunning && timerData.startTime && timerData.elapsedTime) {
                     const now = Date.now();
-                    const elapsedSeconds = Math.floor((now - timerData.startTime) / 1000);
-                    const remainingSeconds = Math.max(0, timerData.totalSeconds - elapsedSeconds);
+                    const elapsedTime = timerData.elapsedTime + (now - timerData.startTime);
+                    const remainingTime = Math.max(0, timerData.initialTotalSeconds * 1000 - elapsedTime);
                     
-                    timerElement.totalSeconds = remainingSeconds;
                     timerElement.startTime = timerData.startTime;
-                    timerElement.isRunning = remainingSeconds > 0;
-                    timerElement.originalTotalSeconds = timerData.totalSeconds;
+                    timerElement.elapsedTime = timerData.elapsedTime;
+                    timerElement.isRunning = true;
                     
-                    if (timerElement.isRunning) {
+                    if (remainingTime > 0) {
                         const startBtn = timerElement.querySelector('.start');
                         const pauseBtn = timerElement.querySelector('.pause');
                         
@@ -1144,9 +1148,9 @@
                         startBtn.classList.add('hidden');
                         pauseBtn.classList.remove('hidden');
                         
-                        updateTimerDisplayFromSeconds(id, remainingSeconds);
-                        updateEndTimeDisplay(id, timerData.startTime, timerData.totalSeconds);
-                        startTimerInterval(id, remainingSeconds, timerData.startTime);
+                        updateTimerDisplayFromMilliseconds(id, remainingTime);
+                        updateEndTimeDisplay(id, timerData.startTime, timerData.elapsedTime, timerData.initialTotalSeconds * 1000);
+                        startTimerInterval(id, remainingTime, timerData.startTime, timerData.elapsedTime);
                     } else {
                         const display = timerElement.querySelector('.time-display');
                         const endTimeDisplay = document.getElementById(`end-time-${id}`);
@@ -1165,13 +1169,13 @@
                         const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                         if (savedTimers[id]) {
                             savedTimers[id].isRunning = false;
-                            savedTimers[id].totalSeconds = 0;
+                            savedTimers[id].elapsedTime = 0;
+                            delete savedTimers[id].startTime;
                             localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                         }
                     }
                 } else {
-                    timerElement.totalSeconds = timerData.totalSeconds;
-                    timerElement.originalTotalSeconds = timerData.totalSeconds;
+                    timerElement.elapsedTime = timerData.elapsedTime || 0;
                     timerElement.isRunning = false;
                     updateTimerDisplay(id);
                 }
@@ -1385,7 +1389,7 @@
                     const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
                     const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
                     const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                    const initialTotalSeconds = hours * 3600 + minutes * 60 + seconds;
                     
                     saveContainer.classList.add('saved');
                     saveContainer.querySelector('.save-text').textContent = 'Сохранен';
@@ -1393,8 +1397,12 @@
                     const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                     savedTimers[id] = {
                         name: title,
-                        totalSeconds: totalSeconds,
+                        initialTotalSeconds: initialTotalSeconds,
+                        initialHours: hours,
+                        initialMinutes: minutes,
+                        initialSeconds: seconds,
                         startTime: timer.isRunning ? timer.startTime : null,
+                        elapsedTime: timer.elapsedTime || 0,
                         isRunning: timer.isRunning,
                         saved: true
                     };
@@ -1474,69 +1482,55 @@
                 
                 if (timer.isRunning) return;
                 
-                if (timer.totalSeconds > 0 && !timer.isRunning) {
-                    timer.isRunning = true;
-                    timer.startTime = Date.now() - (timer.originalTotalSeconds - timer.totalSeconds) * 1000;
-                    startBtn.textContent = "▶ Возобновить";
-                    startBtn.classList.add('hidden');
-                    pauseBtn.classList.remove('hidden');
-                    
-                    const saveContainer = timer.querySelector('.save-container');
-                    if (saveContainer.classList.contains('saved')) {
-                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
-                        if (savedTimers[id]) {
-                            savedTimers[id].isRunning = true;
-                            savedTimers[id].startTime = timer.startTime;
-                            savedTimers[id].totalSeconds = timer.totalSeconds;
-                            localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
-                        }
-                    }
-                    
-                    startBtn.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        startBtn.style.transform = '';
-                    }, 150);
-                    
-                    updateEndTimeDisplay(id, timer.startTime, timer.originalTotalSeconds);
-                    startTimerInterval(id, timer.totalSeconds, timer.startTime);
-                } else {
-                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
-                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
-                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                    const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
-                    
-                    if (newTotalSeconds <= 0) return;
-                    
-                    timer.isRunning = true;
-                    timer.startTime = Date.now();
-                    timer.totalSeconds = newTotalSeconds;
-                    timer.originalTotalSeconds = newTotalSeconds;
-                    startBtn.textContent = "▶ Возобновить";
-                    startBtn.classList.add('hidden');
-                    pauseBtn.classList.remove('hidden');
-                    
-                    const saveContainer = timer.querySelector('.save-container');
-                    if (saveContainer.classList.contains('saved')) {
-                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
-                        if (savedTimers[id]) {
-                            savedTimers[id].isRunning = true;
-                            savedTimers[id].startTime = timer.startTime;
-                            savedTimers[id].totalSeconds = newTotalSeconds;
-                            localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
-                        }
-                    }
-                    
-                    startBtn.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        startBtn.style.transform = '';
-                    }, 150);
-                    
-                    updateEndTimeDisplay(id, timer.startTime, timer.totalSeconds);
-                    startTimerInterval(id, timer.totalSeconds, timer.startTime);
+                const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                const initialTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+                
+                if (initialTotalSeconds <= 0) return;
+                
+                timer.initialTotalSeconds = initialTotalSeconds;
+                timer.initialHours = hours;
+                timer.initialMinutes = minutes;
+                timer.initialSeconds = seconds;
+                
+                const remainingTime = initialTotalSeconds * 1000 - (timer.elapsedTime || 0);
+                
+                if (remainingTime <= 0) return;
+                
+                timer.isRunning = true;
+                timer.startTime = Date.now();
+                timer.startBtnText = startBtn.textContent;
+                
+                if (timer.startBtnText === "▶ Старт") {
+                    timer.elapsedTime = 0;
                 }
+                
+                startBtn.textContent = "▶ Возобновить";
+                startBtn.classList.add('hidden');
+                pauseBtn.classList.remove('hidden');
+                
+                const saveContainer = timer.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    if (savedTimers[id]) {
+                        savedTimers[id].isRunning = true;
+                        savedTimers[id].startTime = timer.startTime;
+                        savedTimers[id].elapsedTime = timer.elapsedTime || 0;
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }
+                }
+                
+                startBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    startBtn.style.transform = '';
+                }, 150);
+                
+                updateEndTimeDisplay(id, timer.startTime, timer.elapsedTime || 0, initialTotalSeconds * 1000);
+                startTimerInterval(id, remainingTime, timer.startTime, timer.elapsedTime || 0);
             };
 
-            function startTimerInterval(id, totalSeconds, startTime) {
+            function startTimerInterval(id, remainingTime, startTime, elapsedTime) {
                 const timer = document.getElementById(`timer-${id}`);
                 const display = timer.querySelector('.time-display');
                 const startBtn = timer.querySelector('.start');
@@ -1544,13 +1538,13 @@
                 
                 timer.intervalId = setInterval(() => {
                     const now = Date.now();
-                    const elapsedSeconds = Math.floor((now - startTime) / 1000);
-                    const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
+                    const newElapsedTime = elapsedTime + (now - startTime);
+                    const newRemainingTime = Math.max(0, timer.initialTotalSeconds * 1000 - newElapsedTime);
                     
-                    if (remainingSeconds <= 0) {
+                    if (newRemainingTime <= 0) {
                         clearInterval(timer.intervalId);
                         timer.isRunning = false;
-                        timer.totalSeconds = 0;
+                        timer.elapsedTime = 0;
                         startBtn.textContent = "▶ Старт";
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
@@ -1565,13 +1559,14 @@
                             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                             if (savedTimers[id]) {
                                 savedTimers[id].isRunning = false;
-                                savedTimers[id].totalSeconds = 0;
+                                savedTimers[id].elapsedTime = 0;
+                                delete savedTimers[id].startTime;
                                 localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                             }
                         }
                     }
                     
-                    updateTimerDisplayFromSeconds(id, remainingSeconds);
+                    updateTimerDisplayFromMilliseconds(id, newRemainingTime);
                 }, 1000);
             }
 
@@ -1586,8 +1581,7 @@
                 
                 if (timer.isRunning && timer.startTime) {
                     const now = Date.now();
-                    const elapsedSeconds = Math.floor((now - timer.startTime) / 1000);
-                    timer.totalSeconds = Math.max(0, timer.originalTotalSeconds - elapsedSeconds);
+                    timer.elapsedTime = (timer.elapsedTime || 0) + (now - timer.startTime);
                 }
                 
                 timer.isRunning = false;
@@ -1602,7 +1596,7 @@
                     const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                     if (savedTimers[id]) {
                         savedTimers[id].isRunning = false;
-                        savedTimers[id].totalSeconds = timer.totalSeconds;
+                        savedTimers[id].elapsedTime = timer.elapsedTime || 0;
                         delete savedTimers[id].startTime;
                         localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                     }
@@ -1624,8 +1618,7 @@
                 clearInterval(timer.intervalId);
                 timer.isRunning = false;
                 timer.startTime = null;
-                timer.totalSeconds = null;
-                timer.originalTotalSeconds = null;
+                timer.elapsedTime = 0;
                 startBtn.textContent = "▶ Старт";
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
@@ -1642,10 +1635,14 @@
                         const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
                         const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
                         const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                        const initialTotalSeconds = hours * 3600 + minutes * 60 + seconds;
                         
-                        savedTimers[id].totalSeconds = totalSeconds;
+                        savedTimers[id].initialTotalSeconds = initialTotalSeconds;
+                        savedTimers[id].initialHours = hours;
+                        savedTimers[id].initialMinutes = minutes;
+                        savedTimers[id].initialSeconds = seconds;
                         savedTimers[id].isRunning = false;
+                        savedTimers[id].elapsedTime = 0;
                         delete savedTimers[id].startTime;
                         localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                     }
@@ -1666,6 +1663,11 @@
                 return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }
 
+            function formatTimeFromMilliseconds(milliseconds) {
+                const totalSeconds = Math.ceil(milliseconds / 1000);
+                return formatTime(totalSeconds);
+            }
+
             function formatEndTime(timestamp) {
                 const date = new Date(timestamp);
                 const hours = date.getHours().toString().padStart(2, '0');
@@ -1673,10 +1675,10 @@
                 return `Закончится в ${hours}:${minutes}`;
             }
 
-            function updateEndTimeDisplay(id, startTime, totalSeconds) {
+            function updateEndTimeDisplay(id, startTime, elapsedTime, totalTime) {
                 const endTimeDisplay = document.getElementById(`end-time-${id}`);
-                if (endTimeDisplay) {
-                    const endTime = startTime + (totalSeconds * 1000);
+                if (endTimeDisplay && startTime) {
+                    const endTime = startTime + (totalTime - elapsedTime);
                     endTimeDisplay.textContent = formatEndTime(endTime);
                 }
             }
@@ -1691,10 +1693,10 @@
                 display.childNodes[0].textContent = formatTime(hours * 3600 + minutes * 60 + seconds);
             }
 
-            function updateTimerDisplayFromSeconds(id, totalSeconds) {
+            function updateTimerDisplayFromMilliseconds(id, milliseconds) {
                 const timer = document.getElementById(`timer-${id}`);
                 const display = timer.querySelector('.time-display');
-                display.childNodes[0].textContent = formatTime(totalSeconds);
+                display.childNodes[0].textContent = formatTimeFromMilliseconds(milliseconds);
             }
 
             document.addEventListener('input', function(e) {
@@ -1711,20 +1713,30 @@
                             const hours = parseInt(timerDiv.querySelector('.hours-input').value) || 0;
                             const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
                             const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
-                            timerDiv.totalSeconds = hours * 3600 + minutes * 60 + seconds;
-                            timerDiv.originalTotalSeconds = timerDiv.totalSeconds;
+                            timerDiv.initialTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+                            timerDiv.initialHours = hours;
+                            timerDiv.initialMinutes = minutes;
+                            timerDiv.initialSeconds = seconds;
+                            timerDiv.elapsedTime = 0;
+                            
+                            const startBtn = timerDiv.querySelector('.start');
+                            startBtn.textContent = "▶ Старт";
                         }
                         
                         const saveContainer = timerDiv.querySelector('.save-container');
                         if (saveContainer.classList.contains('saved')) {
-                            const hours = parseInt(timerDiv.querySelector('.hours-input').value) || 0;
-                            const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
-                            const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
-                            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-                            
                             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                             if (savedTimers[id]) {
-                                savedTimers[id].totalSeconds = totalSeconds;
+                                const hours = parseInt(timerDiv.querySelector('.hours-input').value) || 0;
+                                const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
+                                const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
+                                const initialTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+                                
+                                savedTimers[id].initialTotalSeconds = initialTotalSeconds;
+                                savedTimers[id].initialHours = hours;
+                                savedTimers[id].initialMinutes = minutes;
+                                savedTimers[id].initialSeconds = seconds;
+                                savedTimers[id].elapsedTime = 0;
                                 localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                             }
                         }
