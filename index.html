@@ -588,16 +588,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            animation: fadeIn 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .city-list-modal.active {
-            display: flex;
+            background: rgba(0, 0, 0, 0.9);
+            opacity: 1;
+            visibility: visible;
         }
 
         .city-list-content {
@@ -610,6 +614,14 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .city-list-modal.active .city-list-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
         }
 
         .city-list-header {
@@ -658,11 +670,13 @@
             border-radius: 12px;
             color: #ffeb3b;
             font-size: 16px;
+            transition: all 0.3s;
         }
 
         .city-list-search input:focus {
             outline: none;
             border-color: #ffeb3b;
+            box-shadow: 0 0 15px rgba(255, 235, 59, 0.2);
         }
 
         .city-list-items {
@@ -688,6 +702,7 @@
             background: #2a2a2a;
             border-color: #ffeb3b;
             transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 235, 59, 0.1);
         }
 
         .city-list-item-name {
@@ -716,14 +731,18 @@
             font-family: 'Courier New', monospace;
         }
 
-        .card-remove {
+        .timer.removing, .stopwatch.removing, .city-card.removing {
             animation: cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         @keyframes cardRemove {
-            to {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
                 opacity: 0;
-                transform: translateX(100px) scale(0.8);
+                transform: translateY(20px) scale(0.9);
             }
         }
 
@@ -930,6 +949,7 @@
             .city-list-content {
                 width: 95%;
                 max-height: 90vh;
+                margin: 10px;
             }
             
             .city-list-items {
@@ -2109,7 +2129,7 @@
                 const timer = document.getElementById(`timer-${id}`);
                 if (timer) {
                     clearInterval(timer.intervalId);
-                    timer.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    timer.classList.add('removing');
                     setTimeout(() => {
                         timer.remove();
                         
@@ -2124,7 +2144,7 @@
                 const stopwatch = document.getElementById(`stopwatch-${id}`);
                 if (stopwatch) {
                     clearInterval(stopwatch.intervalId);
-                    stopwatch.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    stopwatch.classList.add('removing');
                     setTimeout(() => {
                         stopwatch.remove();
                         
@@ -2139,7 +2159,7 @@
                 const city = document.getElementById(`city-${id}`);
                 if (city) {
                     clearInterval(city.updateInterval);
-                    city.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    city.classList.add('removing');
                     setTimeout(() => {
                         city.remove();
                         
