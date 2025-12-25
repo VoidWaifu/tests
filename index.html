@@ -222,7 +222,7 @@
         .timer:hover, .stopwatch:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-            border-color: #444;
+            border-color = #444;
         }
 
         .timer-header, .stopwatch-header {
@@ -297,7 +297,7 @@
             content: '✓';
             position: absolute;
             top: 50%;
-            left: 50%;
+            left = 50%;
             transform: translate(-50%, -50%) scale(0);
             color: #ffeb3b;
             font-size: 16px;
@@ -646,7 +646,7 @@
                 order: 2;
                 padding: 8px 16px;
                 font-size: 13px;
-                border-radius: 10px;
+                border-radius = 10px;
             }
             
             .tabs {
@@ -720,7 +720,7 @@
             
             .checkbox-custom {
                 width: 16px;
-                height = 16px;
+                height: 16px;
                 margin-right: 6px;
             }
             
@@ -781,7 +781,7 @@
             
             .controls {
                 gap: 8px;
-                margin-top: 8px;
+                margin-top = 8px;
             }
             
             .control-btn {
@@ -1224,7 +1224,9 @@
                 
                 if (stopwatchData.isRunning && stopwatchData.startTime) {
                     const now = Date.now();
-                    stopwatchElement.elapsed = stopwatchData.elapsed + (now - stopwatchData.startTime);
+                    const elapsed = stopwatchData.elapsed + (now - stopwatchData.startTime);
+                    
+                    stopwatchElement.elapsed = elapsed;
                     stopwatchElement.isRunning = true;
                     stopwatchElement.startTime = now;
                     
@@ -1235,7 +1237,7 @@
                     startBtn.classList.add('hidden');
                     pauseBtn.classList.remove('hidden');
                     
-                    startStopwatchInterval(id, stopwatchElement.elapsed, now);
+                    startStopwatchInterval(id, elapsed, now);
                 } else {
                     stopwatchElement.elapsed = stopwatchData.elapsed;
                     stopwatchElement.isRunning = false;
@@ -1733,12 +1735,6 @@
                 stopwatch.isRunning = true;
                 stopwatch.startTime = Date.now();
                 
-                if (startBtn.textContent === "▶ Старт") {
-                    stopwatch.elapsed = 0;
-                } else {
-                    stopwatch.startTime = Date.now() - stopwatch.elapsed;
-                }
-                
                 startBtn.textContent = "▶ Возобновить";
                 startBtn.classList.add('hidden');
                 pauseBtn.classList.remove('hidden');
@@ -1749,7 +1745,7 @@
                     if (savedStopwatches[id]) {
                         savedStopwatches[id].isRunning = true;
                         savedStopwatches[id].startTime = stopwatch.startTime;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed || 0;
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                     }
                 }
@@ -1759,7 +1755,7 @@
                     startBtn.style.transform = '';
                 }, 150);
                 
-                startStopwatchInterval(id, stopwatch.elapsed, stopwatch.startTime);
+                startStopwatchInterval(id, stopwatch.elapsed || 0, stopwatch.startTime);
             };
 
             function startStopwatchInterval(id, elapsed, startTime) {
@@ -1782,7 +1778,7 @@
                 
                 if (stopwatch.isRunning && stopwatch.startTime) {
                     const now = Date.now();
-                    stopwatch.elapsed = stopwatch.elapsed + (now - stopwatch.startTime);
+                    stopwatch.elapsed = (stopwatch.elapsed || 0) + (now - stopwatch.startTime);
                 }
                 
                 stopwatch.isRunning = false;
@@ -1795,7 +1791,7 @@
                     const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
                     if (savedStopwatches[id]) {
                         savedStopwatches[id].isRunning = false;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed || 0;
                         delete savedStopwatches[id].startTime;
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                     }
