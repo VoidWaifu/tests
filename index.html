@@ -359,6 +359,12 @@
             gap: 5px;
         }
 
+        .time-display.ended {
+            font-size: 156px;
+            color: #ff4444;
+            animation: pulse 0.5s infinite alternate;
+        }
+
         .end-time {
             font-size: 14px;
             color: #aaa;
@@ -620,6 +626,10 @@
             .timer-container, .stopwatch-container {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .time-display.ended {
+                font-size: 120px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -736,6 +746,10 @@
                 margin: 10px 0;
             }
             
+            .time-display.ended {
+                font-size: 96px;
+            }
+            
             .end-time {
                 font-size: 11px;
                 margin-top: 2px;
@@ -849,6 +863,10 @@
                 font-size: 28px;
             }
             
+            .time-display.ended {
+                font-size: 84px;
+            }
+            
             .end-time {
                 font-size: 10px;
             }
@@ -904,6 +922,10 @@
             
             .timer-title, .stopwatch-title {
                 font-size: 13px;
+            }
+            
+            .time-display.ended {
+                font-size: 72px;
             }
             
             .time-inputs {
@@ -1152,8 +1174,7 @@
                         
                         display.childNodes[0].textContent = '00:00:00';
                         endTimeDisplay.textContent = '';
-                        display.style.color = '#ff4444';
-                        display.style.animation = 'pulse 0.5s infinite alternate';
+                        display.classList.add('ended');
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
                         timerElement.isRunning = false;
@@ -1483,6 +1504,7 @@
                 timer.startTime = Date.now();
                 startBtn.classList.add('hidden');
                 pauseBtn.classList.remove('hidden');
+                display.classList.remove('ended');
                 
                 const saveContainer = timer.querySelector('.save-container');
                 if (saveContainer.classList.contains('saved')) {
@@ -1519,8 +1541,7 @@
                         timer.isRunning = false;
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
-                        display.style.color = '#ff4444';
-                        display.style.animation = 'pulse 0.5s infinite alternate';
+                        display.classList.add('ended');
                         
                         const endTimeDisplay = document.getElementById(`end-time-${id}`);
                         endTimeDisplay.textContent = '';
@@ -1558,7 +1579,7 @@
                 timer.isRunning = false;
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
-                display.style.animation = '';
+                display.classList.remove('ended');
                 endTimeDisplay.textContent = '';
                 
                 const saveContainer = timer.querySelector('.save-container');
@@ -1591,8 +1612,7 @@
                 timer.totalSeconds = null;
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
-                display.style.color = '#ffeb3b';
-                display.style.animation = '';
+                display.classList.remove('ended');
                 endTimeDisplay.textContent = '';
                 
                 updateTimerDisplay(id);
