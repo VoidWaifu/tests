@@ -360,7 +360,7 @@
         }
 
         .end-time {
-            font-size: 42px;
+            font-size: 21px;
             color: #aaa;
             font-weight: normal;
             margin-top: 15px;
@@ -737,7 +737,7 @@
             }
             
             .end-time {
-                font-size: 33px;
+                font-size: 16.5px;
                 margin-top: 10px;
             }
             
@@ -850,7 +850,7 @@
             }
             
             .end-time {
-                font-size: 30px;
+                font-size: 15px;
                 margin-top: 8px;
             }
             
@@ -1483,6 +1483,7 @@
                 timer.startTime = Date.now();
                 timer.totalSeconds = newTotalSeconds;
                 timer.originalTotalSeconds = newTotalSeconds;
+                startBtn.textContent = "▶ Возобновить";
                 startBtn.classList.add('hidden');
                 pauseBtn.classList.remove('hidden');
                 
@@ -1520,6 +1521,7 @@
                     if (remainingSeconds <= 0) {
                         clearInterval(timer.intervalId);
                         timer.isRunning = false;
+                        startBtn.textContent = "▶ Старт";
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
                         display.style.color = '#ff4444';
@@ -1564,6 +1566,7 @@
                 }
                 
                 timer.isRunning = false;
+                startBtn.textContent = "▶ Возобновить";
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
                 display.style.animation = '';
@@ -1597,6 +1600,7 @@
                 timer.isRunning = false;
                 timer.startTime = null;
                 timer.totalSeconds = null;
+                startBtn.textContent = "▶ Старт";
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
                 display.style.color = '#ffeb3b';
