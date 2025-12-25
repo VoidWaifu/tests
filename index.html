@@ -439,6 +439,7 @@
             flex-direction: column;
             align-items: center;
             min-width: 80px;
+            position: relative;
         }
 
         .time-input label {
@@ -460,6 +461,14 @@
             font-size: 18px;
             font-weight: bold;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .time-input input::-webkit-outer-spin-button,
+        .time-input input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .time-input input:focus {
@@ -467,6 +476,55 @@
             border-color: #ffeb3b;
             box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.1);
             transform: scale(1.05);
+        }
+
+        .dropdown-btn {
+            position: absolute;
+            right: 5px;
+            top: 32px;
+            background: transparent;
+            border: none;
+            color: #ffeb3b;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            z-index: 2;
+        }
+
+        .dropdown-btn:hover {
+            color: #ffc107;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 65px;
+            left: 0;
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 12px;
+            color: #aaa;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: #333;
+            color: #ffeb3b;
         }
 
         .clock-container {
@@ -761,14 +819,20 @@
                         <div class="time-input">
                             <label>Часы</label>
                             <input type="number" min="0" max="99" value="${hoursValue}" class="hours-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Минуты</label>
                             <input type="number" min="0" max="59" value="${minutesValue}" class="minutes-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Секунды</label>
                             <input type="number" min="0" max="59" value="${secondsValue}" class="seconds-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                     </div>
                     <div class="time-display">${formatTime(timerData.totalSeconds)}</div>
@@ -783,6 +847,14 @@
                 
                 const timerElement = document.getElementById(`timer-${id}`);
                 timerElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                const hoursInput = timerElement.querySelector('.hours-input');
+                const minutesInput = timerElement.querySelector('.minutes-input');
+                const secondsInput = timerElement.querySelector('.seconds-input');
+                
+                initDropdown(timerElement.querySelector('.hours-input + .dropdown-btn + .dropdown-list'), 0, 99);
+                initDropdown(timerElement.querySelector('.minutes-input + .dropdown-btn + .dropdown-list'), 0, 59);
+                initDropdown(timerElement.querySelector('.seconds-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 
                 if (timerData.isRunning && timerData.startTime) {
                     const now = Date.now();
@@ -904,14 +976,20 @@
                         <div class="time-input">
                             <label>Часы</label>
                             <input type="number" min="0" max="99" value="0" class="hours-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Минуты</label>
                             <input type="number" min="0" max="59" value="1" class="minutes-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Секунды</label>
                             <input type="number" min="0" max="59" value="0" class="seconds-input">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
                         </div>
                     </div>
                     <div class="time-display">01:00:00</div>
@@ -923,11 +1001,15 @@
                 `;
                 
                 timerContainer.appendChild(timerDiv);
-                updateTimerDisplay(timerId);
                 
                 const timerElement = document.getElementById(`timer-${timerId}`);
                 timerElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                 
+                initDropdown(timerElement.querySelector('.hours-input + .dropdown-btn + .dropdown-list'), 0, 99);
+                initDropdown(timerElement.querySelector('.minutes-input + .dropdown-btn + .dropdown-list'), 0, 59);
+                initDropdown(timerElement.querySelector('.seconds-input + .dropdown-btn + .dropdown-list'), 0, 59);
+                
+                updateTimerDisplay(timerId);
                 timerId++;
             }
 
@@ -964,6 +1046,45 @@
                 
                 stopwatchId++;
             }
+
+            function initDropdown(dropdown, min, max) {
+                dropdown.innerHTML = '';
+                for (let i = min; i <= max; i++) {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.textContent = i.toString().padStart(2, '0');
+                    item.addEventListener('click', function() {
+                        const input = dropdown.previousElementSibling.previousElementSibling;
+                        input.value = i;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        dropdown.classList.remove('show');
+                    });
+                    dropdown.appendChild(item);
+                }
+            }
+
+            window.toggleDropdown = function(button) {
+                const dropdown = button.nextElementSibling;
+                const allDropdowns = document.querySelectorAll('.dropdown-list');
+                
+                allDropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        d.classList.remove('show');
+                    }
+                });
+                
+                dropdown.classList.toggle('show');
+                
+                event.stopPropagation();
+            };
+
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.time-input')) {
+                    document.querySelectorAll('.dropdown-list').forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+                }
+            });
 
             window.toggleSaveTimer = function(id) {
                 const timer = document.getElementById(`timer-${id}`);
