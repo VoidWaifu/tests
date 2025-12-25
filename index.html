@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Стеганографическое шифрование</title>
+    <link rel="icon" type="image/png" href="../assets/icon.png">
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -48,6 +49,8 @@
             right: 0;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
         }
 
         .my-site-btn, .info-btn {
@@ -62,10 +65,9 @@
             transition: var(--transition);
             text-decoration: none;
             display: inline-block;
-        }
-
-        .info-btn {
             white-space: nowrap;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         .my-site-btn:hover, .info-btn:hover {
@@ -136,15 +138,13 @@
 
         .password-input {
             width: 100%;
-            padding: 14px 40px 14px 14px;
+            padding: 14px 85px 14px 14px;
             background: var(--bg-tertiary);
             border: 2px solid transparent;
             border-radius: 10px;
             color: var(--text-primary);
             font-size: 1rem;
             transition: var(--transition);
-            -webkit-appearance: none;
-            -webkit-text-security: disc;
         }
 
         .password-input:focus, textarea:focus {
@@ -164,27 +164,51 @@
             transition: var(--transition);
         }
 
-        .toggle-password {
+        .password-actions {
             position: absolute;
             right: 8px;
-            top: 0;
-            bottom: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+
+        .password-action-btn {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
             cursor: pointer;
             padding: 0;
-            font-size: 1.1rem;
-            font-family: monospace;
-            width: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            z-index: 2;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
         }
 
-        .toggle-password:hover {
+        .password-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+            background-image: url('ShowPassword.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: invert(0.8);
+        }
+
+        .copy-icon {
+            font-size: 1rem;
+            font-family: monospace;
+            line-height: 1;
+            color: var(--text-secondary);
+        }
+
+        .password-action-btn:hover .copy-icon {
             color: var(--text-primary);
         }
 
@@ -321,16 +345,6 @@
             background: #0da271;
         }
 
-        .info-box {
-            background: rgba(59, 130, 246, 0.1);
-            border-left: 4px solid var(--accent-primary);
-            padding: 15px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
         .security-badge {
             display: inline-flex;
             align-items: center;
@@ -459,6 +473,35 @@
             font-weight: 500;
         }
 
+        @media (max-width: 640px) {
+            .header-buttons {
+                position: relative;
+                margin-bottom: 20px;
+                padding: 0;
+                gap: 10px;
+                flex-wrap: nowrap;
+            }
+            
+            header {
+                padding-top: 0;
+            }
+            
+            .info-btn {
+                width: auto;
+                flex-shrink: 0;
+                white-space: nowrap;
+                font-size: 0.85rem;
+                padding: 10px 15px;
+            }
+            
+            .my-site-btn {
+                flex-shrink: 0;
+                white-space: nowrap;
+                font-size: 0.85rem;
+                padding: 10px 15px;
+            }
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 12px;
@@ -494,20 +537,29 @@
                 font-size: 0.9rem;
             }
             
-            .toggle-password {
+            .password-actions {
                 right: 6px;
-                width: 30px;
-                font-size: 1rem;
+                gap: 3px;
+            }
+            
+            .password-action-btn {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .eye-icon {
+                width: 18px;
+                height: 18px;
             }
             
             .info-btn {
-                padding: 10px 15px;
-                font-size: 0.85rem;
+                padding: 10px 12px;
+                font-size: 0.8rem;
             }
             
             .my-site-btn {
-                padding: 10px 15px;
-                font-size: 0.85rem;
+                padding: 10px 12px;
+                font-size: 0.8rem;
             }
             
             .modal-section ul,
@@ -518,6 +570,10 @@
         }
 
         @media (max-width: 360px) {
+            .header-buttons {
+                gap: 6px;
+            }
+            
             .mode-btn {
                 min-width: 90px;
                 font-size: 0.85rem;
@@ -525,13 +581,13 @@
             }
             
             .info-btn {
-                padding: 8px 12px;
-                font-size: 0.8rem;
+                padding: 8px 10px;
+                font-size: 0.75rem;
             }
             
             .my-site-btn {
-                padding: 8px 12px;
-                font-size: 0.8rem;
+                padding: 8px 10px;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -555,8 +611,15 @@
             </h2>
             <div class="password-input-group">
                 <div class="password-wrapper">
-                    <input type="text" id="passwordInput" class="password-input" placeholder="Введите или создайте пароль" autocomplete="off">
-                    <button class="toggle-password" id="togglePasswordBtn">●</button>
+                    <input type="password" id="passwordInput" class="password-input" placeholder="Введите или создайте пароль" autocomplete="off">
+                    <div class="password-actions">
+                        <button class="password-action-btn" id="togglePasswordBtn" title="Показать/скрыть пароль">
+                            <div class="eye-icon"></div>
+                        </button>
+                        <button class="password-action-btn" id="copyPasswordBtn" title="Копировать пароль">
+                            <span class="copy-icon">⎘</span>
+                        </button>
+                    </div>
                 </div>
                 <button id="generatePasswordBtn">Создать пароль</button>
             </div>
@@ -586,10 +649,6 @@
                 </div>
             </div>
 
-            <div class="info-box">
-                <strong>Как это работает:</strong> Секретный текст шифруется с использованием пароля, затем скрывается в обычном тексте с помощью специальных невидимых символов. Для расшифровки нужен тот же пароль.
-            </div>
-
             <button id="encryptBtn" class="btn-primary">Зашифровать и скрыть текст</button>
 
             <div class="result-section" id="encryptResult" style="display: none;">
@@ -603,10 +662,6 @@
             <div class="text-group">
                 <label for="encryptedInput">Текст с скрытым сообщением:</label>
                 <textarea id="encryptedInput" placeholder="Вставьте текст, в котором скрыто сообщение..."></textarea>
-            </div>
-
-            <div class="info-box">
-                <strong>Важно:</strong> Для расшифровки используйте тот же пароль, который использовался при шифровании.
             </div>
 
             <button id="decryptBtn" class="btn-primary">Расшифровать скрытый текст</button>
@@ -901,6 +956,7 @@
             initElements() {
                 this.passwordInput = document.getElementById('passwordInput');
                 this.togglePasswordBtn = document.getElementById('togglePasswordBtn');
+                this.copyPasswordBtn = document.getElementById('copyPasswordBtn');
                 this.generatePasswordBtn = document.getElementById('generatePasswordBtn');
                 this.secretText = document.getElementById('secretText');
                 this.coverText = document.getElementById('coverText');
@@ -926,6 +982,7 @@
 
             bindEvents() {
                 this.togglePasswordBtn.addEventListener('click', () => this.togglePasswordVisibility());
+                this.copyPasswordBtn.addEventListener('click', () => this.copyPassword());
                 this.generatePasswordBtn.addEventListener('click', () => this.generatePassword());
                 this.secretText.addEventListener('input', () => this.updateCharCounts());
                 this.coverText.addEventListener('input', () => this.updateCharCounts());
@@ -952,14 +1009,17 @@
             }
 
             togglePasswordVisibility() {
-                const currentSecurity = this.passwordInput.style.webkitTextSecurity;
-                if (currentSecurity === 'none') {
-                    this.passwordInput.style.webkitTextSecurity = 'disc';
-                    this.togglePasswordBtn.textContent = '●';
-                } else {
-                    this.passwordInput.style.webkitTextSecurity = 'none';
-                    this.togglePasswordBtn.textContent = '○';
+                const isPassword = this.passwordInput.type === 'password';
+                this.passwordInput.type = isPassword ? 'text' : 'password';
+                this.togglePasswordBtn.querySelector('.eye-icon').style.filter = isPassword ? 'invert(0.4)' : 'invert(0.8)';
+            }
+
+            copyPassword() {
+                if (!this.passwordInput.value.trim()) {
+                    this.showNotification('Пароль пуст', 'error');
+                    return;
                 }
+                this.copyToClipboard(this.passwordInput.value);
             }
 
             openModal() {
