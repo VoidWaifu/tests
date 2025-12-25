@@ -179,7 +179,7 @@
             transform: translateY(-1px) scale(0.98);
         }
 
-        .timer-container, .stopwatch-container {
+        .timer-container, .stopwatch-container, .city-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
@@ -197,7 +197,7 @@
             }
         }
 
-        .timer, .stopwatch {
+        .timer, .stopwatch, .city-card {
             background: linear-gradient(145deg, #222, #1a1a1a);
             border: 1px solid #333;
             border-radius: 20px;
@@ -219,13 +219,13 @@
             }
         }
 
-        .timer:hover, .stopwatch:hover {
+        .timer:hover, .stopwatch:hover, .city-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
             border-color: #444;
         }
 
-        .timer-header, .stopwatch-header {
+        .timer-header, .stopwatch-header, .city-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -233,7 +233,7 @@
             min-height: 50px;
         }
 
-        .timer-title, .stopwatch-title {
+        .timer-title, .stopwatch-title, .city-title {
             font-size: 18px;
             font-weight: bold;
             background: transparent;
@@ -247,13 +247,13 @@
             margin-right: 15px;
         }
 
-        .timer-title:focus, .stopwatch-title:focus {
+        .timer-title:focus, .stopwatch-title:focus, .city-title:focus {
             outline: none;
             border-color: #ffeb3b;
             box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.1);
         }
 
-        .timer-controls, .stopwatch-controls {
+        .timer-controls, .stopwatch-controls, .city-controls {
             display: flex;
             gap: 10px;
             align-items: center;
@@ -540,64 +540,180 @@
             color: #ffeb3b;
         }
 
-        .clock-container {
+        .city-time-display {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #ffeb3b;
+            text-shadow: 0 2px 10px rgba(255, 235, 59, 0.2);
+            transition: all 0.3s ease;
+            flex: 1;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .city-info {
+            text-align: center;
+            color: #aaa;
+            font-size: 16px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .city-country {
+            font-size: 18px;
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .city-difference {
+            font-size: 16px;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .city-utc {
+            font-size: 16px;
+            color: #2196F3;
+        }
+
+        .city-list-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
             justify-content: center;
             align-items: center;
-            height: 350px;
-            animation: pulse 2s infinite alternate;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes pulse {
-            from {
-                transform: scale(1);
-            }
-            to {
-                transform: scale(1.02);
-            }
+        .city-list-modal.active {
+            display: flex;
         }
 
-        .clock {
-            font-size: 84px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            text-align: center;
-            text-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
-            background: linear-gradient(135deg, #ffeb3b, #ffc107);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 3s ease-in-out infinite alternate;
+        .city-list-content {
+            background: #1a1a1a;
+            border: 2px solid #ffeb3b;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        @keyframes glow {
-            from {
-                filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.3));
-            }
-            to {
-                filter: drop-shadow(0 0 20px rgba(255, 235, 59, 0.6));
-            }
+        .city-list-header {
+            padding: 20px;
+            border-bottom: 2px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            color: #666;
+        .city-list-header h2 {
+            color: #ffeb3b;
+            font-size: 24px;
+        }
+
+        .close-city-list {
+            background: transparent;
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             font-size: 20px;
-            animation: fadeIn 1s ease-out;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
         }
 
-        .date-display {
-            font-size: 28px;
-            text-align: center;
-            margin-top: 25px;
+        .close-city-list:hover {
+            background: rgba(255, 51, 51, 0.1);
+            transform: scale(1.1);
+        }
+
+        .city-list-search {
+            padding: 15px 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        .city-list-search input {
+            width: 100%;
+            padding: 12px 20px;
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            color: #ffeb3b;
+            font-size: 16px;
+        }
+
+        .city-list-search input:focus {
+            outline: none;
+            border-color: #ffeb3b;
+        }
+
+        .city-list-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+        }
+
+        .city-list-item {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .city-list-item:hover {
+            background: #2a2a2a;
+            border-color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        .city-list-item-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffeb3b;
+            margin-bottom: 5px;
+        }
+
+        .city-list-item-country {
+            font-size: 14px;
             color: #aaa;
-            font-weight: 300;
-            letter-spacing: 1px;
-            animation: fadeIn 1s ease-out 0.3s both;
+            margin-bottom: 10px;
         }
 
-        .content-switch {
-            animation: fadeIn 0.3s ease forwards;
+        .city-list-item-time {
+            font-size: 14px;
+            color: #4CAF50;
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .city-list-item-utc {
+            font-size: 14px;
+            color: #2196F3;
+            font-family: 'Courier New', monospace;
         }
 
         .card-remove {
@@ -617,7 +733,7 @@
         }
 
         @media (max-width: 1200px) {
-            .timer-container, .stopwatch-container {
+            .timer-container, .stopwatch-container, .city-container {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -670,18 +786,18 @@
                 border-radius: 0 0 12px 12px;
             }
             
-            .timer-container, .stopwatch-container {
+            .timer-container, .stopwatch-container, .city-container {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             
-            .timer, .stopwatch {
+            .timer, .stopwatch, .city-card {
                 padding: 15px;
                 min-height: 220px;
                 border-radius: 12px;
             }
             
-            .timer-header, .stopwatch-header {
+            .timer-header, .stopwatch-header, .city-header {
                 flex-direction: column;
                 gap: 10px;
                 align-items: stretch;
@@ -689,7 +805,7 @@
                 min-height: auto;
             }
             
-            .timer-title, .stopwatch-title {
+            .timer-title, .stopwatch-title, .city-title {
                 width: 100%;
                 margin-right: 0;
                 height: 40px;
@@ -698,7 +814,7 @@
                 border-radius: 8px;
             }
             
-            .timer-controls, .stopwatch-controls {
+            .timer-controls, .stopwatch-controls, .city-controls {
                 flex-direction: row;
                 justify-content: space-between;
                 height: auto;
@@ -731,7 +847,7 @@
                 border-radius: 8px;
             }
             
-            .time-display {
+            .time-display, .city-time-display {
                 font-size: 32px;
                 margin: 10px 0;
             }
@@ -747,6 +863,18 @@
             
             .milliseconds {
                 font-size: 20px;
+            }
+            
+            .city-time-display {
+                font-size: 28px;
+            }
+            
+            .city-country {
+                font-size: 16px;
+            }
+            
+            .city-info {
+                font-size: 14px;
             }
             
             .time-inputs {
@@ -799,18 +927,18 @@
                 border-radius: 12px;
             }
             
-            .clock-container {
-                height: 250px;
-                padding: 15px;
+            .city-list-content {
+                width: 95%;
+                max-height: 90vh;
             }
             
-            .clock {
-                font-size: 42px;
+            .city-list-items {
+                grid-template-columns: 1fr;
+                max-height: 300px;
             }
             
-            .date-display {
-                font-size: 18px;
-                margin-top: 10px;
+            .city-list-item-name {
+                font-size: 16px;
             }
         }
         
@@ -835,17 +963,17 @@
                 min-width: 110px;
             }
             
-            .timer-container, .stopwatch-container {
+            .timer-container, .stopwatch-container, .city-container {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
             
-            .timer, .stopwatch {
+            .timer, .stopwatch, .city-card {
                 padding: 12px;
                 min-height: 200px;
             }
             
-            .time-display {
+            .time-display, .city-time-display {
                 font-size: 28px;
             }
             
@@ -860,6 +988,18 @@
             
             .milliseconds {
                 font-size: 18px;
+            }
+            
+            .city-time-display {
+                font-size: 24px;
+            }
+            
+            .city-country {
+                font-size: 14px;
+            }
+            
+            .city-info {
+                font-size: 12px;
             }
             
             .time-inputs {
@@ -888,22 +1028,14 @@
                 min-width: 0;
                 flex: 1;
             }
-            
-            .clock {
-                font-size: 36px;
-            }
-            
-            .date-display {
-                font-size: 16px;
-            }
         }
         
         @media (max-width: 320px) {
-            .timer-container, .stopwatch-container {
+            .timer-container, .stopwatch-container, .city-container {
                 grid-template-columns: 1fr;
             }
             
-            .timer-title, .stopwatch-title {
+            .timer-title, .stopwatch-title, .city-title {
                 font-size: 13px;
             }
             
@@ -920,6 +1052,15 @@
             
             .controls {
                 flex-direction: column;
+            }
+            
+            .city-list-items {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .city-list-item {
+                padding: 12px;
             }
         }
         
@@ -954,11 +1095,20 @@
         </div>
 
         <div id="clock" class="content">
-            <div class="clock-container">
-                <div>
-                    <div class="clock" id="clockDisplay"></div>
-                    <div class="date-display" id="dateDisplay"></div>
+            <button class="add-btn" id="addCity">＋ ДОБАВИТЬ ГОРОД</button>
+            <div class="city-container" id="cityContainer"></div>
+        </div>
+
+        <div class="city-list-modal" id="cityModal">
+            <div class="city-list-content">
+                <div class="city-list-header">
+                    <h2>Выберите город</h2>
+                    <button class="close-city-list" id="closeCityList">✕</button>
                 </div>
+                <div class="city-list-search">
+                    <input type="text" id="citySearch" placeholder="Поиск города...">
+                </div>
+                <div class="city-list-items" id="cityListItems"></div>
             </div>
         </div>
     </div>
@@ -970,6 +1120,9 @@
             }
             if (!localStorage.getItem('savedStopwatches')) {
                 localStorage.setItem('savedStopwatches', JSON.stringify({}));
+            }
+            if (!localStorage.getItem('savedCities')) {
+                localStorage.setItem('savedCities', JSON.stringify({}));
             }
             
             const tabs = document.querySelectorAll('.tab');
@@ -1004,31 +1157,248 @@
                 }
             });
 
-            const clockDisplay = document.getElementById('clockDisplay');
-            const dateDisplay = document.getElementById('dateDisplay');
-
-            function updateClock() {
-                const now = new Date();
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                
-                clockDisplay.textContent = `${hours}:${minutes}:${seconds}`;
-                
-                const options = { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                };
-                dateDisplay.textContent = now.toLocaleDateString('ru-RU', options);
-            }
-
-            setInterval(updateClock, 1000);
-            updateClock();
-
             let timerId = 1;
             let stopwatchId = 1;
+            let cityId = 1;
+
+            const citiesData = [
+                {name: "Москва", country: "Россия", offset: 3},
+                {name: "Санкт-Петербург", country: "Россия", offset: 3},
+                {name: "Новосибирск", country: "Россия", offset: 7},
+                {name: "Екатеринбург", country: "Россия", offset: 5},
+                {name: "Казань", country: "Россия", offset: 3},
+                {name: "Нижний Новгород", country: "Россия", offset: 3},
+                {name: "Челябинск", country: "Россия", offset: 5},
+                {name: "Самара", country: "Россия", offset: 4},
+                {name: "Омск", country: "Россия", offset: 6},
+                {name: "Ростов-на-Дону", country: "Россия", offset: 3},
+                {name: "Уфа", country: "Россия", offset: 5},
+                {name: "Красноярск", country: "Россия", offset: 7},
+                {name: "Пермь", country: "Россия", offset: 5},
+                {name: "Воронеж", country: "Россия", offset: 3},
+                {name: "Волгоград", country: "Россия", offset: 3},
+                {name: "Краснодар", country: "Россия", offset: 3},
+                {name: "Саратов", country: "Россия", offset: 4},
+                {name: "Тюмень", country: "Россия", offset: 5},
+                {name: "Тольятти", country: "Россия", offset: 4},
+                {name: "Ижевск", country: "Россия", offset: 4},
+                {name: "Барнаул", country: "Россия", offset: 7},
+                {name: "Ульяновск", country: "Россия", offset: 4},
+                {name: "Иркутск", country: "Россия", offset: 8},
+                {name: "Хабаровск", country: "Россия", offset: 10},
+                {name: "Ярославль", country: "Россия", offset: 3},
+                {name: "Владивосток", country: "Россия", offset: 10},
+                {name: "Махачкала", country: "Россия", offset: 3},
+                {name: "Томск", country: "Россия", offset: 7},
+                {name: "Оренбург", country: "Россия", offset: 5},
+                {name: "Кемерово", country: "Россия", offset: 7},
+                {name: "Новокузнецк", country: "Россия", offset: 7},
+                {name: "Рязань", country: "Россия", offset: 3},
+                {name: "Астрахань", country: "Россия", offset: 4},
+                {name: "Набережные Челны", country: "Россия", offset: 3},
+                {name: "Пенза", country: "Россия", offset: 3},
+                {name: "Липецк", country: "Россия", offset: 3},
+                {name: "Киров", country: "Россия", offset: 3},
+                {name: "Чебоксары", country: "Россия", offset: 3},
+                {name: "Тула", country: "Россия", offset: 3},
+                {name: "Калининград", country: "Россия", offset: 2},
+                {name: "Брянск", country: "Россия", offset: 3},
+                {name: "Курск", country: "Россия", offset: 3},
+                {name: "Иваново", country: "Россия", offset: 3},
+                {name: "Магнитогорск", country: "Россия", offset: 5},
+                {name: "Тверь", country: "Россия", offset: 3},
+                {name: "Ставрополь", country: "Россия", offset: 3},
+                {name: "Севастополь", country: "Россия", offset: 3},
+                {name: "Нижний Тагил", country: "Россия", offset: 5},
+                {name: "Белгород", country: "Россия", offset: 3},
+                {name: "Архангельск", country: "Россия", offset: 3},
+                {name: "Киев", country: "Украина", offset: 2},
+                {name: "Харьков", country: "Украина", offset: 2},
+                {name: "Одесса", country: "Украина", offset: 2},
+                {name: "Днепр", country: "Украина", offset: 2},
+                {name: "Донецк", country: "Украина", offset: 2},
+                {name: "Запорожье", country: "Украина", offset: 2},
+                {name: "Львов", country: "Украина", offset: 2},
+                {name: "Кривой Рог", country: "Украина", offset: 2},
+                {name: "Николаев", country: "Украина", offset: 2},
+                {name: "Винница", country: "Украина", offset: 2},
+                {name: "Минск", country: "Беларусь", offset: 3},
+                {name: "Гомель", country: "Беларусь", offset: 3},
+                {name: "Могилёв", country: "Беларусь", offset: 3},
+                {name: "Витебск", country: "Беларусь", offset: 3},
+                {name: "Гродно", country: "Беларусь", offset: 3},
+                {name: "Брест", country: "Беларусь", offset: 3},
+                {name: "Астана", country: "Казахстан", offset: 6},
+                {name: "Алматы", country: "Казахстан", offset: 6},
+                {name: "Шымкент", country: "Казахстан", offset: 6},
+                {name: "Караганда", country: "Казахстан", offset: 6},
+                {name: "Актобе", country: "Казахстан", offset: 5},
+                {name: "Тараз", country: "Казахстан", offset: 6},
+                {name: "Павлодар", country: "Казахстан", offset: 6},
+                {name: "Усть-Каменогорск", country: "Казахстан", offset: 6},
+                {name: "Семей", country: "Казахстан", offset: 6},
+                {name: "Кызылорда", country: "Казахстан", offset: 6},
+                {name: "Тбилиси", country: "Грузия", offset: 4},
+                {name: "Кутаиси", country: "Грузия", offset: 4},
+                {name: "Батуми", country: "Грузия", offset: 4},
+                {name: "Ереван", country: "Армения", offset: 4},
+                {name: "Гюмри", country: "Армения", offset: 4},
+                {name: "Ванадзор", country: "Армения", offset: 4},
+                {name: "Баку", country: "Азербайджан", offset: 4},
+                {name: "Гянджа", country: "Азербайджан", offset: 4},
+                {name: "Сумгаит", country: "Азербайджан", offset: 4},
+                {name: "Мингечаур", country: "Азербайджан", offset: 4},
+                {name: "Варшава", country: "Польша", offset: 1},
+                {name: "Краков", country: "Польша", offset: 1},
+                {name: "Лодзь", country: "Польша", offset: 1},
+                {name: "Вроцлав", country: "Польша", offset: 1},
+                {name: "Познань", country: "Польша", offset: 1},
+                {name: "Гданьск", country: "Польша", offset: 1},
+                {name: "Щецин", country: "Польша", offset: 1},
+                {name: "Быдгощ", country: "Польша", offset: 1},
+                {name: "Люблин", country: "Польша", offset: 1},
+                {name: "Катовице", country: "Польша", offset: 1},
+                {name: "Берлин", country: "Германия", offset: 1},
+                {name: "Гамбург", country: "Германия", offset: 1},
+                {name: "Мюнхен", country: "Германия", offset: 1},
+                {name: "Кёльн", country: "Германия", offset: 1},
+                {name: "Франкфурт", country: "Германия", offset: 1},
+                {name: "Штутгарт", country: "Германия", offset: 1},
+                {name: "Дюссельдорф", country: "Германия", offset: 1},
+                {name: "Дортмунд", country: "Германия", offset: 1},
+                {name: "Эссен", country: "Германия", offset: 1},
+                {name: "Лейпциг", country: "Германия", offset: 1},
+                {name: "Париж", country: "Франция", offset: 1},
+                {name: "Марсель", country: "Франция", offset: 1},
+                {name: "Лион", country: "Франция", offset: 1},
+                {name: "Тулуза", country: "Франция", offset: 1},
+                {name: "Ницца", country: "Франция", offset: 1},
+                {name: "Нант", country: "Франция", offset: 1},
+                {name: "Страсбург", country: "Франция", offset: 1},
+                {name: "Монпелье", country: "Франция", offset: 1},
+                {name: "Бордо", country: "Франция", offset: 1},
+                {name: "Лилль", country: "Франция", offset: 1},
+                {name: "Лондон", country: "Великобритания", offset: 0},
+                {name: "Бирмингем", country: "Великобритания", offset: 0},
+                {name: "Манчестер", country: "Великобритания", offset: 0},
+                {name: "Ливерпуль", country: "Великобритания", offset: 0},
+                {name: "Глазго", country: "Великобритания", offset: 0},
+                {name: "Шеффилд", country: "Великобритания", offset: 0},
+                {name: "Лидс", country: "Великобритания", offset: 0},
+                {name: "Эдинбург", country: "Великобритания", offset: 0},
+                {name: "Бристоль", country: "Великобритания", offset: 0},
+                {name: "Кардифф", country: "Великобритания", offset: 0},
+                {name: "Рим", country: "Италия", offset: 1},
+                {name: "Милан", country: "Италия", offset: 1},
+                {name: "Неаполь", country: "Италия", offset: 1},
+                {name: "Турин", country: "Италия", offset: 1},
+                {name: "Палермо", country: "Италия", offset: 1},
+                {name: "Генуя", country: "Италия", offset: 1},
+                {name: "Болонья", country: "Италия", offset: 1},
+                {name: "Флоренция", country: "Италия", offset: 1},
+                {name: "Венеция", country: "Италия", offset: 1},
+                {name: "Верона", country: "Италия", offset: 1},
+                {name: "Мадрид", country: "Испания", offset: 1},
+                {name: "Барселона", country: "Испания", offset: 1},
+                {name: "Валенсия", country: "Испания", offset: 1},
+                {name: "Севилья", country: "Испания", offset: 1},
+                {name: "Сарагоса", country: "Испания", offset: 1},
+                {name: "Малага", country: "Испания", offset: 1},
+                {name: "Мурсия", country: "Испания", offset: 1},
+                {name: "Пальма", country: "Испания", offset: 1},
+                {name: "Лас-Пальмас", country: "Испания", offset: 0},
+                {name: "Бильбао", country: "Испания", offset: 1},
+                {name: "Амстердам", country: "Нидерланды", offset: 1},
+                {name: "Роттердам", country: "Нидерланды", offset: 1},
+                {name: "Гаага", country: "Нидерланды", offset: 1},
+                {name: "Утрехт", country: "Нидерланды", offset: 1},
+                {name: "Эйндховен", country: "Нидерланды", offset: 1},
+                {name: "Гронинген", country: "Нидерланды", offset: 1},
+                {name: "Тилбург", country: "Нидерланды", offset: 1},
+                {name: "Амерсфорт", country: "Нидерланды", offset: 1},
+                {name: "Бреда", country: "Нидерланды", offset: 1},
+                {name: "Неймеген", country: "Нидерланды", offset: 1},
+                {name: "Стамбул", country: "Турция", offset: 3},
+                {name: "Анкара", country: "Турция", offset: 3},
+                {name: "Измир", country: "Турция", offset: 3},
+                {name: "Бурса", country: "Турция", offset: 3},
+                {name: "Адана", country: "Турция", offset: 3},
+                {name: "Газиантеп", country: "Турция", offset: 3},
+                {name: "Конья", country: "Турция", offset: 3},
+                {name: "Анталья", country: "Турция", offset: 3},
+                {name: "Кайсери", country: "Турция", offset: 3},
+                {name: "Мерсин", country: "Турция", offset: 3},
+                {name: "Пекин", country: "Китай", offset: 8},
+                {name: "Шанхай", country: "Китай", offset: 8},
+                {name: "Гуанчжоу", country: "Китай", offset: 8},
+                {name: "Шэньчжэнь", country: "Китай", offset: 8},
+                {name: "Чэнду", country: "Китай", offset: 8},
+                {name: "Ухань", country: "Китай", offset: 8},
+                {name: "Сиань", country: "Китай", offset: 8},
+                {name: "Ханчжоу", country: "Китай", offset: 8},
+                {name: "Нанкин", country: "Китай", offset: 8},
+                {name: "Тяньцзинь", country: "Китай", offset: 8},
+                {name: "Токио", country: "Япония", offset: 9},
+                {name: "Иокогама", country: "Япония", offset: 9},
+                {name: "Осака", country: "Япония", offset: 9},
+                {name: "Нагоя", country: "Япония", offset: 9},
+                {name: "Саппоро", country: "Япония", offset: 9},
+                {name: "Кобе", country: "Япония", offset: 9},
+                {name: "Киото", country: "Япония", offset: 9},
+                {name: "Фукуока", country: "Япония", offset: 9},
+                {name: "Кавасаки", country: "Япония", offset: 9},
+                {name: "Сайтама", country: "Япония", offset: 9},
+                {name: "Сеул", country: "Южная Корея", offset: 9},
+                {name: "Пусан", country: "Южная Корея", offset: 9},
+                {name: "Инчхон", country: "Южная Корея", offset: 9},
+                {name: "Тэгу", country: "Южная Корея", offset: 9},
+                {name: "Тэджон", country: "Южная Корея", offset: 9},
+                {name: "Кванджу", country: "Южная Корея", offset: 9},
+                {name: "Ульсан", country: "Южная Корея", offset: 9},
+                {name: "Сувон", country: "Южная Корея", offset: 9},
+                {name: "Чханвон", country: "Южная Корея", offset: 9},
+                {name: "Коянг", country: "Южная Корея", offset: 9},
+                {name: "Нью-Йорк", country: "США", offset: -5},
+                {name: "Лос-Анджелес", country: "США", offset: -8},
+                {name: "Чикаго", country: "США", offset: -6},
+                {name: "Хьюстон", country: "США", offset: -6},
+                {name: "Финикс", country: "США", offset: -7},
+                {name: "Филадельфия", country: "США", offset: -5},
+                {name: "Сан-Антонио", country: "США", offset: -6},
+                {name: "Сан-Диего", country: "США", offset: -8},
+                {name: "Даллас", country: "США", offset: -6},
+                {name: "Сан-Хосе", country: "США", offset: -8},
+                {name: "Остин", country: "США", offset: -6},
+                {name: "Джэксонвилл", country: "США", offset: -5},
+                {name: "Форт-Уэрт", country: "США", offset: -6},
+                {name: "Колумбус", country: "США", offset: -5},
+                {name: "Шарлотт", country: "США", offset: -5},
+                {name: "Индианаполис", country: "США", offset: -5},
+                {name: "Сиэтл", country: "США", offset: -8},
+                {name: "Денвер", country: "США", offset: -7},
+                {name: "Вашингтон", country: "США", offset: -5},
+                {name: "Бостон", country: "США", offset: -5},
+                {name: "Торонто", country: "Канада", offset: -5},
+                {name: "Монреаль", country: "Канада", offset: -5},
+                {name: "Ванкувер", country: "Канада", offset: -8},
+                {name: "Калгари", country: "Канада", offset: -7},
+                {name: "Эдмонтон", country: "Канада", offset: -7},
+                {name: "Оттава", country: "Канада", offset: -5},
+                {name: "Виннипег", country: "Канада", offset: -6},
+                {name: "Квебек", country: "Канада", offset: -5},
+                {name: "Гамильтон", country: "Канада", offset: -5},
+                {name: "Лондон", country: "Канада", offset: -5},
+                {name: "Сидней", country: "Австралия", offset: 10},
+                {name: "Мельбурн", country: "Австралия", offset: 10},
+                {name: "Брисбен", country: "Австралия", offset: 10},
+                {name: "Перт", country: "Австралия", offset: 8},
+                {name: "Аделаида", country: "Австралия", offset: 9.5},
+                {name: "Голд-Кост", country: "Австралия", offset: 10},
+                {name: "Канберра", country: "Австралия", offset: 10},
+                {name: "Ньюкасл", country: "Австралия", offset: 10},
+                {name: "Вуллонгонг", country: "Австралия", offset: 10},
+                {name: "Хобарт", country: "Австралия", offset: 10}
+            ];
 
             function loadSavedTimers() {
                 const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
@@ -1056,6 +1426,21 @@
                 for (const [id, stopwatchData] of Object.entries(savedStopwatches)) {
                     if (stopwatchData.saved) {
                         createStopwatchFromData(id, stopwatchData);
+                    }
+                }
+            }
+
+            function loadSavedCities() {
+                const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                
+                const savedIds = Object.keys(savedCities).map(id => parseInt(id)).filter(id => !isNaN(id));
+                if (savedIds.length > 0) {
+                    cityId = Math.max(...savedIds) + 1;
+                }
+                
+                for (const [id, cityData] of Object.entries(savedCities)) {
+                    if (cityData.saved) {
+                        createCityFromData(id, cityData);
                     }
                 }
             }
@@ -1250,8 +1635,89 @@
                 }
             }
 
+            function createCityFromData(id, cityData) {
+                const cityContainer = document.getElementById('cityContainer');
+                
+                const cityDiv = document.createElement('div');
+                cityDiv.className = 'city-card';
+                cityDiv.id = `city-${id}`;
+                cityDiv.dataset.offset = cityData.offset;
+                
+                cityDiv.innerHTML = `
+                    <div class="city-header">
+                        <input type="text" class="city-title" value="${cityData.name}" placeholder="Название города">
+                        <div class="city-controls">
+                            <div class="save-container ${cityData.saved ? 'saved' : ''}" onclick="toggleSaveCity(${id})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">${cityData.saved ? 'Сохранен' : 'Сохранить'}</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteCity(${id})">✕</button>
+                        </div>
+                    </div>
+                    <div class="city-time-display" id="city-time-${id}"></div>
+                    <div class="city-info">
+                        <div class="city-country">${cityData.country}</div>
+                        <div class="city-difference" id="city-diff-${id}"></div>
+                        <div class="city-utc" id="city-utc-${id}"></div>
+                    </div>
+                `;
+                
+                cityContainer.appendChild(cityDiv);
+                
+                const cityElement = document.getElementById(`city-${id}`);
+                cityElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                updateCityTime(id, cityData.offset);
+                updateCityInfo(id, cityData.offset, cityData.country);
+                
+                cityElement.updateInterval = setInterval(() => {
+                    updateCityTime(id, cityData.offset);
+                    updateCityInfo(id, cityData.offset, cityData.country);
+                }, 1000);
+            }
+
+            function updateCityTime(id, offset) {
+                const cityElement = document.getElementById(`city-${id}`);
+                if (!cityElement) return;
+                
+                const now = new Date();
+                const localOffset = now.getTimezoneOffset() / 60;
+                const cityOffset = offset;
+                
+                const cityTime = new Date(now.getTime() + (cityOffset + localOffset) * 3600000);
+                
+                const hours = cityTime.getHours().toString().padStart(2, '0');
+                const minutes = cityTime.getMinutes().toString().padStart(2, '0');
+                const seconds = cityTime.getSeconds().toString().padStart(2, '0');
+                
+                const timeDisplay = document.getElementById(`city-time-${id}`);
+                if (timeDisplay) {
+                    timeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            }
+
+            function updateCityInfo(id, offset, country) {
+                const diffElement = document.getElementById(`city-diff-${id}`);
+                const utcElement = document.getElementById(`city-utc-${id}`);
+                
+                if (!diffElement || !utcElement) return;
+                
+                const localOffset = -new Date().getTimezoneOffset() / 60;
+                const cityOffset = offset;
+                const diff = cityOffset - localOffset;
+                
+                diffElement.textContent = diff >= 0 ? 
+                    `+${diff} ч от вашего времени` : 
+                    `${diff} ч от вашего времени`;
+                
+                utcElement.textContent = `UTC${cityOffset >= 0 ? '+' : ''}${cityOffset}`;
+            }
+
             document.getElementById('addTimer').addEventListener('click', createTimer);
             document.getElementById('addStopwatch').addEventListener('click', createStopwatch);
+            document.getElementById('addCity').addEventListener('click', showCityModal);
+            document.getElementById('closeCityList').addEventListener('click', hideCityModal);
+            document.getElementById('citySearch').addEventListener('input', filterCities);
 
             function createTimer() {
                 const timerContainer = document.getElementById('timerContainer');
@@ -1357,6 +1823,139 @@
                 stopwatchElement.startTime = null;
                 
                 stopwatchId++;
+            }
+
+            function showCityModal() {
+                const modal = document.getElementById('cityModal');
+                modal.classList.add('active');
+                renderCityList();
+            }
+
+            function hideCityModal() {
+                const modal = document.getElementById('cityModal');
+                modal.classList.remove('active');
+            }
+
+            function renderCityList() {
+                const container = document.getElementById('cityListItems');
+                container.innerHTML = '';
+                
+                const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                const savedCityNames = Object.values(savedCities)
+                    .filter(city => city.saved)
+                    .map(city => city.name);
+                
+                const countries = {};
+                citiesData.forEach(city => {
+                    if (!countries[city.country]) {
+                        countries[city.country] = [];
+                    }
+                    if (countries[city.country].length < 20 && !savedCityNames.includes(city.name)) {
+                        countries[city.country].push(city);
+                    }
+                });
+                
+                for (const country in countries) {
+                    countries[country].forEach(city => {
+                        const now = new Date();
+                        const localOffset = now.getTimezoneOffset() / 60;
+                        const cityOffset = city.offset;
+                        const cityTime = new Date(now.getTime() + (cityOffset + localOffset) * 3600000);
+                        
+                        const hours = cityTime.getHours().toString().padStart(2, '0');
+                        const minutes = cityTime.getMinutes().toString().padStart(2, '0');
+                        const seconds = cityTime.getSeconds().toString().padStart(2, '0');
+                        
+                        const item = document.createElement('div');
+                        item.className = 'city-list-item';
+                        item.dataset.city = JSON.stringify(city);
+                        item.innerHTML = `
+                            <div class="city-list-item-name">${city.name}</div>
+                            <div class="city-list-item-country">${city.country}</div>
+                            <div class="city-list-item-time">${hours}:${minutes}:${seconds}</div>
+                            <div class="city-list-item-utc">UTC${city.offset >= 0 ? '+' : ''}${city.offset}</div>
+                        `;
+                        item.addEventListener('click', () => addCity(city));
+                        container.appendChild(item);
+                    });
+                }
+                
+                const cityItems = container.querySelectorAll('.city-list-item');
+                cityItems.forEach(item => {
+                    const city = JSON.parse(item.dataset.city);
+                    setInterval(() => {
+                        const now = new Date();
+                        const localOffset = now.getTimezoneOffset() / 60;
+                        const cityOffset = city.offset;
+                        const cityTime = new Date(now.getTime() + (cityOffset + localOffset) * 3600000);
+                        
+                        const hours = cityTime.getHours().toString().padStart(2, '0');
+                        const minutes = cityTime.getMinutes().toString().padStart(2, '0');
+                        const seconds = cityTime.getSeconds().toString().padStart(2, '0');
+                        
+                        item.querySelector('.city-list-item-time').textContent = `${hours}:${minutes}:${seconds}`;
+                    }, 1000);
+                });
+            }
+
+            function filterCities() {
+                const searchTerm = document.getElementById('citySearch').value.toLowerCase();
+                const items = document.querySelectorAll('.city-list-item');
+                
+                items.forEach(item => {
+                    const name = item.querySelector('.city-list-item-name').textContent.toLowerCase();
+                    const country = item.querySelector('.city-list-item-country').textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || country.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+
+            function addCity(cityData) {
+                const cityContainer = document.getElementById('cityContainer');
+                
+                const cityDiv = document.createElement('div');
+                cityDiv.className = 'city-card';
+                cityDiv.id = `city-${cityId}`;
+                cityDiv.dataset.offset = cityData.offset;
+                
+                cityDiv.innerHTML = `
+                    <div class="city-header">
+                        <input type="text" class="city-title" value="${cityData.name}" placeholder="Название города">
+                        <div class="city-controls">
+                            <div class="save-container" onclick="toggleSaveCity(${cityId})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">Сохранить</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteCity(${cityId})">✕</button>
+                        </div>
+                    </div>
+                    <div class="city-time-display" id="city-time-${cityId}"></div>
+                    <div class="city-info">
+                        <div class="city-country">${cityData.country}</div>
+                        <div class="city-difference" id="city-diff-${cityId}"></div>
+                        <div class="city-utc" id="city-utc-${cityId}"></div>
+                    </div>
+                `;
+                
+                cityContainer.appendChild(cityDiv);
+                
+                const cityElement = document.getElementById(`city-${cityId}`);
+                cityElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                updateCityTime(cityId, cityData.offset);
+                updateCityInfo(cityId, cityData.offset, cityData.country);
+                
+                cityElement.updateInterval = setInterval(() => {
+                    updateCityTime(cityId, cityData.offset);
+                    updateCityInfo(cityId, cityData.offset, cityData.country);
+                }, 1000);
+                
+                hideCityModal();
+                cityId++;
             }
 
             function initDropdown(dropdown, min, max) {
@@ -1472,6 +2071,40 @@
                 }
             };
 
+            window.toggleSaveCity = function(id) {
+                const city = document.getElementById(`city-${id}`);
+                const saveContainer = city.querySelector('.save-container');
+                const isSaved = saveContainer.classList.contains('saved');
+                
+                if (isSaved) {
+                    saveContainer.classList.remove('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранить';
+                    
+                    const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                    if (savedCities[id]) {
+                        savedCities[id].saved = false;
+                        localStorage.setItem('savedCities', JSON.stringify(savedCities));
+                    }
+                } else {
+                    const title = city.querySelector('.city-title').value;
+                    const offset = parseFloat(city.dataset.offset);
+                    const country = city.querySelector('.city-country').textContent;
+                    
+                    saveContainer.classList.add('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранен';
+                    
+                    const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                    savedCities[id] = {
+                        name: title,
+                        country: country,
+                        offset: offset,
+                        saved: true
+                    };
+                    
+                    localStorage.setItem('savedCities', JSON.stringify(savedCities));
+                }
+            };
+
             window.deleteTimer = function(id) {
                 const timer = document.getElementById(`timer-${id}`);
                 if (timer) {
@@ -1498,6 +2131,21 @@
                         const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
                         delete savedStopwatches[id];
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }, 400);
+                }
+            };
+
+            window.deleteCity = function(id) {
+                const city = document.getElementById(`city-${id}`);
+                if (city) {
+                    clearInterval(city.updateInterval);
+                    city.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    setTimeout(() => {
+                        city.remove();
+                        
+                        const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                        delete savedCities[id];
+                        localStorage.setItem('savedCities', JSON.stringify(savedCities));
                     }, 400);
                 }
             };
@@ -1946,13 +2594,30 @@
                         }
                     }
                 }
+                
+                if (e.target.classList.contains('city-title')) {
+                    const cityDiv = e.target.closest('.city-card');
+                    if (cityDiv) {
+                        const id = parseInt(cityDiv.id.split('-')[1]);
+                        const saveContainer = cityDiv.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                            if (savedCities[id]) {
+                                savedCities[id].name = e.target.value;
+                                localStorage.setItem('savedCities', JSON.stringify(savedCities));
+                            }
+                        }
+                    }
+                }
             });
             
             loadSavedTimers();
             loadSavedStopwatches();
+            loadSavedCities();
             
             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
             const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+            const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
             
             if (Object.keys(savedTimers).length === 0) {
                 createTimer();
@@ -1961,6 +2626,12 @@
             if (Object.keys(savedStopwatches).length === 0) {
                 createStopwatch();
             }
+            
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'cityModal') {
+                    hideCityModal();
+                }
+            });
         });
     </script>
 </body>
