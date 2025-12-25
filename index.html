@@ -720,7 +720,7 @@
             
             .checkbox-custom {
                 width: 16px;
-                height: 16px;
+                height = 16px;
                 margin-right: 6px;
             }
             
@@ -1067,9 +1067,9 @@
                 timerDiv.className = 'timer';
                 timerDiv.id = `timer-${id}`;
                 
-                const hoursValue = timerData.initialHours || Math.floor(timerData.initialTotalSeconds / 3600);
-                const minutesValue = timerData.initialMinutes || Math.floor((timerData.initialTotalSeconds % 3600) / 60);
-                const secondsValue = timerData.initialSeconds || timerData.initialTotalSeconds % 60;
+                const initialHours = timerData.initialHours || Math.floor(timerData.initialTotalSeconds / 3600);
+                const initialMinutes = timerData.initialMinutes || Math.floor((timerData.initialTotalSeconds % 3600) / 60);
+                const initialSeconds = timerData.initialSeconds || timerData.initialTotalSeconds % 60;
                 
                 timerDiv.innerHTML = `
                     <div class="timer-header">
@@ -1085,19 +1085,19 @@
                     <div class="time-inputs">
                         <div class="time-input">
                             <label>Часы</label>
-                            <input type="number" min="0" max="99" value="${hoursValue}" class="hours-input">
+                            <input type="number" min="0" max="99" value="${initialHours}" class="hours-input">
                             <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
                             <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Минуты</label>
-                            <input type="number" min="0" max="59" value="${minutesValue}" class="minutes-input">
+                            <input type="number" min="0" max="59" value="${initialMinutes}" class="minutes-input">
                             <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
                             <div class="dropdown-list"></div>
                         </div>
                         <div class="time-input">
                             <label>Секунды</label>
-                            <input type="number" min="0" max="59" value="${secondsValue}" class="seconds-input">
+                            <input type="number" min="0" max="59" value="${initialSeconds}" class="seconds-input">
                             <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
                             <div class="dropdown-list"></div>
                         </div>
@@ -1127,18 +1127,19 @@
                 initDropdown(timerElement.querySelector('.seconds-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 
                 timerElement.initialTotalSeconds = timerData.initialTotalSeconds;
-                timerElement.initialHours = hoursValue;
-                timerElement.initialMinutes = minutesValue;
-                timerElement.initialSeconds = secondsValue;
+                timerElement.initialHours = initialHours;
+                timerElement.initialMinutes = initialMinutes;
+                timerElement.initialSeconds = initialSeconds;
+                timerData.elapsedTime = timerData.elapsedTime || 0;
                 
-                if (timerData.isRunning && timerData.startTime && timerData.elapsedTime) {
+                if (timerData.isRunning && timerData.startTime) {
                     const now = Date.now();
                     const elapsedTime = timerData.elapsedTime + (now - timerData.startTime);
                     const remainingTime = Math.max(0, timerData.initialTotalSeconds * 1000 - elapsedTime);
                     
-                    timerElement.startTime = timerData.startTime;
-                    timerElement.elapsedTime = timerData.elapsedTime;
+                    timerElement.elapsedTime = elapsedTime;
                     timerElement.isRunning = true;
+                    timerElement.startTime = now;
                     
                     if (remainingTime > 0) {
                         const startBtn = timerElement.querySelector('.start');
@@ -1149,8 +1150,8 @@
                         pauseBtn.classList.remove('hidden');
                         
                         updateTimerDisplayFromMilliseconds(id, remainingTime);
-                        updateEndTimeDisplay(id, timerData.startTime, timerData.elapsedTime, timerData.initialTotalSeconds * 1000);
-                        startTimerInterval(id, remainingTime, timerData.startTime, timerData.elapsedTime);
+                        updateEndTimeDisplay(id, now, elapsedTime, timerData.initialTotalSeconds * 1000);
+                        startTimerInterval(id, remainingTime, now, elapsedTime);
                     } else {
                         const display = timerElement.querySelector('.time-display');
                         const endTimeDisplay = document.getElementById(`end-time-${id}`);
@@ -1165,11 +1166,12 @@
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
                         timerElement.isRunning = false;
+                        timerElement.elapsedTime = timerData.initialTotalSeconds * 1000;
                         
                         const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                         if (savedTimers[id]) {
                             savedTimers[id].isRunning = false;
-                            savedTimers[id].elapsedTime = 0;
+                            savedTimers[id].elapsedTime = timerData.initialTotalSeconds * 1000;
                             delete savedTimers[id].startTime;
                             localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                         }
@@ -1177,7 +1179,13 @@
                 } else {
                     timerElement.elapsedTime = timerData.elapsedTime || 0;
                     timerElement.isRunning = false;
-                    updateTimerDisplay(id);
+                    const remainingTime = Math.max(0, timerData.initialTotalSeconds * 1000 - timerElement.elapsedTime);
+                    updateTimerDisplayFromMilliseconds(id, remainingTime);
+                    
+                    const startBtn = timerElement.querySelector('.start');
+                    if (timerElement.elapsedTime > 0) {
+                        startBtn.textContent = "▶ Возобновить";
+                    }
                 }
             }
 
@@ -1212,23 +1220,31 @@
                 const stopwatchElement = document.getElementById(`stopwatch-${id}`);
                 stopwatchElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                 
+                stopwatchData.elapsed = stopwatchData.elapsed || 0;
+                
                 if (stopwatchData.isRunning && stopwatchData.startTime) {
                     const now = Date.now();
                     stopwatchElement.elapsed = stopwatchData.elapsed + (now - stopwatchData.startTime);
-                    stopwatchElement.startTime = stopwatchData.startTime;
                     stopwatchElement.isRunning = true;
+                    stopwatchElement.startTime = now;
                     
                     const startBtn = stopwatchElement.querySelector('.start');
                     const pauseBtn = stopwatchElement.querySelector('.pause');
                     
+                    startBtn.textContent = "▶ Возобновить";
                     startBtn.classList.add('hidden');
                     pauseBtn.classList.remove('hidden');
                     
-                    startStopwatchInterval(id, stopwatchElement.elapsed, stopwatchData.startTime);
+                    startStopwatchInterval(id, stopwatchElement.elapsed, now);
                 } else {
-                    stopwatchElement.elapsed = stopwatchData.elapsed || 0;
+                    stopwatchElement.elapsed = stopwatchData.elapsed;
                     stopwatchElement.isRunning = false;
                     updateStopwatchDisplay(id, stopwatchElement.elapsed);
+                    
+                    const startBtn = stopwatchElement.querySelector('.start');
+                    if (stopwatchElement.elapsed > 0) {
+                        startBtn.textContent = "▶ Возобновить";
+                    }
                 }
             }
 
@@ -1293,6 +1309,12 @@
                 initDropdown(timerElement.querySelector('.minutes-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 initDropdown(timerElement.querySelector('.seconds-input + .dropdown-btn + .dropdown-list'), 0, 59);
                 
+                timerElement.initialTotalSeconds = 60;
+                timerElement.initialHours = 0;
+                timerElement.initialMinutes = 1;
+                timerElement.initialSeconds = 0;
+                timerElement.elapsedTime = 0;
+                
                 updateTimerDisplay(timerId);
                 timerId++;
             }
@@ -1327,6 +1349,8 @@
                 
                 const stopwatchElement = document.getElementById(`stopwatch-${stopwatchId}`);
                 stopwatchElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                stopwatchElement.elapsed = 0;
                 
                 stopwatchId++;
             }
@@ -1544,7 +1568,7 @@
                     if (newRemainingTime <= 0) {
                         clearInterval(timer.intervalId);
                         timer.isRunning = false;
-                        timer.elapsedTime = 0;
+                        timer.elapsedTime = timer.initialTotalSeconds * 1000;
                         startBtn.textContent = "▶ Старт";
                         startBtn.classList.remove('hidden');
                         pauseBtn.classList.add('hidden');
@@ -1559,7 +1583,7 @@
                             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                             if (savedTimers[id]) {
                                 savedTimers[id].isRunning = false;
-                                savedTimers[id].elapsedTime = 0;
+                                savedTimers[id].elapsedTime = timer.initialTotalSeconds * 1000;
                                 delete savedTimers[id].startTime;
                                 localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                             }
@@ -1699,6 +1723,140 @@
                 display.childNodes[0].textContent = formatTimeFromMilliseconds(milliseconds);
             }
 
+            window.startStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                
+                if (stopwatch.isRunning) return;
+                
+                stopwatch.isRunning = true;
+                stopwatch.startTime = Date.now();
+                
+                if (startBtn.textContent === "▶ Старт") {
+                    stopwatch.elapsed = 0;
+                } else {
+                    stopwatch.startTime = Date.now() - stopwatch.elapsed;
+                }
+                
+                startBtn.textContent = "▶ Возобновить";
+                startBtn.classList.add('hidden');
+                pauseBtn.classList.remove('hidden');
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = true;
+                        savedStopwatches[id].startTime = stopwatch.startTime;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                startBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    startBtn.style.transform = '';
+                }, 150);
+                
+                startStopwatchInterval(id, stopwatch.elapsed, stopwatch.startTime);
+            };
+
+            function startStopwatchInterval(id, elapsed, startTime) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const display = stopwatch.querySelector('.time-display');
+                
+                stopwatch.intervalId = setInterval(() => {
+                    const now = Date.now();
+                    stopwatch.elapsed = elapsed + (now - startTime);
+                    updateStopwatchDisplay(id, stopwatch.elapsed);
+                }, 10);
+            }
+
+            window.pauseStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                
+                clearInterval(stopwatch.intervalId);
+                
+                if (stopwatch.isRunning && stopwatch.startTime) {
+                    const now = Date.now();
+                    stopwatch.elapsed = stopwatch.elapsed + (now - stopwatch.startTime);
+                }
+                
+                stopwatch.isRunning = false;
+                startBtn.textContent = "▶ Возобновить";
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = false;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        delete savedStopwatches[id].startTime;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                pauseBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    pauseBtn.style.transform = '';
+                }, 150);
+            };
+
+            window.resetStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                const display = stopwatch.querySelector('.time-display');
+                
+                clearInterval(stopwatch.intervalId);
+                stopwatch.isRunning = false;
+                stopwatch.startTime = null;
+                stopwatch.elapsed = 0;
+                startBtn.textContent = "▶ Старт";
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                display.textContent = '00:00:00';
+                display.querySelector('.milliseconds').textContent = '.000';
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = false;
+                        savedStopwatches[id].elapsed = 0;
+                        delete savedStopwatches[id].startTime;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                const resetBtn = stopwatch.querySelector('.control-btn:last-child');
+                resetBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    resetBtn.style.transform = '';
+                }, 150);
+            };
+
+            function updateStopwatchDisplay(id, elapsed) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const display = stopwatch.querySelector('.time-display');
+                
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                const milliseconds = Math.floor(elapsed % 1000);
+                
+                display.innerHTML = 
+                    `${hours.toString().padStart(2, '0')}:` +
+                    `${minutes.toString().padStart(2, '0')}:` +
+                    `${seconds.toString().padStart(2, '0')}` +
+                    `<span class="milliseconds">.${milliseconds.toString().padStart(3, '0')}</span>`;
+            }
+
             document.addEventListener('input', function(e) {
                 if (e.target.classList.contains('hours-input') || 
                     e.target.classList.contains('minutes-input') || 
@@ -1773,130 +1931,6 @@
                     }
                 }
             });
-
-            window.startStopwatch = function(id) {
-                const stopwatch = document.getElementById(`stopwatch-${id}`);
-                const startBtn = stopwatch.querySelector('.start');
-                const pauseBtn = stopwatch.querySelector('.pause');
-                
-                if (stopwatch.isRunning) return;
-                
-                if (!stopwatch.startTime) {
-                    stopwatch.startTime = Date.now();
-                    stopwatch.elapsed = stopwatch.elapsed || 0;
-                } else {
-                    stopwatch.startTime = Date.now() - stopwatch.elapsed;
-                }
-                
-                stopwatch.isRunning = true;
-                startBtn.classList.add('hidden');
-                pauseBtn.classList.remove('hidden');
-                
-                const saveContainer = stopwatch.querySelector('.save-container');
-                if (saveContainer.classList.contains('saved')) {
-                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
-                    if (savedStopwatches[id]) {
-                        savedStopwatches[id].isRunning = true;
-                        savedStopwatches[id].startTime = stopwatch.startTime;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed;
-                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
-                    }
-                }
-                
-                startBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    startBtn.style.transform = '';
-                }, 150);
-                
-                startStopwatchInterval(id, stopwatch.elapsed, stopwatch.startTime);
-            };
-
-            function startStopwatchInterval(id, elapsed, startTime) {
-                const stopwatch = document.getElementById(`stopwatch-${id}`);
-                const display = stopwatch.querySelector('.time-display');
-                
-                stopwatch.intervalId = setInterval(() => {
-                    const now = Date.now();
-                    stopwatch.elapsed = elapsed + (now - startTime);
-                    updateStopwatchDisplay(id, stopwatch.elapsed);
-                }, 10);
-            }
-
-            window.pauseStopwatch = function(id) {
-                const stopwatch = document.getElementById(`stopwatch-${id}`);
-                const startBtn = stopwatch.querySelector('.start');
-                const pauseBtn = stopwatch.querySelector('.pause');
-                
-                clearInterval(stopwatch.intervalId);
-                stopwatch.isRunning = false;
-                startBtn.classList.remove('hidden');
-                pauseBtn.classList.add('hidden');
-                
-                const saveContainer = stopwatch.querySelector('.save-container');
-                if (saveContainer.classList.contains('saved')) {
-                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
-                    if (savedStopwatches[id]) {
-                        savedStopwatches[id].isRunning = false;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed;
-                        delete savedStopwatches[id].startTime;
-                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
-                    }
-                }
-                
-                pauseBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    pauseBtn.style.transform = '';
-                }, 150);
-            };
-
-            window.resetStopwatch = function(id) {
-                const stopwatch = document.getElementById(`stopwatch-${id}`);
-                const startBtn = stopwatch.querySelector('.start');
-                const pauseBtn = stopwatch.querySelector('.pause');
-                const display = stopwatch.querySelector('.time-display');
-                
-                clearInterval(stopwatch.intervalId);
-                stopwatch.isRunning = false;
-                stopwatch.startTime = null;
-                stopwatch.elapsed = 0;
-                startBtn.classList.remove('hidden');
-                pauseBtn.classList.add('hidden');
-                display.textContent = '00:00:00';
-                display.querySelector('.milliseconds').textContent = '.000';
-                
-                const saveContainer = stopwatch.querySelector('.save-container');
-                if (saveContainer.classList.contains('saved')) {
-                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
-                    if (savedStopwatches[id]) {
-                        savedStopwatches[id].isRunning = false;
-                        savedStopwatches[id].elapsed = 0;
-                        delete savedStopwatches[id].startTime;
-                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
-                    }
-                }
-                
-                const resetBtn = stopwatch.querySelector('.control-btn:last-child');
-                resetBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    resetBtn.style.transform = '';
-                }, 150);
-            };
-
-            function updateStopwatchDisplay(id, elapsed) {
-                const stopwatch = document.getElementById(`stopwatch-${id}`);
-                const display = stopwatch.querySelector('.time-display');
-                
-                const hours = Math.floor(elapsed / 3600000);
-                const minutes = Math.floor((elapsed % 3600000) / 60000);
-                const seconds = Math.floor((elapsed % 60000) / 1000);
-                const milliseconds = Math.floor(elapsed % 1000);
-                
-                display.innerHTML = 
-                    `${hours.toString().padStart(2, '0')}:` +
-                    `${minutes.toString().padStart(2, '0')}:` +
-                    `${seconds.toString().padStart(2, '0')}` +
-                    `<span class="milliseconds">.${milliseconds.toString().padStart(3, '0')}</span>`;
-            }
             
             loadSavedTimers();
             loadSavedStopwatches();
