@@ -346,7 +346,7 @@
             font-size: 52px;
             font-weight: bold;
             text-align: center;
-            margin: 25px 0;
+            margin: 15px 0;
             font-family: 'Courier New', monospace;
             color: #ffeb3b;
             text-shadow: 0 2px 10px rgba(255, 235, 59, 0.2);
@@ -355,10 +355,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .end-time {
+            font-size: 14px;
+            color: #aaa;
+            font-weight: normal;
+            margin-top: 5px;
+            opacity: 0.8;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
         .stopwatch .time-display {
             font-size: 48px;
+            flex-direction: row;
+            gap: 0;
         }
 
         .controls {
@@ -429,7 +442,7 @@
         .time-inputs {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -611,223 +624,184 @@
 
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 8px;
             }
             
             .header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
                 text-align: center;
-                padding-bottom: 10px;
+                padding-bottom: 8px;
+                margin-bottom: 10px;
             }
             
             .header h1 {
-                font-size: 24px;
+                font-size: 20px;
                 order: 1;
                 width: 100%;
+                line-height: 1.2;
             }
             
             .site-btn {
                 order: 2;
-                padding: 10px 20px;
-                font-size: 14px;
+                padding: 8px 16px;
+                font-size: 13px;
+                border-radius: 10px;
             }
             
             .tabs {
-                flex-direction: column;
-                border-radius: 15px 15px 0 0;
-                margin-bottom: 15px;
+                flex-direction: row;
+                border-radius: 12px 12px 0 0;
+                margin-bottom: 10px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
             
             .tab {
-                padding: 16px 20px;
-                font-size: 15px;
-                border-bottom: 1px solid #333;
-            }
-            
-            .tab:last-child {
-                border-bottom: none;
-            }
-            
-            .tab.active {
-                border-radius: 15px 15px 0 0;
+                padding: 12px 16px;
+                font-size: 14px;
+                min-width: 120px;
+                white-space: nowrap;
             }
             
             .content {
-                padding: 20px 15px;
-                min-height: 400px;
-                border-radius: 0 0 15px 15px;
+                padding: 15px;
+                min-height: auto;
+                border-radius: 0 0 12px 12px;
             }
             
             .timer-container, .stopwatch-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
             
             .timer, .stopwatch {
-                padding: 20px;
-                min-height: 250px;
-                min-width: 100%;
+                padding: 15px;
+                min-height: 220px;
+                border-radius: 12px;
             }
             
             .timer-header, .stopwatch-header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
                 align-items: stretch;
-                margin-bottom: 15px;
+                margin-bottom: 10px;
+                min-height: auto;
             }
             
             .timer-title, .stopwatch-title {
                 width: 100%;
                 margin-right: 0;
-                height: 45px;
-                font-size: 16px;
+                height: 40px;
+                font-size: 14px;
+                padding: 8px 12px;
+                border-radius: 8px;
             }
             
             .timer-controls, .stopwatch-controls {
                 flex-direction: row;
                 justify-content: space-between;
                 height: auto;
-                gap: 10px;
+                gap: 8px;
+                margin-top: 5px;
             }
             
             .save-container {
-                height: 45px;
-                padding: 8px 12px;
+                height: 38px;
+                padding: 6px 10px;
                 justify-content: center;
                 flex: 1;
+                border-radius: 8px;
             }
             
-            .delete-btn {
-                height: 45px;
-                padding: 8px 16px;
-                flex: 0 0 auto;
-            }
-            
-            .time-display {
-                font-size: 40px;
-                margin: 15px 0;
-            }
-            
-            .stopwatch .time-display {
-                font-size: 36px;
-            }
-            
-            .milliseconds {
-                font-size: 28px;
-            }
-            
-            .time-inputs {
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-            
-            .time-input {
-                min-width: 70px;
-            }
-            
-            .time-input label {
+            .save-text {
                 font-size: 12px;
             }
             
+            .checkbox-custom {
+                width: 16px;
+                height: 16px;
+                margin-right: 6px;
+            }
+            
+            .delete-btn {
+                height: 38px;
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+            
+            .time-display {
+                font-size: 32px;
+                margin: 10px 0;
+            }
+            
+            .end-time {
+                font-size: 11px;
+                margin-top: 2px;
+            }
+            
+            .stopwatch .time-display {
+                font-size: 28px;
+            }
+            
+            .milliseconds {
+                font-size: 20px;
+            }
+            
+            .time-inputs {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .time-input {
+                min-width: 60px;
+            }
+            
+            .time-input label {
+                font-size: 11px;
+                margin-bottom: 5px;
+            }
+            
             .time-input input {
-                padding: 10px;
+                padding: 8px;
                 font-size: 16px;
+                border-radius: 8px;
             }
             
             .dropdown-btn {
-                top: 30px;
-                font-size: 14px;
-                padding: 3px 8px;
+                top: 28px;
+                font-size: 12px;
+                padding: 2px 6px;
             }
             
             .dropdown-list {
-                top: 60px;
+                top: 50px;
             }
             
             .controls {
-                gap: 10px;
-                margin-top: 10px;
+                gap: 8px;
+                margin-top: 8px;
             }
             
             .control-btn {
-                padding: 10px 15px;
-                font-size: 14px;
-                min-width: 80px;
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 70px;
+                border-radius: 8px;
             }
             
             .add-btn {
                 width: 100%;
-                padding: 14px 20px;
-                font-size: 15px;
-                margin-bottom: 20px;
+                padding: 12px 16px;
+                font-size: 14px;
+                margin-bottom: 15px;
+                border-radius: 12px;
             }
             
             .clock-container {
-                height: 280px;
-                padding: 20px;
-            }
-            
-            .clock {
-                font-size: 48px;
-            }
-            
-            .date-display {
-                font-size: 20px;
-                margin-top: 15px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 22px;
-            }
-            
-            .site-btn {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .tab {
-                padding: 14px 16px;
-                font-size: 14px;
-            }
-            
-            .timer, .stopwatch {
+                height: 250px;
                 padding: 15px;
-                min-height: 220px;
-            }
-            
-            .time-display {
-                font-size: 36px;
-            }
-            
-            .stopwatch .time-display {
-                font-size: 32px;
-            }
-            
-            .milliseconds {
-                font-size: 24px;
-            }
-            
-            .time-inputs {
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .time-input {
-                width: 100%;
-                max-width: 200px;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
-            
-            .control-btn {
-                width: 100%;
-                padding: 12px;
             }
             
             .clock {
@@ -836,6 +810,115 @@
             
             .date-display {
                 font-size: 18px;
+                margin-top: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .site-btn {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+            }
+            
+            .tab {
+                padding: 10px 12px;
+                font-size: 12px;
+                min-width: 110px;
+            }
+            
+            .timer-container, .stopwatch-container {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .timer, .stopwatch {
+                padding: 12px;
+                min-height: 200px;
+            }
+            
+            .time-display {
+                font-size: 28px;
+            }
+            
+            .end-time {
+                font-size: 10px;
+            }
+            
+            .stopwatch .time-display {
+                font-size: 24px;
+            }
+            
+            .milliseconds {
+                font-size: 18px;
+            }
+            
+            .time-inputs {
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 6px;
+            }
+            
+            .time-input {
+                min-width: 55px;
+            }
+            
+            .time-input input {
+                padding: 6px;
+                font-size: 14px;
+            }
+            
+            .controls {
+                flex-direction: row;
+                flex-wrap: nowrap;
+            }
+            
+            .control-btn {
+                padding: 6px 8px;
+                font-size: 11px;
+                min-width: 0;
+                flex: 1;
+            }
+            
+            .clock {
+                font-size: 36px;
+            }
+            
+            .date-display {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .timer-container, .stopwatch-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer-title, .stopwatch-title {
+                font-size: 13px;
+            }
+            
+            .time-inputs {
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .time-input {
+                width: 100%;
+                max-width: 120px;
+            }
+            
+            .controls {
+                flex-direction: column;
             }
         }
         
@@ -1018,7 +1101,10 @@
                             <div class="dropdown-list"></div>
                         </div>
                     </div>
-                    <div class="time-display">${formatTime(timerData.totalSeconds)}</div>
+                    <div class="time-display">
+                        ${formatTime(timerData.totalSeconds)}
+                        <div class="end-time" id="end-time-${id}"></div>
+                    </div>
                     <div class="controls">
                         <button class="control-btn start" onclick="startTimer(${id})">▶ Старт</button>
                         <button class="control-btn pause hidden" onclick="pauseTimer(${id})">⏸ Пауза</button>
@@ -1056,13 +1142,16 @@
                         pauseBtn.classList.remove('hidden');
                         
                         updateTimerDisplayFromSeconds(id, remainingSeconds);
+                        updateEndTimeDisplay(id, timerData.startTime, timerData.totalSeconds);
                         startTimerInterval(id, remainingSeconds, timerData.startTime);
                     } else {
                         const display = timerElement.querySelector('.time-display');
+                        const endTimeDisplay = document.getElementById(`end-time-${id}`);
                         const startBtn = timerElement.querySelector('.start');
                         const pauseBtn = timerElement.querySelector('.pause');
                         
-                        display.textContent = '00:00:00';
+                        display.childNodes[0].textContent = '00:00:00';
+                        endTimeDisplay.textContent = '';
                         display.style.color = '#ff4444';
                         display.style.animation = 'pulse 0.5s infinite alternate';
                         startBtn.classList.remove('hidden');
@@ -1175,7 +1264,10 @@
                             <div class="dropdown-list"></div>
                         </div>
                     </div>
-                    <div class="time-display">01:00:00</div>
+                    <div class="time-display">
+                        01:00:00
+                        <div class="end-time" id="end-time-${timerId}"></div>
+                    </div>
                     <div class="controls">
                         <button class="control-btn start" onclick="startTimer(${timerId})">▶ Старт</button>
                         <button class="control-btn pause hidden" onclick="pauseTimer(${timerId})">⏸ Пауза</button>
@@ -1407,6 +1499,7 @@
                     startBtn.style.transform = '';
                 }, 150);
                 
+                updateEndTimeDisplay(id, timer.startTime, timer.totalSeconds);
                 startTimerInterval(id, timer.totalSeconds, timer.startTime);
             };
 
@@ -1429,6 +1522,9 @@
                         display.style.color = '#ff4444';
                         display.style.animation = 'pulse 0.5s infinite alternate';
                         
+                        const endTimeDisplay = document.getElementById(`end-time-${id}`);
+                        endTimeDisplay.textContent = '';
+                        
                         const saveContainer = timer.querySelector('.save-container');
                         if (saveContainer.classList.contains('saved')) {
                             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
@@ -1449,6 +1545,7 @@
                 const startBtn = timer.querySelector('.start');
                 const pauseBtn = timer.querySelector('.pause');
                 const display = timer.querySelector('.time-display');
+                const endTimeDisplay = document.getElementById(`end-time-${id}`);
                 
                 clearInterval(timer.intervalId);
                 
@@ -1462,6 +1559,7 @@
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
                 display.style.animation = '';
+                endTimeDisplay.textContent = '';
                 
                 const saveContainer = timer.querySelector('.save-container');
                 if (saveContainer.classList.contains('saved')) {
@@ -1485,6 +1583,7 @@
                 const startBtn = timer.querySelector('.start');
                 const pauseBtn = timer.querySelector('.pause');
                 const display = timer.querySelector('.time-display');
+                const endTimeDisplay = document.getElementById(`end-time-${id}`);
                 
                 clearInterval(timer.intervalId);
                 timer.isRunning = false;
@@ -1494,6 +1593,7 @@
                 pauseBtn.classList.add('hidden');
                 display.style.color = '#ffeb3b';
                 display.style.animation = '';
+                endTimeDisplay.textContent = '';
                 
                 updateTimerDisplay(id);
                 
@@ -1528,6 +1628,21 @@
                 return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }
 
+            function formatEndTime(timestamp) {
+                const date = new Date(timestamp);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `Закончится в ${hours}:${minutes}`;
+            }
+
+            function updateEndTimeDisplay(id, startTime, totalSeconds) {
+                const endTimeDisplay = document.getElementById(`end-time-${id}`);
+                if (endTimeDisplay) {
+                    const endTime = startTime + (totalSeconds * 1000);
+                    endTimeDisplay.textContent = formatEndTime(endTime);
+                }
+            }
+
             function updateTimerDisplay(id) {
                 const timer = document.getElementById(`timer-${id}`);
                 const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
@@ -1535,13 +1650,13 @@
                 const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
                 
                 const display = timer.querySelector('.time-display');
-                display.textContent = formatTime(hours * 3600 + minutes * 60 + seconds);
+                display.childNodes[0].textContent = formatTime(hours * 3600 + minutes * 60 + seconds);
             }
 
             function updateTimerDisplayFromSeconds(id, totalSeconds) {
                 const timer = document.getElementById(`timer-${id}`);
                 const display = timer.querySelector('.time-display');
-                display.textContent = formatTime(totalSeconds);
+                display.childNodes[0].textContent = formatTime(totalSeconds);
             }
 
             document.addEventListener('input', function(e) {
