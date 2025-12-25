@@ -222,7 +222,7 @@
         .timer:hover, .stopwatch:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-            border-color = #444;
+            border-color: #444;
         }
 
         .timer-header, .stopwatch-header {
@@ -297,7 +297,7 @@
             content: '✓';
             position: absolute;
             top: 50%;
-            left = 50%;
+            left: 50%;
             transform: translate(-50%, -50%) scale(0);
             color: #ffeb3b;
             font-size: 16px;
@@ -646,7 +646,7 @@
                 order: 2;
                 padding: 8px 16px;
                 font-size: 13px;
-                border-radius = 10px;
+                border-radius: 10px;
             }
             
             .tabs {
@@ -781,7 +781,7 @@
             
             .controls {
                 gap: 8px;
-                margin-top = 8px;
+                margin-top: 8px;
             }
             
             .control-btn {
@@ -1224,9 +1224,8 @@
                 
                 if (stopwatchData.isRunning && stopwatchData.startTime) {
                     const now = Date.now();
-                    const elapsed = stopwatchData.elapsed + (now - stopwatchData.startTime);
-                    
-                    stopwatchElement.elapsed = elapsed;
+                    const elapsedDuringPause = now - stopwatchData.startTime;
+                    stopwatchElement.elapsed = stopwatchData.elapsed + elapsedDuringPause;
                     stopwatchElement.isRunning = true;
                     stopwatchElement.startTime = now;
                     
@@ -1237,10 +1236,11 @@
                     startBtn.classList.add('hidden');
                     pauseBtn.classList.remove('hidden');
                     
-                    startStopwatchInterval(id, elapsed, now);
+                    startStopwatchInterval(id);
                 } else {
                     stopwatchElement.elapsed = stopwatchData.elapsed;
                     stopwatchElement.isRunning = false;
+                    stopwatchElement.startTime = null;
                     updateStopwatchDisplay(id, stopwatchElement.elapsed);
                     
                     const startBtn = stopwatchElement.querySelector('.start');
@@ -1353,6 +1353,8 @@
                 stopwatchElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
                 
                 stopwatchElement.elapsed = 0;
+                stopwatchElement.isRunning = false;
+                stopwatchElement.startTime = null;
                 
                 stopwatchId++;
             }
@@ -1733,7 +1735,12 @@
                 if (stopwatch.isRunning) return;
                 
                 stopwatch.isRunning = true;
-                stopwatch.startTime = Date.now();
+                stopwatch.startTime = Date.now() - (stopwatch.elapsed || 0);
+                
+                if (startBtn.textContent === "▶ Старт") {
+                    stopwatch.elapsed = 0;
+                    stopwatch.startTime = Date.now();
+                }
                 
                 startBtn.textContent = "▶ Возобновить";
                 startBtn.classList.add('hidden');
@@ -1745,7 +1752,7 @@
                     if (savedStopwatches[id]) {
                         savedStopwatches[id].isRunning = true;
                         savedStopwatches[id].startTime = stopwatch.startTime;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed || 0;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                     }
                 }
@@ -1755,16 +1762,18 @@
                     startBtn.style.transform = '';
                 }, 150);
                 
-                startStopwatchInterval(id, stopwatch.elapsed || 0, stopwatch.startTime);
+                startStopwatchInterval(id);
             };
 
-            function startStopwatchInterval(id, elapsed, startTime) {
+            function startStopwatchInterval(id) {
                 const stopwatch = document.getElementById(`stopwatch-${id}`);
                 const display = stopwatch.querySelector('.time-display');
                 
+                clearInterval(stopwatch.intervalId);
+                
                 stopwatch.intervalId = setInterval(() => {
                     const now = Date.now();
-                    stopwatch.elapsed = elapsed + (now - startTime);
+                    stopwatch.elapsed = now - stopwatch.startTime;
                     updateStopwatchDisplay(id, stopwatch.elapsed);
                 }, 10);
             }
@@ -1778,7 +1787,8 @@
                 
                 if (stopwatch.isRunning && stopwatch.startTime) {
                     const now = Date.now();
-                    stopwatch.elapsed = (stopwatch.elapsed || 0) + (now - stopwatch.startTime);
+                    stopwatch.elapsed = now - stopwatch.startTime;
+                    stopwatch.startTime = null;
                 }
                 
                 stopwatch.isRunning = false;
@@ -1791,7 +1801,7 @@
                     const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
                     if (savedStopwatches[id]) {
                         savedStopwatches[id].isRunning = false;
-                        savedStopwatches[id].elapsed = stopwatch.elapsed || 0;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
                         delete savedStopwatches[id].startTime;
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                     }
@@ -1816,8 +1826,7 @@
                 startBtn.textContent = "▶ Старт";
                 startBtn.classList.remove('hidden');
                 pauseBtn.classList.add('hidden');
-                display.textContent = '00:00:00';
-                display.querySelector('.milliseconds').textContent = '.000';
+                updateStopwatchDisplay(id, 0);
                 
                 const saveContainer = stopwatch.querySelector('.save-container');
                 if (saveContainer.classList.contains('saved')) {
