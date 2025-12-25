@@ -1224,10 +1224,10 @@
                 
                 if (stopwatchData.isRunning && stopwatchData.startTime) {
                     const now = Date.now();
-                    const elapsedDuringPause = now - stopwatchData.startTime;
-                    stopwatchElement.elapsed = stopwatchData.elapsed + elapsedDuringPause;
+                    const timeSinceStart = now - stopwatchData.startTime;
+                    stopwatchElement.elapsed = stopwatchData.elapsed + timeSinceStart;
                     stopwatchElement.isRunning = true;
-                    stopwatchElement.startTime = now;
+                    stopwatchElement.startTime = stopwatchData.startTime;
                     
                     const startBtn = stopwatchElement.querySelector('.start');
                     const pauseBtn = stopwatchElement.querySelector('.pause');
@@ -1786,7 +1786,7 @@
                             localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                         }
                     }
-                }, 100);
+                }, 10);
             }
 
             window.pauseStopwatch = function(id) {
