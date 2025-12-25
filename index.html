@@ -610,54 +610,238 @@
         }
 
         @media (max-width: 768px) {
-            .timer-container, .stopwatch-container {
-                grid-template-columns: 1fr;
+            body {
+                padding: 10px;
             }
             
-            .clock {
-                font-size: 56px;
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding-bottom: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+                order: 1;
+                width: 100%;
+            }
+            
+            .site-btn {
+                order: 2;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                border-radius: 15px 15px 0 0;
+                margin-bottom: 15px;
+            }
+            
+            .tab {
+                padding: 16px 20px;
+                font-size: 15px;
+                border-bottom: 1px solid #333;
+            }
+            
+            .tab:last-child {
+                border-bottom: none;
+            }
+            
+            .tab.active {
+                border-radius: 15px 15px 0 0;
+            }
+            
+            .content {
+                padding: 20px 15px;
+                min-height: 400px;
+                border-radius: 0 0 15px 15px;
+            }
+            
+            .timer-container, .stopwatch-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .timer, .stopwatch {
+                padding: 20px;
+                min-height: 250px;
+                min-width: 100%;
+            }
+            
+            .timer-header, .stopwatch-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+                margin-bottom: 15px;
+            }
+            
+            .timer-title, .stopwatch-title {
+                width: 100%;
+                margin-right: 0;
+                height: 45px;
+                font-size: 16px;
+            }
+            
+            .timer-controls, .stopwatch-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                height: auto;
+                gap: 10px;
+            }
+            
+            .save-container {
+                height: 45px;
+                padding: 8px 12px;
+                justify-content: center;
+                flex: 1;
+            }
+            
+            .delete-btn {
+                height: 45px;
+                padding: 8px 16px;
+                flex: 0 0 auto;
             }
             
             .time-display {
-                font-size: 42px;
+                font-size: 40px;
+                margin: 15px 0;
             }
             
             .stopwatch .time-display {
                 font-size: 36px;
             }
             
-            .timer, .stopwatch {
-                min-width: 100%;
+            .milliseconds {
+                font-size: 28px;
             }
             
-            .tabs {
-                flex-direction: column;
-                border-radius: 20px 20px 0 0;
+            .time-inputs {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .time-input {
+                min-width: 70px;
+            }
+            
+            .time-input label {
+                font-size: 12px;
+            }
+            
+            .time-input input {
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .dropdown-btn {
+                top: 30px;
+                font-size: 14px;
+                padding: 3px 8px;
+            }
+            
+            .dropdown-list {
+                top: 60px;
+            }
+            
+            .controls {
+                gap: 10px;
+                margin-top: 10px;
+            }
+            
+            .control-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+                min-width: 80px;
+            }
+            
+            .add-btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .clock-container {
+                height: 280px;
+                padding: 20px;
+            }
+            
+            .clock {
+                font-size: 48px;
+            }
+            
+            .date-display {
+                font-size: 20px;
+                margin-top: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .site-btn {
+                width: 100%;
+                text-align: center;
             }
             
             .tab {
-                border-radius: 0;
-                margin-bottom: 0;
+                padding: 14px 16px;
+                font-size: 14px;
             }
             
-            .tab.active {
-                border-radius: 20px 20px 0 0;
+            .timer, .stopwatch {
+                padding: 15px;
+                min-height: 220px;
             }
             
-            .timer-controls, .stopwatch-controls {
+            .time-display {
+                font-size: 36px;
+            }
+            
+            .stopwatch .time-display {
+                font-size: 32px;
+            }
+            
+            .milliseconds {
+                font-size: 24px;
+            }
+            
+            .time-inputs {
                 flex-direction: column;
-                height: auto;
-                gap: 5px;
+                align-items: center;
+                gap: 8px;
             }
             
-            .save-container {
-                height: 40px;
-                padding: 6px 10px;
+            .time-input {
+                width: 100%;
+                max-width: 200px;
             }
             
-            .delete-btn {
-                height: 40px;
-                padding: 6px 12px;
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-btn {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .clock {
+                font-size: 42px;
+            }
+            
+            .date-display {
+                font-size: 18px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .header h1 {
+                font-size: 28px;
             }
         }
     </style>
@@ -665,7 +849,6 @@
 <body>
     <div class="container">
         <div class="header">
-            <div></div>
             <h1>Таймеры, секундомеры, часы</h1>
             <a href="https://voidwaifu.github.io" target="_blank" class="site-btn">Мой сайт</a>
         </div>
