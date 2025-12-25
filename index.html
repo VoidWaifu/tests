@@ -3,1209 +3,1438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Стеганографическое шифрование</title>
-    <link rel="icon" type="image/png" href="../assets/icon.png">
+    <title>Таймеры и часы</title>
     <style>
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #1d4ed8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --border-radius: 12px;
-            --transition: all 0.2s ease;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
+            background-color: #0a0a0a;
+            color: #ffeb3b;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
-            position: relative;
         }
 
-        .header-buttons {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: nowrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #333;
         }
 
-        .my-site-btn, .info-btn {
-            background: var(--accent-primary);
-            color: white;
+        .site-btn {
+            background: linear-gradient(135deg, #ffeb3b, #ffc107);
+            color: #0a0a0a;
             border: none;
-            padding: 10px 20px;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
             text-decoration: none;
             display: inline-block;
-            white-space: nowrap;
-            text-align: center;
-            flex-shrink: 0;
         }
 
-        .my-site-btn:hover, .info-btn:hover {
-            background: var(--accent-secondary);
+        .site-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 235, 59, 0.4);
+        }
+
+        .site-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #333;
+            margin-bottom: 20px;
+            width: 100%;
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px 24px;
+            background: #1a1a1a;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            color: #aaa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab:hover::before {
+            left: 100%;
+        }
+
+        .tab:hover {
+            color: #ffeb3b;
+            background: #222;
             transform: translateY(-2px);
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-top: 50px;
-        }
-
-        h1 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            word-break: break-word;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
-            line-height: 1.5;
-        }
-
-        .password-section {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 25px;
-            border: 1px solid var(--bg-tertiary);
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            word-break: break-word;
-        }
-
-        .password-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        @media (min-width: 640px) {
-            .password-input-group {
-                flex-direction: row;
-                align-items: center;
-            }
-        }
-
-        .password-wrapper {
-            position: relative;
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 14px 85px 14px 14px;
-            background: var(--bg-tertiary);
-            border: 2px solid transparent;
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .password-input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        textarea {
-            width: 100%;
-            padding: 14px;
-            background: var(--bg-tertiary);
-            border: 2px solid transparent;
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .password-actions {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 5px;
-        }
-
-        .password-action-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-        }
-
-        .password-action-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .eye-icon {
-            width: 20px;
-            height: 20px;
-            background-image: url('ShowPassword.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            filter: invert(0.8);
-        }
-
-        .copy-icon {
-            font-size: 1rem;
-            font-family: monospace;
-            line-height: 1;
-            color: var(--text-secondary);
-        }
-
-        .password-action-btn:hover .copy-icon {
-            color: var(--text-primary);
-        }
-
-        button {
-            padding: 14px 24px;
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        @media (min-width: 640px) {
-            button {
-                width: auto;
-            }
-        }
-
-        button:hover {
-            background: var(--accent-secondary);
-            transform: translateY(-1px);
-        }
-
-        button:active {
+        .tab.active {
+            background: #ffeb3b;
+            color: #0a0a0a;
+            box-shadow: 0 4px 20px rgba(255, 235, 59, 0.3);
             transform: translateY(0);
         }
 
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 25px;
-            background: var(--bg-secondary);
-            padding: 4px;
-            border-radius: 10px;
-            flex-wrap: wrap;
-        }
-
-        .mode-btn {
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-            padding: 12px 8px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .mode-btn.active {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .content-section {
+        .content {
             display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .content-section.active {
-            display: block;
+            padding: 30px;
+            border: 1px solid #333;
+            border-radius: 0 0 20px 20px;
+            min-height: 500px;
+            background: #1a1a1a;
+            animation: fadeIn 0.3s ease forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .text-group {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--bg-tertiary);
+        .content.active {
+            display: block;
         }
 
-        textarea {
-            min-height: 140px;
-            resize: vertical;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        .char-count {
-            text-align: right;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 8px;
-        }
-
-        .char-count.warning {
-            color: var(--warning);
-        }
-
-        .char-count.error {
-            color: var(--danger);
-        }
-
-        .result-section {
-            margin-top: 25px;
-        }
-
-        .result-box {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            border: 2px solid var(--bg-tertiary);
-            min-height: 100px;
-            white-space: pre-wrap;
-            line-height: 1.6;
-            font-size: 1rem;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-        }
-
-        .copy-btn {
-            margin-top: 15px;
-            background: var(--success);
-        }
-
-        .copy-btn:hover {
-            background: #0da271;
-        }
-
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 15px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 30px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--bg-tertiary);
-            position: relative;
-            text-align: center;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
+        .add-btn {
+            background: linear-gradient(135deg, #ffeb3b, #ffc107);
+            color: #0a0a0a;
             border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
+            padding: 16px 32px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            margin-bottom: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .add-btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 235, 59, 0.4);
+        }
+
+        .add-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .timer-container, .stopwatch-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timer, .stopwatch {
+            background: linear-gradient(145deg, #222, #1a1a1a);
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            animation: cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timer:hover, .stopwatch:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: #444;
+        }
+
+        .timer-header, .stopwatch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+
+        .timer-title, .stopwatch-title {
+            font-size: 18px;
+            font-weight: bold;
+            background: transparent;
+            border: 2px solid #333;
+            color: #ffeb3b;
+            padding: 10px 15px;
+            border-radius: 12px;
+            width: 60%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .timer-title:focus, .stopwatch-title:focus {
+            outline: none;
+            border-color: #ffeb3b;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.1);
+        }
+
+        .timer-controls, .stopwatch-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            height: 50px;
+        }
+
+        .save-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 50px;
+            box-sizing: border-box;
+        }
+
+        .save-container:hover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .save-container.saved {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background: #1a1a1a;
+            position: relative;
+            transition: all 0.3s;
+            margin-right: 8px;
+        }
+
+        .checkbox-custom::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            color: #ffeb3b;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .save-container.saved .checkbox-custom {
+            border-color: #4CAF50;
+            background: #4CAF50;
+        }
+
+        .save-container.saved .checkbox-custom::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .save-text {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: bold;
+            height: 50px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            transition: var(--transition);
         }
 
-        .modal-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
+        .delete-btn:hover {
+            background: rgba(255, 51, 51, 0.1);
+            transform: scale(1.05);
         }
 
-        .modal-title {
-            font-size: 1.8rem;
+        .time-display {
+            font-size: 52px;
+            font-weight: bold;
+            text-align: center;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            color: #ffeb3b;
+            text-shadow: 0 2px 10px rgba(255, 235, 59, 0.2);
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stopwatch .time-display {
+            font-size: 48px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #333;
+            color: #ffeb3b;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            min-width: 90px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn.hidden {
+            display: none;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover:not(.hidden) {
+            background: #444;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.start {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+        }
+
+        .control-btn.start:hover:not(.hidden) {
+            background: linear-gradient(135deg, #388e3c, #66bb6a);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .control-btn.pause {
+            background: linear-gradient(135deg, #f57c00, #ff9800);
+        }
+
+        .control-btn.pause:hover:not(.hidden) {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 15px;
             margin-bottom: 20px;
-            color: var(--text-primary);
-            text-align: center;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .modal-content {
-            line-height: 1.7;
-            text-align: center;
+        .time-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
         }
 
-        .modal-section {
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .modal-section h3 {
-            color: var(--accent-primary);
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-            text-align: center;
-        }
-
-        .modal-section p {
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            text-align: center;
-        }
-
-        .modal-section ul {
-            margin: 0 auto 10px auto;
-            padding-left: 20px;
-            color: var(--text-secondary);
-            display: inline-block;
-            text-align: left;
-            max-width: 500px;
-        }
-
-        .modal-section ol {
-            margin: 0 auto 10px auto;
-            padding-left: 20px;
-            color: var(--text-secondary);
-            display: inline-block;
-            text-align: left;
-            max-width: 500px;
-        }
-
-        .modal-section li {
+        .time-input label {
+            font-size: 13px;
             margin-bottom: 8px;
-            text-align: left;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .highlight {
-            color: var(--text-primary);
-            background: rgba(59, 130, 246, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 500;
+        .time-input input {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            color: #ffeb3b;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @media (max-width: 640px) {
-            .header-buttons {
-                position: relative;
-                margin-bottom: 20px;
-                padding: 0;
-                gap: 10px;
-                flex-wrap: nowrap;
-            }
-            
-            header {
-                padding-top: 0;
-            }
-            
-            .info-btn {
-                width: auto;
-                flex-shrink: 0;
-                white-space: nowrap;
-                font-size: 0.85rem;
-                padding: 10px 15px;
-            }
-            
-            .my-site-btn {
-                flex-shrink: 0;
-                white-space: nowrap;
-                font-size: 0.85rem;
-                padding: 10px 15px;
-            }
+        .time-input input:focus {
+            outline: none;
+            border-color: #ffeb3b;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.1);
+            transform: scale(1.05);
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 12px;
+        .clock-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 350px;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
             }
-            
-            .password-section, .text-group {
-                padding: 16px;
-            }
-            
-            .result-box {
-                padding: 16px;
-            }
-            
-            .modal {
-                padding: 20px;
-            }
-            
-            .modal-title {
-                font-size: 1.5rem;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .section-title {
-                font-size: 1.1rem;
-            }
-            
-            .mode-btn {
-                min-width: 100px;
-                padding: 10px 6px;
-                font-size: 0.9rem;
-            }
-            
-            .password-actions {
-                right: 6px;
-                gap: 3px;
-            }
-            
-            .password-action-btn {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .eye-icon {
-                width: 18px;
-                height: 18px;
-            }
-            
-            .info-btn {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
-            
-            .my-site-btn {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
-            
-            .modal-section ul,
-            .modal-section ol {
-                padding-left: 15px;
-                max-width: 100%;
+            to {
+                transform: scale(1.02);
             }
         }
 
-        @media (max-width: 360px) {
-            .header-buttons {
-                gap: 6px;
+        .clock {
+            font-size: 84px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
+            background: linear-gradient(135deg, #ffeb3b, #ffc107);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(255, 235, 59, 0.6));
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+            font-size: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .date-display {
+            font-size: 28px;
+            text-align: center;
+            margin-top: 25px;
+            color: #aaa;
+            font-weight: 300;
+            letter-spacing: 1px;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .content-switch {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .card-remove {
+            animation: cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes cardRemove {
+            to {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
+        }
+
+        .milliseconds {
+            font-size: 36px;
+            color: #ffc107;
+        }
+
+        @media (max-width: 1200px) {
+            .timer-container, .stopwatch-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .timer-container, .stopwatch-container {
+                grid-template-columns: 1fr;
             }
             
-            .mode-btn {
-                min-width: 90px;
-                font-size: 0.85rem;
-                padding: 8px 4px;
+            .clock {
+                font-size: 56px;
             }
             
-            .info-btn {
-                padding: 8px 10px;
-                font-size: 0.75rem;
+            .time-display {
+                font-size: 42px;
             }
             
-            .my-site-btn {
-                padding: 8px 10px;
-                font-size: 0.75rem;
+            .stopwatch .time-display {
+                font-size: 36px;
+            }
+            
+            .timer, .stopwatch {
+                min-width: 100%;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                border-radius: 20px 20px 0 0;
+            }
+            
+            .tab {
+                border-radius: 0;
+                margin-bottom: 0;
+            }
+            
+            .tab.active {
+                border-radius: 20px 20px 0 0;
+            }
+            
+            .timer-controls, .stopwatch-controls {
+                flex-direction: column;
+                height: auto;
+                gap: 5px;
+            }
+            
+            .save-container {
+                height: 40px;
+                padding: 6px 10px;
+            }
+            
+            .delete-btn {
+                height: 40px;
+                padding: 6px 12px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-buttons">
-            <button class="info-btn" id="infoBtn">Как это работает?</button>
-            <a href="https://voidwaifu.github.io" target="_blank" class="my-site-btn">Мой сайт</a>
-        </div>
-        
-        <header>
-            <h1>Стеганографическое шифрование</h1>
-            <p class="subtitle">Шифруйте текст, скрывая его в обычных сообщениях</p>
-        </header>
-
-        <section class="password-section">
-            <h2 class="section-title">
-                <span>🔐</span>
-                Пароль для шифрования
-            </h2>
-            <div class="password-input-group">
-                <div class="password-wrapper">
-                    <input type="password" id="passwordInput" class="password-input" placeholder="Введите или создайте пароль" autocomplete="off">
-                    <div class="password-actions">
-                        <button class="password-action-btn" id="togglePasswordBtn" title="Показать/скрыть пароль">
-                            <div class="eye-icon"></div>
-                        </button>
-                        <button class="password-action-btn" id="copyPasswordBtn" title="Копировать пароль">
-                            <span class="copy-icon">⎘</span>
-                        </button>
-                    </div>
-                </div>
-                <button id="generatePasswordBtn">Создать пароль</button>
-            </div>
-            <div class="security-badge">
-                <span>✓</span>
-                Ваши данные шифруются локально в браузере
-            </div>
-        </section>
-
-        <div class="mode-selector">
-            <button class="mode-btn active" data-mode="encrypt">Зашифровать</button>
-            <button class="mode-btn" data-mode="decrypt">Расшифровать</button>
+        <div class="header">
+            <a href="https://voidwaifu.github.io" target="_blank" class="site-btn">Мой сайт</a>
+            <h1>Таймеры и часы</h1>
+            <div></div>
         </div>
 
-        <div id="encryptSection" class="content-section active">
-            <div class="text-group">
-                <label for="secretText">Текст для шифрования:</label>
-                <textarea id="secretText" placeholder="Введите секретный текст, который нужно скрыть..."></textarea>
-                <div class="char-count" id="secretCharCount">0 символов</div>
-            </div>
-
-            <div class="text-group">
-                <label for="coverText">Обычный текст (маскировка):</label>
-                <textarea id="coverText" placeholder="Введите обычный текст, в который будет скрыт секретный текст..."></textarea>
-                <div class="char-count" id="coverCharCount">
-                    Введите минимум <span id="minChars">0</span> символов
-                </div>
-            </div>
-
-            <button id="encryptBtn" class="btn-primary">Зашифровать и скрыть текст</button>
-
-            <div class="result-section" id="encryptResult" style="display: none;">
-                <h3 class="section-title">Результат:</h3>
-                <div class="result-box" id="encryptedResult"></div>
-                <button class="copy-btn" id="copyEncryptedBtn">Копировать результат</button>
-            </div>
+        <div class="tabs">
+            <div class="tab" data-tab="timer">ТАЙМЕР</div>
+            <div class="tab" data-tab="stopwatch">СЕКУНДОМЕР</div>
+            <div class="tab" data-tab="clock">ЧАСЫ</div>
         </div>
 
-        <div id="decryptSection" class="content-section">
-            <div class="text-group">
-                <label for="encryptedInput">Текст с скрытым сообщением:</label>
-                <textarea id="encryptedInput" placeholder="Вставьте текст, в котором скрыто сообщение..."></textarea>
-            </div>
-
-            <button id="decryptBtn" class="btn-primary">Расшифровать скрытый текст</button>
-
-            <div class="result-section" id="decryptResult" style="display: none;">
-                <h3 class="section-title">Расшифрованный текст:</h3>
-                <div class="result-box" id="decryptedResult"></div>
-                <button class="copy-btn" id="copyDecryptedBtn">Копировать текст</button>
-            </div>
+        <div id="timer" class="content">
+            <button class="add-btn" id="addTimer">＋ ДОБАВИТЬ ТАЙМЕР</button>
+            <div class="timer-container" id="timerContainer"></div>
         </div>
-    </div>
 
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <h2 class="modal-title">Как работает этот сайт</h2>
-            <div class="modal-content">
-                <div class="modal-section">
-                    <h3>Основная идея</h3>
-                    <p>Этот инструмент позволяет <span class="highlight">скрывать секретные сообщения</span> внутри обычных текстов так, что их невозможно обнаружить при беглом просмотре.</p>
-                    <p>Вы можете отправлять такие тексты публично, и только человек с правильным паролем сможет извлечь скрытое сообщение.</p>
-                </div>
+        <div id="stopwatch" class="content">
+            <button class="add-btn" id="addStopwatch">＋ ДОБАВИТЬ СЕКУНДОМЕР</button>
+            <div class="stopwatch-container" id="stopwatchContainer"></div>
+        </div>
 
-                <div class="modal-section">
-                    <h3>Процесс шифрования</h3>
-                    <ol>
-                        <li>Вводите секретный текст, который хотите скрыть</li>
-                        <li>Вводите обычный текст, который будет служить маскировкой</li>
-                        <li>Задаете пароль для защиты</li>
-                        <li>Нажимаете "Зашифровать и скрыть текст"</li>
-                    </ol>
-                    <p>Результат выглядит как обычный текст, но содержит ваше скрытое сообщение.</p>
-                </div>
-
-                <div class="modal-section">
-                    <h3>Процесс расшифровки</h3>
-                    <ol>
-                        <li>Вставляете текст со скрытым сообщением</li>
-                        <li>Вводите тот же пароль, что использовался при шифровании</li>
-                        <li>Нажимаете "Расшифровать скрытый текст"</li>
-                    </ol>
-                    <p>Сайт извлечет и покажет исходное секретное сообщение.</p>
-                </div>
-
-                <div class="modal-section">
-                    <h3>Технические особенности</h3>
-                    <ul>
-                        <li><span class="highlight">Всё работает в вашем браузере</span> — данные никуда не отправляются</li>
-                        <li>Используется <span class="highlight">военная криптография AES-256</span></li>
-                        <li>Пароль защищен 100,000 итерациями PBKDF2</li>
-                        <li>Скрытое сообщение маскируется с помощью <span class="highlight">невидимых символов Unicode</span></li>
-                        <li>Результат выглядит абсолютно естественно</li>
-                    </ul>
-                </div>
-
-                <div class="modal-section">
-                    <h3>Примеры использования</h3>
-                    <ul>
-                        <li>Передача конфиденциальной информации в публичных каналах</li>
-                        <li>Создание секретных посланий в соцсетях и мессенджерах</li>
-                        <li>Защита личных заметок от случайного прочтения</li>
-                        <li>Обмен паролями и ключами через открытые каналы</li>
-                    </ul>
-                </div>
-
-                <div class="modal-section">
-                    <h3>Важная информация</h3>
-                    <p><span class="highlight">Запомните или сохраните пароль!</span> Без него невозможно восстановить скрытое сообщение.</p>
-                    <p>Текст-маскировка должен быть достаточно длинным, чтобы вместить зашифрованные данные.</p>
-                    <p>Сайт совместим с русским и английским языками, а также их комбинациями.</p>
+        <div id="clock" class="content">
+            <div class="clock-container">
+                <div>
+                    <div class="clock" id="clockDisplay"></div>
+                    <div class="date-display" id="dateDisplay"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        class SteganographyCrypto {
-            constructor() {
-                this.INVISIBLE_CHARS = [
-                    '\u200B', '\u200C', '\u200D', '\u2060',
-                    '\u2061', '\u2062', '\u2063', '\u2064'
-                ];
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('savedTimers')) {
+                localStorage.setItem('savedTimers', JSON.stringify({}));
             }
-
-            async deriveKey(password, salt) {
-                const encoder = new TextEncoder();
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    encoder.encode(password),
-                    { name: 'PBKDF2' },
-                    false,
-                    ['deriveKey']
-                );
-
-                return crypto.subtle.deriveKey(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: 100000,
-                        hash: 'SHA-256'
-                    },
-                    keyMaterial,
-                    { name: 'AES-GCM', length: 256 },
-                    false,
-                    ['encrypt', 'decrypt']
-                );
+            if (!localStorage.getItem('savedStopwatches')) {
+                localStorage.setItem('savedStopwatches', JSON.stringify({}));
             }
-
-            async encrypt(plaintext, password) {
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-                const key = await this.deriveKey(password, salt);
-
-                const encoder = new TextEncoder();
-                const data = encoder.encode(plaintext);
-
-                const encrypted = await crypto.subtle.encrypt(
-                    { name: 'AES-GCM', iv: iv },
-                    key,
-                    data
-                );
-
-                const encryptedArray = new Uint8Array(encrypted);
-                const result = new Uint8Array(salt.length + iv.length + encryptedArray.length);
-                result.set(salt);
-                result.set(iv, salt.length);
-                result.set(encryptedArray, salt.length + iv.length);
-
-                return btoa(String.fromCharCode(...result));
-            }
-
-            async decrypt(encryptedData, password) {
-                const binaryString = atob(encryptedData);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-
-                const salt = bytes.slice(0, 16);
-                const iv = bytes.slice(16, 28);
-                const encrypted = bytes.slice(28);
-
-                const key = await this.deriveKey(password, salt);
-
-                const decrypted = await crypto.subtle.decrypt(
-                    { name: 'AES-GCM', iv: iv },
-                    key,
-                    encrypted
-                );
-
-                const decoder = new TextDecoder();
-                return decoder.decode(decrypted);
-            }
-
-            textToBinary(text) {
-                let binary = '';
-                for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i);
-                    binary += charCode.toString(2).padStart(8, '0');
-                }
-                return binary;
-            }
-
-            binaryToText(binary) {
-                let text = '';
-                for (let i = 0; i < binary.length; i += 8) {
-                    const byte = binary.substr(i, 8);
-                    if (byte.length === 8) {
-                        text += String.fromCharCode(parseInt(byte, 2));
-                    }
-                }
-                return text;
-            }
-
-            binaryToInvisible(binary) {
-                let invisible = '';
-                for (let i = 0; i < binary.length; i += 3) {
-                    const chunk = binary.substr(i, 3).padEnd(3, '0');
-                    const index = parseInt(chunk, 2);
-                    invisible += this.INVISIBLE_CHARS[index % this.INVISIBLE_CHARS.length];
-                }
-                return invisible;
-            }
-
-            invisibleToBinary(invisible) {
-                let binary = '';
-                for (let char of invisible) {
-                    const index = this.INVISIBLE_CHARS.indexOf(char);
-                    if (index !== -1) {
-                        binary += index.toString(2).padStart(3, '0');
-                    }
-                }
-                return binary;
-            }
-
-            insertInvisible(coverText, invisibleData) {
-                if (coverText.length === 0) return invisibleData;
-                
-                const positions = [];
-                const textChars = coverText.split('');
-                
-                for (let i = 0; i < invisibleData.length; i++) {
-                    let pos;
-                    if (textChars.length < 100) {
-                        pos = Math.floor(Math.random() * (textChars.length + 1));
-                    } else {
-                        const segmentSize = Math.floor(textChars.length / invisibleData.length);
-                        const offset = Math.floor(Math.random() * Math.max(1, segmentSize / 3));
-                        pos = Math.min(i * segmentSize + offset, textChars.length);
-                    }
-                    positions.push(pos);
+            
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.content');
+            
+            const lastActiveTab = localStorage.getItem('lastActiveTab') || 'timer';
+            
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === lastActiveTab) {
+                    tab.classList.add('active');
                 }
                 
-                positions.sort((a, b) => a - b);
-                
-                let result = textChars;
-                let offset = 0;
-                
-                for (let i = 0; i < positions.length; i++) {
-                    const pos = positions[i] + offset;
-                    const invisibleChar = invisibleData[i];
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab');
                     
-                    if (pos >= result.length) {
-                        result.push(invisibleChar);
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const targetContent = document.getElementById(target);
+                    targetContent.classList.add('active');
+                    
+                    localStorage.setItem('lastActiveTab', target);
+                });
+            });
+            
+            contents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === lastActiveTab) {
+                    content.classList.add('active');
+                }
+            });
+
+            const clockDisplay = document.getElementById('clockDisplay');
+            const dateDisplay = document.getElementById('dateDisplay');
+
+            function updateClock() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                
+                clockDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+                
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                dateDisplay.textContent = now.toLocaleDateString('ru-RU', options);
+            }
+
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            let timerId = 1;
+            let stopwatchId = 1;
+
+            function loadSavedTimers() {
+                const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                
+                const savedIds = Object.keys(savedTimers).map(id => parseInt(id)).filter(id => !isNaN(id));
+                if (savedIds.length > 0) {
+                    timerId = Math.max(...savedIds) + 1;
+                }
+                
+                for (const [id, timerData] of Object.entries(savedTimers)) {
+                    if (timerData.saved) {
+                        createTimerFromData(id, timerData);
+                    }
+                }
+            }
+
+            function loadSavedStopwatches() {
+                const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                
+                const savedIds = Object.keys(savedStopwatches).map(id => parseInt(id)).filter(id => !isNaN(id));
+                if (savedIds.length > 0) {
+                    stopwatchId = Math.max(...savedIds) + 1;
+                }
+                
+                for (const [id, stopwatchData] of Object.entries(savedStopwatches)) {
+                    if (stopwatchData.saved) {
+                        createStopwatchFromData(id, stopwatchData);
+                    }
+                }
+            }
+
+            function createTimerFromData(id, timerData) {
+                const timerContainer = document.getElementById('timerContainer');
+                
+                const timerDiv = document.createElement('div');
+                timerDiv.className = 'timer';
+                timerDiv.id = `timer-${id}`;
+                
+                const hoursValue = Math.floor(timerData.totalSeconds / 3600);
+                const minutesValue = Math.floor((timerData.totalSeconds % 3600) / 60);
+                const secondsValue = timerData.totalSeconds % 60;
+                
+                timerDiv.innerHTML = `
+                    <div class="timer-header">
+                        <input type="text" class="timer-title" value="${timerData.name}" placeholder="Название таймера">
+                        <div class="timer-controls">
+                            <div class="save-container ${timerData.saved ? 'saved' : ''}" onclick="toggleSaveTimer(${id})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">${timerData.saved ? 'Сохранен' : 'Сохранить'}</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteTimer(${id})">✕</button>
+                        </div>
+                    </div>
+                    <div class="time-inputs">
+                        <div class="time-input">
+                            <label>Часы</label>
+                            <input type="number" min="0" max="99" value="${hoursValue}" class="hours-input">
+                        </div>
+                        <div class="time-input">
+                            <label>Минуты</label>
+                            <input type="number" min="0" max="59" value="${minutesValue}" class="minutes-input">
+                        </div>
+                        <div class="time-input">
+                            <label>Секунды</label>
+                            <input type="number" min="0" max="59" value="${secondsValue}" class="seconds-input">
+                        </div>
+                    </div>
+                    <div class="time-display">${formatTime(timerData.totalSeconds)}</div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="startTimer(${id})">▶ Старт</button>
+                        <button class="control-btn pause hidden" onclick="pauseTimer(${id})">⏸ Пауза</button>
+                        <button class="control-btn" onclick="resetTimer(${id})">↻ Сброс</button>
+                    </div>
+                `;
+                
+                timerContainer.appendChild(timerDiv);
+                
+                const timerElement = document.getElementById(`timer-${id}`);
+                timerElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                if (timerData.isRunning && timerData.startTime) {
+                    const now = Date.now();
+                    const elapsedSeconds = Math.floor((now - timerData.startTime) / 1000);
+                    const remainingSeconds = Math.max(0, timerData.totalSeconds - elapsedSeconds);
+                    
+                    timerElement.totalSeconds = remainingSeconds;
+                    timerElement.startTime = timerData.startTime;
+                    timerElement.isRunning = remainingSeconds > 0;
+                    
+                    if (timerElement.isRunning) {
+                        const startBtn = timerElement.querySelector('.start');
+                        const pauseBtn = timerElement.querySelector('.pause');
+                        
+                        startBtn.classList.add('hidden');
+                        pauseBtn.classList.remove('hidden');
+                        
+                        updateTimerDisplayFromSeconds(id, remainingSeconds);
+                        startTimerInterval(id, remainingSeconds, timerData.startTime);
                     } else {
-                        result.splice(pos, 0, invisibleChar);
-                    }
-                    offset++;
-                }
-                
-                return result.join('');
-            }
-
-            extractInvisible(text) {
-                let invisible = '';
-                for (let char of text) {
-                    if (this.INVISIBLE_CHARS.includes(char)) {
-                        invisible += char;
-                    }
-                }
-                return invisible;
-            }
-
-            cleanText(text) {
-                return text.split('').filter(char => !this.INVISIBLE_CHARS.includes(char)).join('');
-            }
-
-            async hideText(secretText, coverText, password) {
-                if (!secretText || !coverText || !password) {
-                    throw new Error('Все поля должны быть заполнены');
-                }
-                
-                const cleanedCover = this.cleanText(coverText);
-                const encryptedData = await this.encrypt(secretText, password);
-                const binaryData = this.textToBinary(encryptedData);
-                const invisibleData = this.binaryToInvisible(binaryData);
-                return this.insertInvisible(cleanedCover, invisibleData);
-            }
-
-            async revealText(stegoText, password) {
-                if (!stegoText || !password) {
-                    throw new Error('Все поля должны быть заполнены');
-                }
-                
-                const invisibleData = this.extractInvisible(stegoText);
-                if (!invisibleData) {
-                    throw new Error('Не найдено скрытых данных');
-                }
-                
-                const binaryData = this.invisibleToBinary(invisibleData);
-                const encryptedData = this.binaryToText(binaryData);
-                return await this.decrypt(encryptedData, password);
-            }
-
-            calculateRequiredLength(secretText) {
-                const byteLength = new TextEncoder().encode(secretText).length;
-                const encryptedLength = 44 + byteLength;
-                const binaryLength = encryptedLength * 8;
-                const invisibleLength = Math.ceil(binaryLength / 3);
-                return Math.max(invisibleLength * 2, 10);
-            }
-        }
-
-        class App {
-            constructor() {
-                this.crypto = new SteganographyCrypto();
-                this.initElements();
-                this.bindEvents();
-                this.updateCharCounts();
-            }
-
-            initElements() {
-                this.passwordInput = document.getElementById('passwordInput');
-                this.togglePasswordBtn = document.getElementById('togglePasswordBtn');
-                this.copyPasswordBtn = document.getElementById('copyPasswordBtn');
-                this.generatePasswordBtn = document.getElementById('generatePasswordBtn');
-                this.secretText = document.getElementById('secretText');
-                this.coverText = document.getElementById('coverText');
-                this.secretCharCount = document.getElementById('secretCharCount');
-                this.coverCharCount = document.getElementById('coverCharCount');
-                this.minCharsSpan = document.getElementById('minChars');
-                this.encryptBtn = document.getElementById('encryptBtn');
-                this.decryptBtn = document.getElementById('decryptBtn');
-                this.modeBtns = document.querySelectorAll('.mode-btn');
-                this.encryptSection = document.getElementById('encryptSection');
-                this.decryptSection = document.getElementById('decryptSection');
-                this.encryptedInput = document.getElementById('encryptedInput');
-                this.encryptResult = document.getElementById('encryptResult');
-                this.decryptResult = document.getElementById('decryptResult');
-                this.encryptedResult = document.getElementById('encryptedResult');
-                this.decryptedResult = document.getElementById('decryptedResult');
-                this.copyEncryptedBtn = document.getElementById('copyEncryptedBtn');
-                this.copyDecryptedBtn = document.getElementById('copyDecryptedBtn');
-                this.infoBtn = document.getElementById('infoBtn');
-                this.modalOverlay = document.getElementById('modalOverlay');
-                this.modalClose = document.getElementById('modalClose');
-            }
-
-            bindEvents() {
-                this.togglePasswordBtn.addEventListener('click', () => this.togglePasswordVisibility());
-                this.copyPasswordBtn.addEventListener('click', () => this.copyPassword());
-                this.generatePasswordBtn.addEventListener('click', () => this.generatePassword());
-                this.secretText.addEventListener('input', () => this.updateCharCounts());
-                this.coverText.addEventListener('input', () => this.updateCharCounts());
-                this.encryptBtn.addEventListener('click', () => this.performEncryption());
-                this.decryptBtn.addEventListener('click', () => this.performDecryption());
-                this.infoBtn.addEventListener('click', () => this.openModal());
-                this.modalClose.addEventListener('click', () => this.closeModal());
-                this.modalOverlay.addEventListener('click', (e) => {
-                    if (e.target === this.modalOverlay) this.closeModal();
-                });
-                
-                this.modeBtns.forEach(btn => {
-                    btn.addEventListener('click', (e) => this.switchMode(e.target.dataset.mode));
-                });
-
-                this.copyEncryptedBtn.addEventListener('click', () => this.copyToClipboard(this.encryptedResult.textContent));
-                this.copyDecryptedBtn.addEventListener('click', () => this.copyToClipboard(this.decryptedResult.textContent));
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && this.modalOverlay.classList.contains('active')) {
-                        this.closeModal();
-                    }
-                });
-            }
-
-            togglePasswordVisibility() {
-                const isPassword = this.passwordInput.type === 'password';
-                this.passwordInput.type = isPassword ? 'text' : 'password';
-                this.togglePasswordBtn.querySelector('.eye-icon').style.filter = isPassword ? 'invert(0.4)' : 'invert(0.8)';
-            }
-
-            copyPassword() {
-                if (!this.passwordInput.value.trim()) {
-                    this.showNotification('Пароль пуст', 'error');
-                    return;
-                }
-                this.copyToClipboard(this.passwordInput.value);
-            }
-
-            openModal() {
-                this.modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            closeModal() {
-                this.modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-
-            generatePassword() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
-                let password = '';
-                const array = new Uint8Array(16);
-                crypto.getRandomValues(array);
-                for (let i = 0; i < 16; i++) {
-                    password += chars[array[i] % chars.length];
-                }
-                this.passwordInput.value = password;
-                this.showNotification('Пароль создан', 'success');
-            }
-
-            updateCharCounts() {
-                const secretLength = this.secretText.value.length;
-                this.secretCharCount.textContent = `${secretLength} символов`;
-                
-                const requiredLength = this.crypto.calculateRequiredLength(this.secretText.value);
-                this.minCharsSpan.textContent = requiredLength;
-                
-                const coverLength = this.coverText.value.length;
-                this.coverCharCount.textContent = `Введите минимум ${requiredLength} символов (сейчас: ${coverLength})`;
-                
-                this.coverCharCount.className = 'char-count';
-                if (coverLength > 0 && coverLength < requiredLength) {
-                    this.coverCharCount.classList.add('error');
-                } else if (coverLength >= requiredLength) {
-                    this.coverCharCount.classList.add('success');
-                }
-            }
-
-            async performEncryption() {
-                if (!this.validateInputs(true)) return;
-
-                try {
-                    this.showLoading(true);
-                    const stegoText = await this.crypto.hideText(
-                        this.secretText.value,
-                        this.coverText.value,
-                        this.passwordInput.value
-                    );
-
-                    this.encryptedResult.textContent = stegoText;
-                    this.encryptResult.style.display = 'block';
-                    this.showNotification('Текст успешно зашифрован и скрыт', 'success');
-                } catch (error) {
-                    this.showNotification('Ошибка при шифровании: ' + error.message, 'error');
-                } finally {
-                    this.showLoading(false);
-                }
-            }
-
-            async performDecryption() {
-                if (!this.validateInputs(false)) return;
-
-                try {
-                    this.showLoading(true);
-                    const revealedText = await this.crypto.revealText(
-                        this.encryptedInput.value,
-                        this.passwordInput.value
-                    );
-
-                    this.decryptedResult.textContent = revealedText;
-                    this.decryptResult.style.display = 'block';
-                    this.showNotification('Текст успешно расшифрован', 'success');
-                } catch (error) {
-                    this.showNotification('Ошибка при расшифровке: ' + error.message, 'error');
-                } finally {
-                    this.showLoading(false);
-                }
-            }
-
-            validateInputs(isEncrypt) {
-                if (!this.passwordInput.value.trim()) {
-                    this.showNotification('Введите пароль', 'error');
-                    return false;
-                }
-
-                if (isEncrypt) {
-                    if (!this.secretText.value.trim()) {
-                        this.showNotification('Введите текст для шифрования', 'error');
-                        return false;
-                    }
-
-                    const requiredLength = this.crypto.calculateRequiredLength(this.secretText.value);
-                    if (this.coverText.value.length < requiredLength) {
-                        this.showNotification(`Текст-маскировка должен содержать минимум ${requiredLength} символов`, 'error');
-                        return false;
+                        const display = timerElement.querySelector('.time-display');
+                        const startBtn = timerElement.querySelector('.start');
+                        const pauseBtn = timerElement.querySelector('.pause');
+                        
+                        display.textContent = '00:00:00';
+                        display.style.color = '#ff4444';
+                        display.style.animation = 'pulse 0.5s infinite alternate';
+                        startBtn.classList.remove('hidden');
+                        pauseBtn.classList.add('hidden');
+                        timerElement.isRunning = false;
+                        
+                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                        if (savedTimers[id]) {
+                            savedTimers[id].isRunning = false;
+                            savedTimers[id].totalSeconds = 0;
+                            localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                        }
                     }
                 } else {
-                    if (!this.encryptedInput.value.trim()) {
-                        this.showNotification('Введите текст для расшифровки', 'error');
-                        return false;
-                    }
+                    timerElement.totalSeconds = timerData.totalSeconds;
+                    timerElement.isRunning = false;
+                    updateTimerDisplay(id);
                 }
-
-                return true;
             }
 
-            switchMode(mode) {
-                this.modeBtns.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.mode === mode);
-                });
-
-                this.encryptSection.classList.toggle('active', mode === 'encrypt');
-                this.decryptSection.classList.toggle('active', mode === 'decrypt');
+            function createStopwatchFromData(id, stopwatchData) {
+                const stopwatchContainer = document.getElementById('stopwatchContainer');
                 
-                this.encryptResult.style.display = 'none';
-                this.decryptResult.style.display = 'none';
-            }
-
-            showNotification(message, type) {
-                const notification = document.createElement('div');
-                notification.textContent = message;
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 25px;
-                    background: ${type === 'success' ? '#10b981' : '#ef4444'};
-                    color: white;
-                    border-radius: 8px;
-                    z-index: 1000;
-                    animation: slideIn 0.3s ease;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                const stopwatchDiv = document.createElement('div');
+                stopwatchDiv.className = 'stopwatch';
+                stopwatchDiv.id = `stopwatch-${id}`;
+                
+                stopwatchDiv.innerHTML = `
+                    <div class="stopwatch-header">
+                        <input type="text" class="stopwatch-title" value="${stopwatchData.name}" placeholder="Название секундомера">
+                        <div class="stopwatch-controls">
+                            <div class="save-container ${stopwatchData.saved ? 'saved' : ''}" onclick="toggleSaveStopwatch(${id})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">${stopwatchData.saved ? 'Сохранен' : 'Сохранить'}</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteStopwatch(${id})">✕</button>
+                        </div>
+                    </div>
+                    <div class="time-display">00:00:00<span class="milliseconds">.000</span></div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="startStopwatch(${id})">▶ Старт</button>
+                        <button class="control-btn pause hidden" onclick="pauseStopwatch(${id})">⏸ Пауза</button>
+                        <button class="control-btn" onclick="resetStopwatch(${id})">↻ Сброс</button>
+                    </div>
                 `;
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-            }
-
-            showLoading(show) {
-                const buttons = [this.encryptBtn, this.decryptBtn];
-                buttons.forEach(btn => {
-                    if (btn) {
-                        btn.disabled = show;
-                        btn.textContent = show ? 'Обработка...' : (btn === this.encryptBtn ? 'Зашифровать и скрыть текст' : 'Расшифровать скрытый текст');
-                    }
-                });
-            }
-
-            async copyToClipboard(text) {
-                try {
-                    await navigator.clipboard.writeText(text);
-                    this.showNotification('Скопировано в буфер обмена', 'success');
-                } catch (err) {
-                    this.showNotification('Ошибка копирования', 'error');
+                
+                stopwatchContainer.appendChild(stopwatchDiv);
+                
+                const stopwatchElement = document.getElementById(`stopwatch-${id}`);
+                stopwatchElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                if (stopwatchData.isRunning && stopwatchData.startTime) {
+                    const now = Date.now();
+                    stopwatchElement.elapsed = stopwatchData.elapsed + (now - stopwatchData.startTime);
+                    stopwatchElement.startTime = stopwatchData.startTime;
+                    stopwatchElement.isRunning = true;
+                    
+                    const startBtn = stopwatchElement.querySelector('.start');
+                    const pauseBtn = stopwatchElement.querySelector('.pause');
+                    
+                    startBtn.classList.add('hidden');
+                    pauseBtn.classList.remove('hidden');
+                    
+                    startStopwatchInterval(id, stopwatchElement.elapsed, stopwatchData.startTime);
+                } else {
+                    stopwatchElement.elapsed = stopwatchData.elapsed || 0;
+                    stopwatchElement.isRunning = false;
+                    updateStopwatchDisplay(id, stopwatchElement.elapsed);
                 }
             }
-        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            new App();
+            document.getElementById('addTimer').addEventListener('click', createTimer);
+            document.getElementById('addStopwatch').addEventListener('click', createStopwatch);
+
+            function createTimer() {
+                const timerContainer = document.getElementById('timerContainer');
+                
+                const timerDiv = document.createElement('div');
+                timerDiv.className = 'timer';
+                timerDiv.id = `timer-${timerId}`;
+                
+                timerDiv.innerHTML = `
+                    <div class="timer-header">
+                        <input type="text" class="timer-title" value="Таймер ${timerId}" placeholder="Название таймера">
+                        <div class="timer-controls">
+                            <div class="save-container" onclick="toggleSaveTimer(${timerId})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">Сохранить</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteTimer(${timerId})">✕</button>
+                        </div>
+                    </div>
+                    <div class="time-inputs">
+                        <div class="time-input">
+                            <label>Часы</label>
+                            <input type="number" min="0" max="99" value="0" class="hours-input">
+                        </div>
+                        <div class="time-input">
+                            <label>Минуты</label>
+                            <input type="number" min="0" max="59" value="1" class="minutes-input">
+                        </div>
+                        <div class="time-input">
+                            <label>Секунды</label>
+                            <input type="number" min="0" max="59" value="0" class="seconds-input">
+                        </div>
+                    </div>
+                    <div class="time-display">01:00:00</div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="startTimer(${timerId})">▶ Старт</button>
+                        <button class="control-btn pause hidden" onclick="pauseTimer(${timerId})">⏸ Пауза</button>
+                        <button class="control-btn" onclick="resetTimer(${timerId})">↻ Сброс</button>
+                    </div>
+                `;
+                
+                timerContainer.appendChild(timerDiv);
+                updateTimerDisplay(timerId);
+                
+                const timerElement = document.getElementById(`timer-${timerId}`);
+                timerElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                timerId++;
+            }
+
+            function createStopwatch() {
+                const stopwatchContainer = document.getElementById('stopwatchContainer');
+                
+                const stopwatchDiv = document.createElement('div');
+                stopwatchDiv.className = 'stopwatch';
+                stopwatchDiv.id = `stopwatch-${stopwatchId}`;
+                
+                stopwatchDiv.innerHTML = `
+                    <div class="stopwatch-header">
+                        <input type="text" class="stopwatch-title" value="Секундомер ${stopwatchId}" placeholder="Название секундомера">
+                        <div class="stopwatch-controls">
+                            <div class="save-container" onclick="toggleSaveStopwatch(${stopwatchId})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">Сохранить</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteStopwatch(${stopwatchId})">✕</button>
+                        </div>
+                    </div>
+                    <div class="time-display">00:00:00<span class="milliseconds">.000</span></div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="startStopwatch(${stopwatchId})">▶ Старт</button>
+                        <button class="control-btn pause hidden" onclick="pauseStopwatch(${stopwatchId})">⏸ Пауза</button>
+                        <button class="control-btn" onclick="resetStopwatch(${stopwatchId})">↻ Сброс</button>
+                    </div>
+                `;
+                
+                stopwatchContainer.appendChild(stopwatchDiv);
+                
+                const stopwatchElement = document.getElementById(`stopwatch-${stopwatchId}`);
+                stopwatchElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                stopwatchId++;
+            }
+
+            window.toggleSaveTimer = function(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                const saveContainer = timer.querySelector('.save-container');
+                const isSaved = saveContainer.classList.contains('saved');
+                
+                if (isSaved) {
+                    saveContainer.classList.remove('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранить';
+                    
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    if (savedTimers[id]) {
+                        savedTimers[id].saved = false;
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }
+                } else {
+                    const title = timer.querySelector('.timer-title').value;
+                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                    
+                    saveContainer.classList.add('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранен';
+                    
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    savedTimers[id] = {
+                        name: title,
+                        totalSeconds: totalSeconds,
+                        startTime: timer.isRunning ? timer.startTime : null,
+                        isRunning: timer.isRunning,
+                        saved: true
+                    };
+                    
+                    localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                }
+            };
+
+            window.toggleSaveStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const saveContainer = stopwatch.querySelector('.save-container');
+                const isSaved = saveContainer.classList.contains('saved');
+                
+                if (isSaved) {
+                    saveContainer.classList.remove('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранить';
+                    
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].saved = false;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                } else {
+                    const title = stopwatch.querySelector('.stopwatch-title').value;
+                    
+                    saveContainer.classList.add('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранен';
+                    
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    savedStopwatches[id] = {
+                        name: title,
+                        startTime: stopwatch.isRunning ? stopwatch.startTime : null,
+                        elapsed: stopwatch.elapsed || 0,
+                        isRunning: stopwatch.isRunning,
+                        saved: true
+                    };
+                    
+                    localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                }
+            };
+
+            window.deleteTimer = function(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                if (timer) {
+                    clearInterval(timer.intervalId);
+                    timer.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    setTimeout(() => {
+                        timer.remove();
+                        
+                        const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                        delete savedTimers[id];
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }, 400);
+                }
+            };
+
+            window.deleteStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                if (stopwatch) {
+                    clearInterval(stopwatch.intervalId);
+                    stopwatch.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    setTimeout(() => {
+                        stopwatch.remove();
+                        
+                        const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                        delete savedStopwatches[id];
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }, 400);
+                }
+            };
+
+            window.startTimer = function(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                const display = timer.querySelector('.time-display');
+                const startBtn = timer.querySelector('.start');
+                const pauseBtn = timer.querySelector('.pause');
+                
+                if (timer.isRunning) return;
+                
+                if (!timer.totalSeconds) {
+                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                    
+                    timer.totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                }
+                
+                if (timer.totalSeconds <= 0) return;
+                
+                timer.isRunning = true;
+                timer.startTime = Date.now();
+                startBtn.classList.add('hidden');
+                pauseBtn.classList.remove('hidden');
+                
+                const saveContainer = timer.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    if (savedTimers[id]) {
+                        savedTimers[id].isRunning = true;
+                        savedTimers[id].startTime = timer.startTime;
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }
+                }
+                
+                startBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    startBtn.style.transform = '';
+                }, 150);
+                
+                startTimerInterval(id, timer.totalSeconds, timer.startTime);
+            };
+
+            function startTimerInterval(id, totalSeconds, startTime) {
+                const timer = document.getElementById(`timer-${id}`);
+                const display = timer.querySelector('.time-display');
+                const startBtn = timer.querySelector('.start');
+                const pauseBtn = timer.querySelector('.pause');
+                
+                timer.intervalId = setInterval(() => {
+                    const now = Date.now();
+                    const elapsedSeconds = Math.floor((now - startTime) / 1000);
+                    const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
+                    
+                    if (remainingSeconds <= 0) {
+                        clearInterval(timer.intervalId);
+                        timer.isRunning = false;
+                        startBtn.classList.remove('hidden');
+                        pauseBtn.classList.add('hidden');
+                        display.style.color = '#ff4444';
+                        display.style.animation = 'pulse 0.5s infinite alternate';
+                        
+                        const saveContainer = timer.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                            if (savedTimers[id]) {
+                                savedTimers[id].isRunning = false;
+                                savedTimers[id].totalSeconds = 0;
+                                localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                            }
+                        }
+                    }
+                    
+                    updateTimerDisplayFromSeconds(id, remainingSeconds);
+                }, 1000);
+            }
+
+            window.pauseTimer = function(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                const startBtn = timer.querySelector('.start');
+                const pauseBtn = timer.querySelector('.pause');
+                const display = timer.querySelector('.time-display');
+                
+                clearInterval(timer.intervalId);
+                
+                if (timer.isRunning && timer.startTime) {
+                    const now = Date.now();
+                    const elapsedSeconds = Math.floor((now - timer.startTime) / 1000);
+                    timer.totalSeconds = Math.max(0, timer.totalSeconds - elapsedSeconds);
+                }
+                
+                timer.isRunning = false;
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                display.style.animation = '';
+                
+                const saveContainer = timer.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    if (savedTimers[id]) {
+                        savedTimers[id].isRunning = false;
+                        savedTimers[id].totalSeconds = timer.totalSeconds;
+                        delete savedTimers[id].startTime;
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }
+                }
+                
+                pauseBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    pauseBtn.style.transform = '';
+                }, 150);
+            };
+
+            window.resetTimer = function(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                const startBtn = timer.querySelector('.start');
+                const pauseBtn = timer.querySelector('.pause');
+                const display = timer.querySelector('.time-display');
+                
+                clearInterval(timer.intervalId);
+                timer.isRunning = false;
+                timer.startTime = null;
+                timer.totalSeconds = null;
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                display.style.color = '#ffeb3b';
+                display.style.animation = '';
+                
+                updateTimerDisplay(id);
+                
+                const saveContainer = timer.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                    if (savedTimers[id]) {
+                        const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                        const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                        const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                        
+                        savedTimers[id].totalSeconds = totalSeconds;
+                        savedTimers[id].isRunning = false;
+                        delete savedTimers[id].startTime;
+                        localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                    }
+                }
+                
+                const resetBtn = timer.querySelector('.control-btn:last-child');
+                resetBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    resetBtn.style.transform = '';
+                }, 150);
+            };
+
+            function formatTime(totalSeconds) {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            function updateTimerDisplay(id) {
+                const timer = document.getElementById(`timer-${id}`);
+                const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                
+                const display = timer.querySelector('.time-display');
+                display.textContent = formatTime(hours * 3600 + minutes * 60 + seconds);
+            }
+
+            function updateTimerDisplayFromSeconds(id, totalSeconds) {
+                const timer = document.getElementById(`timer-${id}`);
+                const display = timer.querySelector('.time-display');
+                display.textContent = formatTime(totalSeconds);
+            }
+
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('hours-input') || 
+                    e.target.classList.contains('minutes-input') || 
+                    e.target.classList.contains('seconds-input')) {
+                    
+                    const timerDiv = e.target.closest('.timer');
+                    if (timerDiv) {
+                        const id = parseInt(timerDiv.id.split('-')[1]);
+                        updateTimerDisplay(id);
+                        
+                        const saveContainer = timerDiv.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const hours = parseInt(timerDiv.querySelector('.hours-input').value) || 0;
+                            const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
+                            const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
+                            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                            
+                            const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                            if (savedTimers[id]) {
+                                savedTimers[id].totalSeconds = totalSeconds;
+                                localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                            }
+                        }
+                    }
+                }
+                
+                if (e.target.classList.contains('timer-title')) {
+                    const timerDiv = e.target.closest('.timer');
+                    if (timerDiv) {
+                        const id = parseInt(timerDiv.id.split('-')[1]);
+                        const saveContainer = timerDiv.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                            if (savedTimers[id]) {
+                                savedTimers[id].name = e.target.value;
+                                localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                            }
+                        }
+                    }
+                }
+                
+                if (e.target.classList.contains('stopwatch-title')) {
+                    const stopwatchDiv = e.target.closest('.stopwatch');
+                    if (stopwatchDiv) {
+                        const id = parseInt(stopwatchDiv.id.split('-')[1]);
+                        const saveContainer = stopwatchDiv.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                            if (savedStopwatches[id]) {
+                                savedStopwatches[id].name = e.target.value;
+                                localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                            }
+                        }
+                    }
+                }
+            });
+
+            window.startStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                
+                if (stopwatch.isRunning) return;
+                
+                if (!stopwatch.startTime) {
+                    stopwatch.startTime = Date.now();
+                    stopwatch.elapsed = stopwatch.elapsed || 0;
+                } else {
+                    stopwatch.startTime = Date.now() - stopwatch.elapsed;
+                }
+                
+                stopwatch.isRunning = true;
+                startBtn.classList.add('hidden');
+                pauseBtn.classList.remove('hidden');
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = true;
+                        savedStopwatches[id].startTime = stopwatch.startTime;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                startBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    startBtn.style.transform = '';
+                }, 150);
+                
+                startStopwatchInterval(id, stopwatch.elapsed, stopwatch.startTime);
+            };
+
+            function startStopwatchInterval(id, elapsed, startTime) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const display = stopwatch.querySelector('.time-display');
+                
+                stopwatch.intervalId = setInterval(() => {
+                    const now = Date.now();
+                    stopwatch.elapsed = elapsed + (now - startTime);
+                    updateStopwatchDisplay(id, stopwatch.elapsed);
+                }, 10);
+            }
+
+            window.pauseStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                
+                clearInterval(stopwatch.intervalId);
+                stopwatch.isRunning = false;
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = false;
+                        savedStopwatches[id].elapsed = stopwatch.elapsed;
+                        delete savedStopwatches[id].startTime;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                pauseBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    pauseBtn.style.transform = '';
+                }, 150);
+            };
+
+            window.resetStopwatch = function(id) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const startBtn = stopwatch.querySelector('.start');
+                const pauseBtn = stopwatch.querySelector('.pause');
+                const display = stopwatch.querySelector('.time-display');
+                
+                clearInterval(stopwatch.intervalId);
+                stopwatch.isRunning = false;
+                stopwatch.startTime = null;
+                stopwatch.elapsed = 0;
+                startBtn.classList.remove('hidden');
+                pauseBtn.classList.add('hidden');
+                display.textContent = '00:00:00';
+                display.querySelector('.milliseconds').textContent = '.000';
+                
+                const saveContainer = stopwatch.querySelector('.save-container');
+                if (saveContainer.classList.contains('saved')) {
+                    const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                    if (savedStopwatches[id]) {
+                        savedStopwatches[id].isRunning = false;
+                        savedStopwatches[id].elapsed = 0;
+                        delete savedStopwatches[id].startTime;
+                        localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                    }
+                }
+                
+                const resetBtn = stopwatch.querySelector('.control-btn:last-child');
+                resetBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    resetBtn.style.transform = '';
+                }, 150);
+            };
+
+            function updateStopwatchDisplay(id, elapsed) {
+                const stopwatch = document.getElementById(`stopwatch-${id}`);
+                const display = stopwatch.querySelector('.time-display');
+                
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                const milliseconds = Math.floor(elapsed % 1000);
+                
+                display.innerHTML = 
+                    `${hours.toString().padStart(2, '0')}:` +
+                    `${minutes.toString().padStart(2, '0')}:` +
+                    `${seconds.toString().padStart(2, '0')}` +
+                    `<span class="milliseconds">.${milliseconds.toString().padStart(3, '0')}</span>`;
+            }
+            
+            loadSavedTimers();
+            loadSavedStopwatches();
+            
+            const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+            const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+            
+            if (Object.keys(savedTimers).length === 0) {
+                createTimer();
+            }
+            
+            if (Object.keys(savedStopwatches).length === 0) {
+                createStopwatch();
+            }
         });
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-            
-            .success { color: #10b981 !important; }
-            .error { color: #ef4444 !important; }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
