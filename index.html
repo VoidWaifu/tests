@@ -1775,7 +1775,18 @@
                     const now = Date.now();
                     stopwatch.elapsed = now - stopwatch.startTime;
                     updateStopwatchDisplay(id, stopwatch.elapsed);
-                }, 10);
+                    
+                    const saveContainer = stopwatch.querySelector('.save-container');
+                    if (saveContainer && saveContainer.classList.contains('saved')) {
+                        const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                        if (savedStopwatches[id]) {
+                            savedStopwatches[id].elapsed = stopwatch.elapsed;
+                            savedStopwatches[id].startTime = stopwatch.startTime;
+                            savedStopwatches[id].isRunning = stopwatch.isRunning;
+                            localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                        }
+                    }
+                }, 100);
             }
 
             window.pauseStopwatch = function(id) {
