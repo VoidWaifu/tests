@@ -360,10 +360,10 @@
         }
 
         .end-time {
-            font-size: 14px;
+            font-size: 42px;
             color: #aaa;
             font-weight: normal;
-            margin-top: 5px;
+            margin-top: 15px;
             opacity: 0.8;
             font-family: 'Segoe UI', Arial, sans-serif;
         }
@@ -737,8 +737,8 @@
             }
             
             .end-time {
-                font-size: 11px;
-                margin-top: 2px;
+                font-size: 33px;
+                margin-top: 10px;
             }
             
             .stopwatch .time-display {
@@ -850,7 +850,8 @@
             }
             
             .end-time {
-                font-size: 10px;
+                font-size: 30px;
+                margin-top: 8px;
             }
             
             .stopwatch .time-display {
@@ -1133,6 +1134,7 @@
                     timerElement.totalSeconds = remainingSeconds;
                     timerElement.startTime = timerData.startTime;
                     timerElement.isRunning = remainingSeconds > 0;
+                    timerElement.originalTotalSeconds = timerData.totalSeconds;
                     
                     if (timerElement.isRunning) {
                         const startBtn = timerElement.querySelector('.start');
@@ -1167,6 +1169,7 @@
                     }
                 } else {
                     timerElement.totalSeconds = timerData.totalSeconds;
+                    timerElement.originalTotalSeconds = timerData.totalSeconds;
                     timerElement.isRunning = false;
                     updateTimerDisplay(id);
                 }
@@ -1469,18 +1472,17 @@
                 
                 if (timer.isRunning) return;
                 
-                if (!timer.totalSeconds) {
-                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
-                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
-                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
-                    
-                    timer.totalSeconds = hours * 3600 + minutes * 60 + seconds;
-                }
+                const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
                 
-                if (timer.totalSeconds <= 0) return;
+                if (newTotalSeconds <= 0) return;
                 
                 timer.isRunning = true;
                 timer.startTime = Date.now();
+                timer.totalSeconds = newTotalSeconds;
+                timer.originalTotalSeconds = newTotalSeconds;
                 startBtn.classList.add('hidden');
                 pauseBtn.classList.remove('hidden');
                 
@@ -1490,6 +1492,7 @@
                     if (savedTimers[id]) {
                         savedTimers[id].isRunning = true;
                         savedTimers[id].startTime = timer.startTime;
+                        savedTimers[id].totalSeconds = newTotalSeconds;
                         localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                     }
                 }
@@ -1552,7 +1555,12 @@
                 if (timer.isRunning && timer.startTime) {
                     const now = Date.now();
                     const elapsedSeconds = Math.floor((now - timer.startTime) / 1000);
-                    timer.totalSeconds = Math.max(0, timer.totalSeconds - elapsedSeconds);
+                    const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
+                    const minutes = parseInt(timer.querySelector('.minutes-input').value) || 0;
+                    const seconds = parseInt(timer.querySelector('.seconds-input').value) || 0;
+                    const newTotalSeconds = hours * 3600 + minutes * 60 + seconds;
+                    
+                    timer.totalSeconds = Math.max(0, newTotalSeconds - elapsedSeconds);
                 }
                 
                 timer.isRunning = false;
@@ -1668,6 +1676,13 @@
                     if (timerDiv) {
                         const id = parseInt(timerDiv.id.split('-')[1]);
                         updateTimerDisplay(id);
+                        
+                        if (!timerDiv.isRunning) {
+                            const hours = parseInt(timerDiv.querySelector('.hours-input').value) || 0;
+                            const minutes = parseInt(timerDiv.querySelector('.minutes-input').value) || 0;
+                            const seconds = parseInt(timerDiv.querySelector('.seconds-input').value) || 0;
+                            timerDiv.totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                        }
                         
                         const saveContainer = timerDiv.querySelector('.save-container');
                         if (saveContainer.classList.contains('saved')) {
