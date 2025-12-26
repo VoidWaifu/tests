@@ -1507,11 +1507,11 @@
                 element: null,
                 clone: null,
                 startIndex: -1,
-                currentIndex: -1,
                 container: null,
                 type: null,
                 placeholder: null,
-                isDragging: false
+                isDragging: false,
+                dragOverElement: null
             };
 
             function initDragAndDrop() {
@@ -1549,12 +1549,12 @@
                     element: element,
                     clone: null,
                     startIndex: startIndex,
-                    currentIndex: startIndex,
                     container: container,
                     type: element.classList.contains('timer') ? 'timer' : 
                           element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
                     placeholder: null,
-                    isDragging: false
+                    isDragging: false,
+                    dragOverElement: null
                 };
 
                 document.addEventListener('mousemove', startDraggingCheck);
@@ -1588,7 +1588,7 @@
                 dragState.placeholder.className = 'drag-placeholder';
                 dragState.placeholder.style.width = rect.width + 'px';
                 dragState.placeholder.style.height = rect.height + 'px';
-                dragState.container.insertBefore(dragState.placeholder, element);
+                element.parentNode.insertBefore(dragState.placeholder, element);
                 
                 element.style.visibility = 'hidden';
             }
@@ -1613,37 +1613,67 @@
                 const containerRect = dragState.container.getBoundingClientRect();
                 const children = Array.from(dragState.container.children).filter(child => 
                     child !== dragState.placeholder && 
+                    child !== dragState.element &&
                     (child.classList.contains('timer') || 
                      child.classList.contains('stopwatch') || 
                      child.classList.contains('city-card'))
                 );
                 
-                let closestIndex = -1;
-                let closestDistance = Infinity;
+                if (dragState.dragOverElement) {
+                    dragState.dragOverElement.classList.remove('drag-over');
+                    dragState.dragOverElement = null;
+                }
                 
-                children.forEach((child, index) => {
+                let targetElement = null;
+                let targetPosition = 'before';
+                
+                for (const child of children) {
                     const rect = child.getBoundingClientRect();
-                    const centerY = rect.top + rect.height / 2;
-                    const distance = Math.abs(clientY - centerY);
                     
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestIndex = index;
+                    if (clientY >= rect.top && clientY <= rect.bottom && 
+                        clientX >= rect.left && clientX <= rect.right) {
+                        
+                        const elementCenterY = rect.top + rect.height / 2;
+                        
+                        if (clientY < elementCenterY) {
+                            targetElement = child;
+                            targetPosition = 'before';
+                        } else {
+                            targetElement = child;
+                            targetPosition = 'after';
+                        }
+                        break;
                     }
-                });
+                }
                 
-                if (closestIndex !== -1 && closestIndex !== dragState.currentIndex) {
-                    dragState.currentIndex = closestIndex;
+                if (targetElement) {
+                    targetElement.classList.add('drag-over');
+                    dragState.dragOverElement = targetElement;
                     
-                    children.forEach(child => {
-                        child.classList.remove('drag-over');
-                    });
-                    
-                    if (children[closestIndex]) {
-                        children[closestIndex].classList.add('drag-over');
+                    if (targetPosition === 'before') {
+                        if (dragState.placeholder.nextSibling !== targetElement) {
+                            dragState.container.insertBefore(dragState.placeholder, targetElement);
+                        }
+                    } else {
+                        if (targetElement.nextSibling !== dragState.placeholder) {
+                            if (targetElement.nextSibling) {
+                                dragState.container.insertBefore(dragState.placeholder, targetElement.nextSibling);
+                            } else {
+                                dragState.container.appendChild(dragState.placeholder);
+                            }
+                        }
                     }
-                    
-                    dragState.container.insertBefore(dragState.placeholder, children[closestIndex] || null);
+                } else {
+                    const lastChild = children[children.length - 1];
+                    if (lastChild && clientY > lastChild.getBoundingClientRect().bottom) {
+                        if (lastChild.nextSibling !== dragState.placeholder) {
+                            dragState.container.appendChild(dragState.placeholder);
+                        }
+                    } else if (children.length === 0 || clientY < children[0].getBoundingClientRect().top) {
+                        if (dragState.container.firstChild !== dragState.placeholder) {
+                            dragState.container.insertBefore(dragState.placeholder, dragState.container.firstChild);
+                        }
+                    }
                 }
             }
 
@@ -1655,27 +1685,20 @@
                         element: null,
                         clone: null,
                         startIndex: -1,
-                        currentIndex: -1,
                         container: null,
                         type: null,
                         placeholder: null,
-                        isDragging: false
+                        isDragging: false,
+                        dragOverElement: null
                     };
                     return;
                 }
                 
                 e.preventDefault();
                 
-                const children = Array.from(dragState.container.children).filter(child => 
-                    child !== dragState.placeholder && 
-                    (child.classList.contains('timer') || 
-                     child.classList.contains('stopwatch') || 
-                     child.classList.contains('city-card'))
-                );
-                
-                children.forEach(child => {
-                    child.classList.remove('drag-over');
-                });
+                if (dragState.dragOverElement) {
+                    dragState.dragOverElement.classList.remove('drag-over');
+                }
                 
                 if (dragState.placeholder && dragState.placeholder.parentNode) {
                     dragState.container.insertBefore(dragState.element, dragState.placeholder);
@@ -1695,11 +1718,11 @@
                     element: null,
                     clone: null,
                     startIndex: -1,
-                    currentIndex: -1,
                     container: null,
                     type: null,
                     placeholder: null,
-                    isDragging: false
+                    isDragging: false,
+                    dragOverElement: null
                 };
             }
 
@@ -1806,12 +1829,10 @@
                     timerId = Math.max(...savedIds) + 1;
                 }
                 
-                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                const sortedIds = Object.keys(savedTimers).sort((a, b) => (positions[a] || 0) - (positions[b] || 0));
                 
-                const allIds = new Set([...sortedIds, ...Object.keys(savedTimers)]);
-                
-                Array.from(allIds).forEach(id => {
-                    if (savedTimers[id]) {
+                sortedIds.forEach(id => {
+                    if (savedTimers[id] && savedTimers[id].saved) {
                         createTimerFromData(id, savedTimers[id]);
                     }
                 });
@@ -1826,12 +1847,10 @@
                     stopwatchId = Math.max(...savedIds) + 1;
                 }
                 
-                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                const sortedIds = Object.keys(savedStopwatches).sort((a, b) => (positions[a] || 0) - (positions[b] || 0));
                 
-                const allIds = new Set([...sortedIds, ...Object.keys(savedStopwatches)]);
-                
-                Array.from(allIds).forEach(id => {
-                    if (savedStopwatches[id]) {
+                sortedIds.forEach(id => {
+                    if (savedStopwatches[id] && savedStopwatches[id].saved) {
                         createStopwatchFromData(id, savedStopwatches[id]);
                     }
                 });
@@ -1846,12 +1865,10 @@
                     cityId = Math.max(...savedIds) + 1;
                 }
                 
-                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                const sortedIds = Object.keys(savedCities).sort((a, b) => (positions[a] || 0) - (positions[b] || 0));
                 
-                const allIds = new Set([...sortedIds, ...Object.keys(savedCities)]);
-                
-                Array.from(allIds).forEach(id => {
-                    if (savedCities[id]) {
+                sortedIds.forEach(id => {
+                    if (savedCities[id] && savedCities[id].saved) {
                         createCityFromData(id, savedCities[id]);
                     }
                 });
@@ -2452,6 +2469,7 @@
                     
                     localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
                 }
+                savePositions('timer');
             };
 
             window.toggleSaveStopwatch = function(id) {
@@ -2485,6 +2503,7 @@
                     
                     localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
                 }
+                savePositions('stopwatch');
             };
 
             window.toggleSaveCity = function(id) {
@@ -2519,6 +2538,7 @@
                     
                     localStorage.setItem('savedCities', JSON.stringify(savedCities));
                 }
+                savePositions('city');
             };
 
             window.deleteTimer = function(id) {
