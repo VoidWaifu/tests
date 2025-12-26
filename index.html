@@ -13,11 +13,6 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             user-select: none;
-            touch-action: none;
-        }
-
-        html, body {
-            overflow: hidden;
         }
 
         body {
@@ -26,7 +21,6 @@
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
-            position: relative;
         }
 
         .container {
@@ -56,8 +50,6 @@
             box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
             text-decoration: none;
             display: inline-block;
-            z-index: 1000;
-            position: relative;
         }
 
         .site-btn:hover {
@@ -77,7 +69,6 @@
             background: #1a1a1a;
             border-bottom: 2px solid #333;
             height: 64px;
-            z-index: 1000;
         }
 
         .tabs {
@@ -177,7 +168,6 @@
             box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
             position: relative;
             overflow: hidden;
-            z-index: 1000;
         }
 
         .add-btn::after {
@@ -212,7 +202,6 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
             position: relative;
-            min-height: 300px;
         }
 
         .timer, .stopwatch, .city-card {
@@ -231,16 +220,15 @@
             position: relative;
             cursor: move;
             touch-action: none;
-            -webkit-user-drag: none;
-            will-change: transform;
+            user-select: none;
         }
 
         .timer.dragging, .stopwatch.dragging, .city-card.dragging {
-            z-index: 10000 !important;
-            cursor: grabbing !important;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            transform: scale(1.02) rotate(3deg);
-            transition: transform 0.1s, box-shadow 0.1s;
+            z-index: 10000;
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            opacity: 0.9;
         }
 
         .timer.drag-over, .stopwatch.drag-over, .city-card.drag-over {
@@ -268,7 +256,6 @@
             align-items: center;
             margin-bottom: 20px;
             min-height: 50px;
-            cursor: default;
         }
 
         .timer-title, .stopwatch-title, .city-title {
@@ -283,9 +270,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 50px;
             margin-right: 15px;
-            cursor: text;
-            user-select: text;
-            -webkit-user-select: text;
         }
 
         .timer-title:focus, .stopwatch-title:focus, .city-title:focus {
@@ -398,7 +382,6 @@
             justify-content: center;
             flex-direction: column;
             gap: 5px;
-            cursor: default;
         }
 
         .end-time {
@@ -795,34 +778,13 @@
             color: #ffc107;
         }
 
-        .drop-indicator {
-            position: absolute;
-            background: #ffeb3b;
-            border-radius: 4px;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .drop-indicator.active {
-            opacity: 0.7;
-        }
-
-        .drop-indicator.horizontal {
-            height: 4px;
-            width: 100%;
-        }
-
-        .drop-indicator.vertical {
-            width: 4px;
-            height: 100%;
-        }
-
-        .drag-ghost {
+        .drag-placeholder {
+            background: rgba(255, 235, 59, 0.1);
+            border: 2px dashed #ffeb3b;
+            border-radius: 20px;
+            min-height: 280px;
             opacity: 0.5;
-            transform: scale(0.95);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
         }
 
         @media (max-width: 1200px) {
@@ -1543,275 +1505,202 @@
 
             let dragState = {
                 element: null,
-                offsetX: 0,
-                offsetY: 0,
-                startX: 0,
-                startY: 0,
-                originalX: 0,
-                originalY: 0,
+                clone: null,
+                startIndex: -1,
+                currentIndex: -1,
                 container: null,
                 type: null,
-                ghost: null,
-                dropIndicator: null,
-                siblings: []
+                placeholder: null,
+                isDragging: false
             };
 
             function initDragAndDrop() {
                 document.addEventListener('mousedown', startDrag);
-                document.addEventListener('touchstart', startDragTouch, { passive: false });
+                document.addEventListener('touchstart', startDrag, { passive: false });
                 document.addEventListener('mousemove', drag);
-                document.addEventListener('touchmove', dragTouch, { passive: false });
+                document.addEventListener('touchmove', drag, { passive: false });
                 document.addEventListener('mouseup', stopDrag);
                 document.addEventListener('touchend', stopDrag);
                 document.addEventListener('touchcancel', stopDrag);
             }
 
             function startDrag(e) {
-                if (e.button !== 0) return;
-                if (!e.target.closest('.timer, .stopwatch, .city-card')) return;
+                if (e.type === 'mousedown' && e.button !== 0) return;
                 
                 const element = e.target.closest('.timer, .stopwatch, .city-card');
-                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn')) {
+                if (!element) return;
+                
+                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn, .dropdown-list, .dropdown-item')) {
                     return;
                 }
 
                 e.preventDefault();
                 
-                const rect = element.getBoundingClientRect();
+                const container = element.parentNode;
+                const children = Array.from(container.children).filter(child => 
+                    child.classList.contains('timer') || 
+                    child.classList.contains('stopwatch') || 
+                    child.classList.contains('city-card')
+                );
+                
+                const startIndex = children.indexOf(element);
+                
                 dragState = {
                     element: element,
-                    offsetX: e.clientX - rect.left,
-                    offsetY: e.clientY - rect.top,
-                    startX: e.clientX,
-                    startY: e.clientY,
-                    originalX: rect.left,
-                    originalY: rect.top,
-                    container: element.parentNode,
+                    clone: null,
+                    startIndex: startIndex,
+                    currentIndex: startIndex,
+                    container: container,
                     type: element.classList.contains('timer') ? 'timer' : 
                           element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
-                    ghost: null,
-                    dropIndicator: null,
-                    siblings: Array.from(element.parentNode.children).filter(child => child !== element)
+                    placeholder: null,
+                    isDragging: false
                 };
 
-                element.classList.add('dragging');
-                element.style.zIndex = '10000';
-                element.style.position = 'fixed';
-                element.style.width = rect.width + 'px';
-                element.style.height = rect.height + 'px';
-                element.style.left = rect.left + 'px';
-                element.style.top = rect.top + 'px';
-                element.style.cursor = 'grabbing';
-
-                createDropIndicator();
-                updateSiblingStates();
+                document.addEventListener('mousemove', startDraggingCheck);
+                document.addEventListener('touchmove', startDraggingCheck, { passive: false });
             }
 
-            function startDragTouch(e) {
-                if (!e.target.closest('.timer, .stopwatch, .city-card')) return;
+            function startDraggingCheck(e) {
+                if (!dragState.element || dragState.isDragging) return;
                 
-                const element = e.target.closest('.timer, .stopwatch, .city-card');
-                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn')) {
-                    return;
-                }
-
-                e.preventDefault();
+                dragState.isDragging = true;
+                document.removeEventListener('mousemove', startDraggingCheck);
+                document.removeEventListener('touchmove', startDraggingCheck);
                 
-                const touch = e.touches[0];
-                const rect = element.getBoundingClientRect();
-                dragState = {
-                    element: element,
-                    offsetX: touch.clientX - rect.left,
-                    offsetY: touch.clientY - rect.top,
-                    startX: touch.clientX,
-                    startY: touch.clientY,
-                    originalX: rect.left,
-                    originalY: rect.top,
-                    container: element.parentNode,
-                    type: element.classList.contains('timer') ? 'timer' : 
-                          element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
-                    ghost: null,
-                    dropIndicator: null,
-                    siblings: Array.from(element.parentNode.children).filter(child => child !== element)
-                };
-
+                const element = dragState.element;
                 element.classList.add('dragging');
-                element.style.zIndex = '10000';
-                element.style.position = 'fixed';
-                element.style.width = rect.width + 'px';
-                element.style.height = rect.height + 'px';
-                element.style.left = rect.left + 'px';
-                element.style.top = rect.top + 'px';
-                element.style.cursor = 'grabbing';
-
-                createDropIndicator();
-                updateSiblingStates();
+                
+                const rect = element.getBoundingClientRect();
+                
+                dragState.clone = element.cloneNode(true);
+                dragState.clone.style.position = 'fixed';
+                dragState.clone.style.width = rect.width + 'px';
+                dragState.clone.style.height = rect.height + 'px';
+                dragState.clone.style.left = rect.left + 'px';
+                dragState.clone.style.top = rect.top + 'px';
+                dragState.clone.style.zIndex = '10000';
+                dragState.clone.style.pointerEvents = 'none';
+                dragState.clone.style.opacity = '0.8';
+                document.body.appendChild(dragState.clone);
+                
+                dragState.placeholder = document.createElement('div');
+                dragState.placeholder.className = 'drag-placeholder';
+                dragState.placeholder.style.width = rect.width + 'px';
+                dragState.placeholder.style.height = rect.height + 'px';
+                dragState.container.insertBefore(dragState.placeholder, element);
+                
+                element.style.visibility = 'hidden';
             }
 
             function drag(e) {
-                if (!dragState.element) return;
+                if (!dragState.isDragging || !dragState.clone) return;
                 
                 e.preventDefault();
                 
-                const x = e.clientX - dragState.offsetX;
-                const y = e.clientY - dragState.offsetY;
-                
-                dragState.element.style.left = x + 'px';
-                dragState.element.style.top = y + 'px';
-                
-                updateDropIndicator(x, y);
-            }
-
-            function dragTouch(e) {
-                if (!dragState.element || e.touches.length === 0) return;
-                
-                e.preventDefault();
-                
-                const touch = e.touches[0];
-                const x = touch.clientX - dragState.offsetX;
-                const y = touch.clientY - dragState.offsetY;
-                
-                dragState.element.style.left = x + 'px';
-                dragState.element.style.top = y + 'px';
-                
-                updateDropIndicator(x, y);
-            }
-
-            function stopDrag(e) {
-                if (!dragState.element) return;
-                
-                e.preventDefault();
-                
-                const element = dragState.element;
-                const container = dragState.container;
-                const type = dragState.type;
-                
-                element.classList.remove('dragging');
-                element.style.cursor = '';
-                
-                if (dragState.dropIndicator && dragState.dropIndicator.parentNode) {
-                    const indicator = dragState.dropIndicator;
-                    const insertBefore = indicator.dataset.insertBefore === 'true';
-                    const targetIndex = parseInt(indicator.dataset.targetIndex);
-                    
-                    if (targetIndex >= 0 && targetIndex < container.children.length) {
-                        const targetElement = container.children[targetIndex];
-                        if (insertBefore) {
-                            container.insertBefore(element, targetElement);
-                        } else {
-                            if (targetElement.nextSibling) {
-                                container.insertBefore(element, targetElement.nextSibling);
-                            } else {
-                                container.appendChild(element);
-                            }
-                        }
-                    }
-                    
-                    indicator.remove();
+                let clientX, clientY;
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else if (e.type === 'touchmove') {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
                 }
                 
-                element.style.position = '';
-                element.style.left = '';
-                element.style.top = '';
-                element.style.width = '';
-                element.style.height = '';
-                element.style.zIndex = '';
-                
-                resetSiblingStates();
-                
-                savePositions(type);
-                
-                dragState = {
-                    element: null,
-                    offsetX: 0,
-                    offsetY: 0,
-                    startX: 0,
-                    startY: 0,
-                    originalX: 0,
-                    originalY: 0,
-                    container: null,
-                    type: null,
-                    ghost: null,
-                    dropIndicator: null,
-                    siblings: []
-                };
-            }
-
-            function createDropIndicator() {
-                const indicator = document.createElement('div');
-                indicator.className = 'drop-indicator horizontal';
-                indicator.style.position = 'absolute';
-                indicator.style.left = '0';
-                indicator.style.top = '0';
-                indicator.style.opacity = '0';
-                dragState.container.appendChild(indicator);
-                dragState.dropIndicator = indicator;
-            }
-
-            function updateDropIndicator(x, y) {
-                if (!dragState.dropIndicator || !dragState.container) return;
+                dragState.clone.style.left = (clientX - dragState.clone.offsetWidth / 2) + 'px';
+                dragState.clone.style.top = (clientY - dragState.clone.offsetHeight / 2) + 'px';
                 
                 const containerRect = dragState.container.getBoundingClientRect();
-                const element = dragState.element;
-                const indicator = dragState.dropIndicator;
+                const children = Array.from(dragState.container.children).filter(child => 
+                    child !== dragState.placeholder && 
+                    (child.classList.contains('timer') || 
+                     child.classList.contains('stopwatch') || 
+                     child.classList.contains('city-card'))
+                );
                 
                 let closestIndex = -1;
                 let closestDistance = Infinity;
-                let insertBefore = true;
                 
-                const children = Array.from(dragState.container.children).filter(child => 
-                    !child.classList.contains('drop-indicator')
-                );
-                
-                for (let i = 0; i < children.length; i++) {
-                    const child = children[i];
-                    if (child === element) continue;
-                    
+                children.forEach((child, index) => {
                     const rect = child.getBoundingClientRect();
                     const centerY = rect.top + rect.height / 2;
-                    
-                    const distance = Math.abs(y + element.offsetHeight / 2 - centerY);
+                    const distance = Math.abs(clientY - centerY);
                     
                     if (distance < closestDistance) {
                         closestDistance = distance;
-                        closestIndex = i;
-                        insertBefore = y + element.offsetHeight / 2 < centerY;
+                        closestIndex = index;
                     }
+                });
+                
+                if (closestIndex !== -1 && closestIndex !== dragState.currentIndex) {
+                    dragState.currentIndex = closestIndex;
+                    
+                    children.forEach(child => {
+                        child.classList.remove('drag-over');
+                    });
+                    
+                    if (children[closestIndex]) {
+                        children[closestIndex].classList.add('drag-over');
+                    }
+                    
+                    dragState.container.insertBefore(dragState.placeholder, children[closestIndex] || null);
+                }
+            }
+
+            function stopDrag(e) {
+                if (!dragState.isDragging) {
+                    document.removeEventListener('mousemove', startDraggingCheck);
+                    document.removeEventListener('touchmove', startDraggingCheck);
+                    dragState = {
+                        element: null,
+                        clone: null,
+                        startIndex: -1,
+                        currentIndex: -1,
+                        container: null,
+                        type: null,
+                        placeholder: null,
+                        isDragging: false
+                    };
+                    return;
                 }
                 
-                if (closestIndex >= 0 && closestDistance < 100) {
-                    const targetElement = children[closestIndex];
-                    const targetRect = targetElement.getBoundingClientRect();
-                    
-                    indicator.style.width = targetRect.width + 'px';
-                    indicator.style.height = '4px';
-                    indicator.style.left = targetRect.left - containerRect.left + 'px';
-                    
-                    if (insertBefore) {
-                        indicator.style.top = targetRect.top - containerRect.top - 2 + 'px';
-                    } else {
-                        indicator.style.top = targetRect.bottom - containerRect.top - 2 + 'px';
-                    }
-                    
-                    indicator.style.opacity = '0.7';
-                    indicator.dataset.targetIndex = closestIndex.toString();
-                    indicator.dataset.insertBefore = insertBefore.toString();
-                } else {
-                    indicator.style.opacity = '0';
+                e.preventDefault();
+                
+                const children = Array.from(dragState.container.children).filter(child => 
+                    child !== dragState.placeholder && 
+                    (child.classList.contains('timer') || 
+                     child.classList.contains('stopwatch') || 
+                     child.classList.contains('city-card'))
+                );
+                
+                children.forEach(child => {
+                    child.classList.remove('drag-over');
+                });
+                
+                if (dragState.placeholder && dragState.placeholder.parentNode) {
+                    dragState.container.insertBefore(dragState.element, dragState.placeholder);
+                    dragState.placeholder.remove();
                 }
-            }
-
-            function updateSiblingStates() {
-                dragState.siblings.forEach(sibling => {
-                    sibling.classList.add('drag-ghost');
-                });
-            }
-
-            function resetSiblingStates() {
-                dragState.siblings.forEach(sibling => {
-                    sibling.classList.remove('drag-ghost');
-                    sibling.classList.remove('drag-over');
-                });
+                
+                dragState.element.style.visibility = '';
+                dragState.element.classList.remove('dragging');
+                
+                if (dragState.clone) {
+                    dragState.clone.remove();
+                }
+                
+                savePositions(dragState.type);
+                
+                dragState = {
+                    element: null,
+                    clone: null,
+                    startIndex: -1,
+                    currentIndex: -1,
+                    container: null,
+                    type: null,
+                    placeholder: null,
+                    isDragging: false
+                };
             }
 
             function savePositions(type) {
@@ -1822,7 +1711,11 @@
                 if (!container) return;
                 
                 const positions = {};
-                const children = Array.from(container.children);
+                const children = Array.from(container.children).filter(child => 
+                    child.classList.contains('timer') || 
+                    child.classList.contains('stopwatch') || 
+                    child.classList.contains('city-card')
+                );
                 
                 children.forEach((child, index) => {
                     const id = child.id.split('-')[1];
@@ -1845,7 +1738,12 @@
                 
                 if (!container) return positions;
                 
-                const children = Array.from(container.children);
+                const children = Array.from(container.children).filter(child => 
+                    child.classList.contains('timer') || 
+                    child.classList.contains('stopwatch') || 
+                    child.classList.contains('city-card')
+                );
+                
                 const sortedChildren = children.sort((a, b) => {
                     const idA = a.id.split('-')[1];
                     const idB = b.id.split('-')[1];
