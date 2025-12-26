@@ -81,7 +81,7 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 33.333%;
+            width: 25%;
             height: 100%;
             background: #ffeb3b;
             border-radius: 20px 20px 0 0;
@@ -197,14 +197,14 @@
             transform: translateY(-1px) scale(0.98);
         }
 
-        .timer-container, .stopwatch-container, .city-container {
+        .timer-container, .stopwatch-container, .city-container, .alarm-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
             position: relative;
         }
 
-        .timer, .stopwatch, .city-card {
+        .timer, .stopwatch, .city-card, .alarm {
             background: linear-gradient(145deg, #222, #1a1a1a);
             border: 1px solid #333;
             border-radius: 20px;
@@ -223,7 +223,7 @@
             user-select: none;
         }
 
-        .timer.dragging, .stopwatch.dragging, .city-card.dragging {
+        .timer.dragging, .stopwatch.dragging, .city-card.dragging, .alarm.dragging {
             z-index: 10000;
             transform: scale(1.05) rotate(2deg);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
@@ -231,7 +231,7 @@
             opacity: 0.9;
         }
 
-        .timer.drag-over, .stopwatch.drag-over, .city-card.drag-over {
+        .timer.drag-over, .stopwatch.drag-over, .city-card.drag-over, .alarm.drag-over {
             border-color: #ffeb3b;
             transform: scale(1.02);
             transition: transform 0.2s;
@@ -244,13 +244,13 @@
             }
         }
 
-        .timer:hover, .stopwatch:hover, .city-card:hover {
+        .timer:hover, .stopwatch:hover, .city-card:hover, .alarm:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
             border-color: #444;
         }
 
-        .timer-header, .stopwatch-header, .city-header {
+        .timer-header, .stopwatch-header, .city-header, .alarm-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -258,7 +258,7 @@
             min-height: 50px;
         }
 
-        .timer-title, .stopwatch-title, .city-title {
+        .timer-title, .stopwatch-title, .city-title, .alarm-title {
             font-size: 18px;
             font-weight: bold;
             background: transparent;
@@ -272,13 +272,13 @@
             margin-right: 15px;
         }
 
-        .timer-title:focus, .stopwatch-title:focus, .city-title:focus {
+        .timer-title:focus, .stopwatch-title:focus, .city-title:focus, .alarm-title:focus {
             outline: none;
             border-color: #ffeb3b;
             box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.1);
         }
 
-        .timer-controls, .stopwatch-controls, .city-controls {
+        .timer-controls, .stopwatch-controls, .city-controls, .alarm-controls {
             display: flex;
             gap: 10px;
             align-items: center;
@@ -787,8 +787,102 @@
             transition: all 0.3s;
         }
 
+        .alarm-time-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .alarm-time-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+            position: relative;
+        }
+
+        .alarm-time-input input {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            color: #ffeb3b;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .alarm-time-input label {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alarm-status {
+            text-align: center;
+            font-size: 14px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+            min-height: 20px;
+        }
+
+        .alarm-time-display {
+            font-size: 52px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #ffeb3b;
+            text-shadow: 0 2px 10px rgba(255, 235, 59, 0.2);
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .alarm-next-time {
+            font-size: 21px;
+            color: #aaa;
+            font-weight: normal;
+            margin-top: 15px;
+            opacity: 0.8;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .alarm-days {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .day-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: transparent;
+            color: #ffeb3b;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .day-btn.active {
+            background: #ffeb3b;
+            color: #0a0a0a;
+            border-color: #ffeb3b;
+        }
+
         @media (max-width: 1200px) {
-            .timer-container, .stopwatch-container, .city-container {
+            .timer-container, .stopwatch-container, .city-container, .alarm-container {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -849,18 +943,18 @@
                 border-radius: 0 0 12px 12px;
             }
             
-            .timer-container, .stopwatch-container, .city-container {
+            .timer-container, .stopwatch-container, .city-container, .alarm-container {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             
-            .timer, .stopwatch, .city-card {
+            .timer, .stopwatch, .city-card, .alarm {
                 padding: 15px;
                 min-height: 220px;
                 border-radius: 12px;
             }
             
-            .timer-header, .stopwatch-header, .city-header {
+            .timer-header, .stopwatch-header, .city-header, .alarm-header {
                 flex-direction: column;
                 gap: 10px;
                 align-items: stretch;
@@ -868,7 +962,7 @@
                 min-height: auto;
             }
             
-            .timer-title, .stopwatch-title, .city-title {
+            .timer-title, .stopwatch-title, .city-title, .alarm-title {
                 width: 100%;
                 margin-right: 0;
                 height: 40px;
@@ -877,7 +971,7 @@
                 border-radius: 8px;
             }
             
-            .timer-controls, .stopwatch-controls, .city-controls {
+            .timer-controls, .stopwatch-controls, .city-controls, .alarm-controls {
                 flex-direction: row;
                 justify-content: space-between;
                 height: auto;
@@ -910,12 +1004,12 @@
                 border-radius: 8px;
             }
             
-            .time-display, .city-time-display {
+            .time-display, .city-time-display, .alarm-time-display {
                 font-size: 32px;
                 margin: 10px 0;
             }
             
-            .end-time {
+            .end-time, .alarm-next-time {
                 font-size: 16.5px;
                 margin-top: 10px;
             }
@@ -940,21 +1034,21 @@
                 font-size: 14px;
             }
             
-            .time-inputs {
+            .time-inputs, .alarm-time-inputs {
                 gap: 8px;
                 margin-bottom: 10px;
             }
             
-            .time-input {
+            .time-input, .alarm-time-input {
                 min-width: 60px;
             }
             
-            .time-input label {
+            .time-input label, .alarm-time-input label {
                 font-size: 11px;
                 margin-bottom: 5px;
             }
             
-            .time-input input {
+            .time-input input, .alarm-time-input input {
                 padding: 8px;
                 font-size: 16px;
                 border-radius: 8px;
@@ -1030,21 +1124,21 @@
                 justify-content: center;
             }
             
-            .timer-container, .stopwatch-container, .city-container {
+            .timer-container, .stopwatch-container, .city-container, .alarm-container {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
             
-            .timer, .stopwatch, .city-card {
+            .timer, .stopwatch, .city-card, .alarm {
                 padding: 12px;
                 min-height: 200px;
             }
             
-            .time-display, .city-time-display {
+            .time-display, .city-time-display, .alarm-time-display {
                 font-size: 28px;
             }
             
-            .end-time {
+            .end-time, .alarm-next-time {
                 font-size: 15px;
                 margin-top: 8px;
             }
@@ -1069,17 +1163,17 @@
                 font-size: 12px;
             }
             
-            .time-inputs {
+            .time-inputs, .alarm-time-inputs {
                 flex-direction: row;
                 justify-content: space-around;
                 gap: 6px;
             }
             
-            .time-input {
+            .time-input, .alarm-time-input {
                 min-width: 55px;
             }
             
-            .time-input input {
+            .time-input input, .alarm-time-input input {
                 padding: 6px;
                 font-size: 14px;
             }
@@ -1098,21 +1192,21 @@
         }
         
         @media (max-width: 320px) {
-            .timer-container, .stopwatch-container, .city-container {
+            .timer-container, .stopwatch-container, .city-container, .alarm-container {
                 grid-template-columns: 1fr;
             }
             
-            .timer-title, .stopwatch-title, .city-title {
+            .timer-title, .stopwatch-title, .city-title, .alarm-title {
                 font-size: 13px;
             }
             
-            .time-inputs {
+            .time-inputs, .alarm-time-inputs {
                 flex-direction: column;
                 align-items: center;
                 gap: 5px;
             }
             
-            .time-input {
+            .time-input, .alarm-time-input {
                 width: 100%;
                 max-width: 120px;
             }
@@ -1150,6 +1244,7 @@
             <div class="tabs">
                 <div class="tab" data-tab="timer">ТАЙМЕР</div>
                 <div class="tab" data-tab="stopwatch">СЕКУНДОМЕР</div>
+                <div class="tab" data-tab="alarm">БУДИЛЬНИК</div>
                 <div class="tab" data-tab="clock">ЧАСЫ</div>
             </div>
         </div>
@@ -1163,6 +1258,11 @@
             <div id="stopwatch" class="content">
                 <button class="add-btn" id="addStopwatch">＋ ДОБАВИТЬ СЕКУНДОМЕР</button>
                 <div class="stopwatch-container" id="stopwatchContainer"></div>
+            </div>
+
+            <div id="alarm" class="content">
+                <button class="add-btn" id="addAlarm">＋ ДОБАВИТЬ БУДИЛЬНИК</button>
+                <div class="alarm-container" id="alarmContainer"></div>
             </div>
 
             <div id="clock" class="content">
@@ -1196,6 +1296,9 @@
             if (!localStorage.getItem('savedCities')) {
                 localStorage.setItem('savedCities', JSON.stringify({}));
             }
+            if (!localStorage.getItem('savedAlarms')) {
+                localStorage.setItem('savedAlarms', JSON.stringify({}));
+            }
             if (!localStorage.getItem('timerPositions')) {
                 localStorage.setItem('timerPositions', JSON.stringify({}));
             }
@@ -1204,6 +1307,9 @@
             }
             if (!localStorage.getItem('cityPositions')) {
                 localStorage.setItem('cityPositions', JSON.stringify({}));
+            }
+            if (!localStorage.getItem('alarmPositions')) {
+                localStorage.setItem('alarmPositions', JSON.stringify({}));
             }
             
             const tabs = document.querySelectorAll('.tab');
@@ -1263,6 +1369,7 @@
             let timerId = 1;
             let stopwatchId = 1;
             let cityId = 1;
+            let alarmId = 1;
 
             const citiesData = [
                 {name: "Москва", country: "Россия", offset: 3},
@@ -1511,7 +1618,9 @@
                 type: null,
                 placeholder: null,
                 isDragging: false,
-                dragOverElement: null
+                dragOverElement: null,
+                startX: 0,
+                startY: 0
             };
 
             function initDragAndDrop() {
@@ -1527,10 +1636,10 @@
             function startDrag(e) {
                 if (e.type === 'mousedown' && e.button !== 0) return;
                 
-                const element = e.target.closest('.timer, .stopwatch, .city-card');
+                const element = e.target.closest('.timer, .stopwatch, .city-card, .alarm');
                 if (!element) return;
                 
-                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn, .dropdown-list, .dropdown-item')) {
+                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .alarm-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn, .dropdown-list, .dropdown-item, .alarm-time-input input, .day-btn')) {
                     return;
                 }
 
@@ -1540,10 +1649,20 @@
                 const children = Array.from(container.children).filter(child => 
                     child.classList.contains('timer') || 
                     child.classList.contains('stopwatch') || 
-                    child.classList.contains('city-card')
+                    child.classList.contains('city-card') ||
+                    child.classList.contains('alarm')
                 );
                 
                 const startIndex = children.indexOf(element);
+                
+                let clientX, clientY;
+                if (e.type === 'mousedown') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else if (e.type === 'touchstart') {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
                 
                 dragState = {
                     element: element,
@@ -1551,10 +1670,13 @@
                     startIndex: startIndex,
                     container: container,
                     type: element.classList.contains('timer') ? 'timer' : 
-                          element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
+                          element.classList.contains('stopwatch') ? 'stopwatch' : 
+                          element.classList.contains('alarm') ? 'alarm' : 'city',
                     placeholder: null,
                     isDragging: false,
-                    dragOverElement: null
+                    dragOverElement: null,
+                    startX: clientX,
+                    startY: clientY
                 };
 
                 document.addEventListener('mousemove', startDraggingCheck);
@@ -1564,33 +1686,47 @@
             function startDraggingCheck(e) {
                 if (!dragState.element || dragState.isDragging) return;
                 
-                dragState.isDragging = true;
-                document.removeEventListener('mousemove', startDraggingCheck);
-                document.removeEventListener('touchmove', startDraggingCheck);
+                let clientX, clientY;
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else if (e.type === 'touchmove') {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
                 
-                const element = dragState.element;
-                element.classList.add('dragging');
+                const dx = Math.abs(clientX - dragState.startX);
+                const dy = Math.abs(clientY - dragState.startY);
                 
-                const rect = element.getBoundingClientRect();
-                
-                dragState.clone = element.cloneNode(true);
-                dragState.clone.style.position = 'fixed';
-                dragState.clone.style.width = rect.width + 'px';
-                dragState.clone.style.height = rect.height + 'px';
-                dragState.clone.style.left = rect.left + 'px';
-                dragState.clone.style.top = rect.top + 'px';
-                dragState.clone.style.zIndex = '10000';
-                dragState.clone.style.pointerEvents = 'none';
-                dragState.clone.style.opacity = '0.8';
-                document.body.appendChild(dragState.clone);
-                
-                dragState.placeholder = document.createElement('div');
-                dragState.placeholder.className = 'drag-placeholder';
-                dragState.placeholder.style.width = rect.width + 'px';
-                dragState.placeholder.style.height = rect.height + 'px';
-                element.parentNode.insertBefore(dragState.placeholder, element);
-                
-                element.style.visibility = 'hidden';
+                if (dx > 5 || dy > 5) {
+                    dragState.isDragging = true;
+                    document.removeEventListener('mousemove', startDraggingCheck);
+                    document.removeEventListener('touchmove', startDraggingCheck);
+                    
+                    const element = dragState.element;
+                    element.classList.add('dragging');
+                    
+                    const rect = element.getBoundingClientRect();
+                    
+                    dragState.clone = element.cloneNode(true);
+                    dragState.clone.style.position = 'fixed';
+                    dragState.clone.style.width = rect.width + 'px';
+                    dragState.clone.style.height = rect.height + 'px';
+                    dragState.clone.style.left = rect.left + 'px';
+                    dragState.clone.style.top = rect.top + 'px';
+                    dragState.clone.style.zIndex = '10000';
+                    dragState.clone.style.pointerEvents = 'none';
+                    dragState.clone.style.opacity = '0.8';
+                    document.body.appendChild(dragState.clone);
+                    
+                    dragState.placeholder = document.createElement('div');
+                    dragState.placeholder.className = 'drag-placeholder';
+                    dragState.placeholder.style.width = rect.width + 'px';
+                    dragState.placeholder.style.height = rect.height + 'px';
+                    element.parentNode.insertBefore(dragState.placeholder, element);
+                    
+                    element.style.visibility = 'hidden';
+                }
             }
 
             function drag(e) {
@@ -1611,42 +1747,48 @@
                 dragState.clone.style.top = (clientY - dragState.clone.offsetHeight / 2) + 'px';
                 
                 const containerRect = dragState.container.getBoundingClientRect();
-                const children = Array.from(dragState.container.children).filter(child => 
-                    child !== dragState.placeholder && 
-                    child !== dragState.element &&
-                    (child.classList.contains('timer') || 
-                     child.classList.contains('stopwatch') || 
-                     child.classList.contains('city-card'))
-                );
                 
                 if (dragState.dragOverElement) {
                     dragState.dragOverElement.classList.remove('drag-over');
                     dragState.dragOverElement = null;
                 }
                 
+                const children = Array.from(dragState.container.children).filter(child => 
+                    child !== dragState.placeholder && 
+                    child !== dragState.element &&
+                    (child.classList.contains('timer') || 
+                     child.classList.contains('stopwatch') || 
+                     child.classList.contains('city-card') ||
+                     child.classList.contains('alarm'))
+                );
+                
                 let targetElement = null;
+                let minDistance = Infinity;
                 let targetPosition = 'before';
                 
-                for (const child of children) {
+                children.forEach(child => {
                     const rect = child.getBoundingClientRect();
+                    const childCenterX = rect.left + rect.width / 2;
+                    const childCenterY = rect.top + rect.height / 2;
                     
-                    if (clientY >= rect.top && clientY <= rect.bottom && 
-                        clientX >= rect.left && clientX <= rect.right) {
+                    const distance = Math.sqrt(
+                        Math.pow(clientX - childCenterX, 2) + 
+                        Math.pow(clientY - childCenterY, 2)
+                    );
+                    
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        targetElement = child;
                         
-                        const elementCenterY = rect.top + rect.height / 2;
-                        
-                        if (clientY < elementCenterY) {
-                            targetElement = child;
+                        if (clientY < childCenterY) {
                             targetPosition = 'before';
                         } else {
-                            targetElement = child;
                             targetPosition = 'after';
                         }
-                        break;
                     }
-                }
+                });
                 
-                if (targetElement) {
+                if (targetElement && minDistance < Math.max(targetElement.offsetWidth, targetElement.offsetHeight) * 0.7) {
                     targetElement.classList.add('drag-over');
                     dragState.dragOverElement = targetElement;
                     
@@ -1656,22 +1798,60 @@
                         }
                     } else {
                         if (targetElement.nextSibling !== dragState.placeholder) {
-                            if (targetElement.nextSibling) {
-                                dragState.container.insertBefore(dragState.placeholder, targetElement.nextSibling);
-                            } else {
-                                dragState.container.appendChild(dragState.placeholder);
-                            }
+                            dragState.container.insertBefore(dragState.placeholder, targetElement.nextSibling);
                         }
                     }
                 } else {
-                    const lastChild = children[children.length - 1];
-                    if (lastChild && clientY > lastChild.getBoundingClientRect().bottom) {
-                        if (lastChild.nextSibling !== dragState.placeholder) {
-                            dragState.container.appendChild(dragState.placeholder);
-                        }
-                    } else if (children.length === 0 || clientY < children[0].getBoundingClientRect().top) {
-                        if (dragState.container.firstChild !== dragState.placeholder) {
-                            dragState.container.insertBefore(dragState.placeholder, dragState.container.firstChild);
+                    const containerCenterY = containerRect.top + containerRect.height / 2;
+                    const containerCenterX = containerRect.left + containerRect.width / 2;
+                    
+                    const distanceToContainer = Math.sqrt(
+                        Math.pow(clientX - containerCenterX, 2) + 
+                        Math.pow(clientY - containerCenterY, 2)
+                    );
+                    
+                    const maxDistance = Math.min(containerRect.width, containerRect.height) * 0.4;
+                    
+                    if (distanceToContainer < maxDistance || 
+                        (clientY >= containerRect.top && clientY <= containerRect.bottom &&
+                         clientX >= containerRect.left && clientX <= containerRect.right)) {
+                        
+                        if (children.length === 0) {
+                            if (dragState.container.firstChild !== dragState.placeholder) {
+                                dragState.container.insertBefore(dragState.placeholder, dragState.container.firstChild);
+                            }
+                        } else if (clientY < children[0].getBoundingClientRect().top + 20) {
+                            if (dragState.container.firstChild !== dragState.placeholder) {
+                                dragState.container.insertBefore(dragState.placeholder, dragState.container.firstChild);
+                            }
+                        } else if (clientY > children[children.length - 1].getBoundingClientRect().bottom - 20) {
+                            if (dragState.container.lastChild !== dragState.placeholder) {
+                                dragState.container.appendChild(dragState.placeholder);
+                            }
+                        } else {
+                            for (let i = 0; i < children.length; i++) {
+                                const child = children[i];
+                                const nextChild = children[i + 1];
+                                const childRect = child.getBoundingClientRect();
+                                
+                                if (nextChild) {
+                                    const nextRect = nextChild.getBoundingClientRect();
+                                    const gapCenter = (childRect.bottom + nextRect.top) / 2;
+                                    
+                                    if (clientY > childRect.bottom - 20 && clientY < nextRect.top + 20) {
+                                        if (clientY < gapCenter) {
+                                            if (child.nextSibling !== dragState.placeholder) {
+                                                dragState.container.insertBefore(dragState.placeholder, child.nextSibling);
+                                            }
+                                        } else {
+                                            if (nextChild !== dragState.placeholder) {
+                                                dragState.container.insertBefore(dragState.placeholder, nextChild);
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1689,7 +1869,9 @@
                         type: null,
                         placeholder: null,
                         isDragging: false,
-                        dragOverElement: null
+                        dragOverElement: null,
+                        startX: 0,
+                        startY: 0
                     };
                     return;
                 }
@@ -1701,6 +1883,7 @@
                 }
                 
                 if (dragState.placeholder && dragState.placeholder.parentNode) {
+                    const newIndex = Array.from(dragState.container.children).indexOf(dragState.placeholder);
                     dragState.container.insertBefore(dragState.element, dragState.placeholder);
                     dragState.placeholder.remove();
                 }
@@ -1722,13 +1905,16 @@
                     type: null,
                     placeholder: null,
                     isDragging: false,
-                    dragOverElement: null
+                    dragOverElement: null,
+                    startX: 0,
+                    startY: 0
                 };
             }
 
             function savePositions(type) {
                 const container = type === 'timer' ? document.getElementById('timerContainer') :
                                 type === 'stopwatch' ? document.getElementById('stopwatchContainer') :
+                                type === 'alarm' ? document.getElementById('alarmContainer') :
                                 document.getElementById('cityContainer');
                 
                 if (!container) return;
@@ -1737,7 +1923,8 @@
                 const children = Array.from(container.children).filter(child => 
                     child.classList.contains('timer') || 
                     child.classList.contains('stopwatch') || 
-                    child.classList.contains('city-card')
+                    child.classList.contains('city-card') ||
+                    child.classList.contains('alarm')
                 );
                 
                 children.forEach((child, index) => {
@@ -1757,6 +1944,7 @@
                 
                 const container = type === 'timer' ? document.getElementById('timerContainer') :
                                 type === 'stopwatch' ? document.getElementById('stopwatchContainer') :
+                                type === 'alarm' ? document.getElementById('alarmContainer') :
                                 document.getElementById('cityContainer');
                 
                 if (!container) return positions;
@@ -1764,7 +1952,8 @@
                 const children = Array.from(container.children).filter(child => 
                     child.classList.contains('timer') || 
                     child.classList.contains('stopwatch') || 
-                    child.classList.contains('city-card')
+                    child.classList.contains('city-card') ||
+                    child.classList.contains('alarm')
                 );
                 
                 const sortedChildren = children.sort((a, b) => {
@@ -1808,6 +1997,25 @@
                 stopwatches.forEach(stopwatch => {
                     const title = stopwatch.querySelector('.stopwatch-title').value;
                     const match = title.match(/^Секундомер (\d+)$/);
+                    if (match) {
+                        usedNumbers.push(parseInt(match[1]));
+                    }
+                });
+                
+                let nextNumber = 1;
+                while (usedNumbers.includes(nextNumber)) {
+                    nextNumber++;
+                }
+                return nextNumber;
+            }
+
+            function getNextAlarmNumber() {
+                const alarms = document.querySelectorAll('.alarm');
+                const usedNumbers = [];
+                
+                alarms.forEach(alarm => {
+                    const title = alarm.querySelector('.alarm-title').value;
+                    const match = title.match(/^Будильник (\d+)$/);
                     if (match) {
                         usedNumbers.push(parseInt(match[1]));
                     }
@@ -1870,6 +2078,24 @@
                 sortedIds.forEach(id => {
                     if (savedCities[id] && savedCities[id].saved) {
                         createCityFromData(id, savedCities[id]);
+                    }
+                });
+            }
+
+            function loadSavedAlarms() {
+                const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                const positions = JSON.parse(localStorage.getItem('alarmPositions') || '{}');
+                
+                const savedIds = Object.keys(savedAlarms).map(id => parseInt(id)).filter(id => !isNaN(id));
+                if (savedIds.length > 0) {
+                    alarmId = Math.max(...savedIds) + 1;
+                }
+                
+                const sortedIds = Object.keys(savedAlarms).sort((a, b) => (positions[a] || 0) - (positions[b] || 0));
+                
+                sortedIds.forEach(id => {
+                    if (savedAlarms[id] && savedAlarms[id].saved) {
+                        createAlarmFromData(id, savedAlarms[id]);
                     }
                 });
             }
@@ -2105,6 +2331,121 @@
                 }, 1000);
             }
 
+            function createAlarmFromData(id, alarmData) {
+                const alarmContainer = document.getElementById('alarmContainer');
+                
+                const alarmDiv = document.createElement('div');
+                alarmDiv.className = 'alarm';
+                alarmDiv.id = `alarm-${id}`;
+                
+                const daysButtons = Array(7).fill(0).map((_, i) => i);
+                const activeDays = alarmData.days || daysButtons;
+                
+                alarmDiv.innerHTML = `
+                    <div class="alarm-header">
+                        <input type="text" class="alarm-title" value="${alarmData.name}" placeholder="Название будильника">
+                        <div class="alarm-controls">
+                            <div class="save-container ${alarmData.saved ? 'saved' : ''}" onclick="toggleSaveAlarm(${id})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">${alarmData.saved ? 'Сохранен' : 'Сохранить'}</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteAlarm(${id})">✕</button>
+                        </div>
+                    </div>
+                    <div class="alarm-time-inputs">
+                        <div class="alarm-time-input">
+                            <label>Часы</label>
+                            <input type="number" min="0" max="23" value="${alarmData.hours}" class="alarm-hours">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                        <div class="alarm-time-input">
+                            <label>Минуты</label>
+                            <input type="number" min="0" max="59" value="${alarmData.minutes}" class="alarm-minutes">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="alarm-days" id="alarm-days-${id}">
+                        <button class="day-btn ${activeDays.includes(1) ? 'active' : ''}" data-day="1">П</button>
+                        <button class="day-btn ${activeDays.includes(2) ? 'active' : ''}" data-day="2">В</button>
+                        <button class="day-btn ${activeDays.includes(3) ? 'active' : ''}" data-day="3">С</button>
+                        <button class="day-btn ${activeDays.includes(4) ? 'active' : ''}" data-day="4">Ч</button>
+                        <button class="day-btn ${activeDays.includes(5) ? 'active' : ''}" data-day="5">П</button>
+                        <button class="day-btn ${activeDays.includes(6) ? 'active' : ''}" data-day="6">С</button>
+                        <button class="day-btn ${activeDays.includes(0) ? 'active' : ''}" data-day="0">В</button>
+                    </div>
+                    <div class="alarm-status" id="alarm-status-${id}"></div>
+                    <div class="alarm-time-display" id="alarm-time-display-${id}">
+                        ${alarmData.hours.toString().padStart(2, '0')}:${alarmData.minutes.toString().padStart(2, '0')}
+                        <div class="alarm-next-time" id="alarm-next-time-${id}"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="toggleAlarm(${id})">${alarmData.active ? 'ВЫКЛ' : 'ВКЛ'}</button>
+                        <button class="control-btn" onclick="testAlarm(${id})">▶ Тест</button>
+                    </div>
+                `;
+                
+                alarmContainer.appendChild(alarmDiv);
+                
+                const alarmElement = document.getElementById(`alarm-${id}`);
+                alarmElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                const daysContainer = document.getElementById(`alarm-days-${id}`);
+                const dayButtons = daysContainer.querySelectorAll('.day-btn');
+                
+                dayButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        updateAlarmDays(id);
+                        updateAlarmNextTimeDisplay(id);
+                    });
+                });
+                
+                alarmElement.hours = alarmData.hours;
+                alarmElement.minutes = alarmData.minutes;
+                alarmElement.days = activeDays;
+                alarmElement.active = alarmData.active || false;
+                alarmElement.isRinging = false;
+                
+                initDropdown(alarmElement.querySelector('.alarm-hours + .dropdown-btn + .dropdown-list'), 0, 23);
+                initDropdown(alarmElement.querySelector('.alarm-minutes + .dropdown-btn + .dropdown-list'), 0, 59);
+                
+                updateAlarmStatus(id);
+                updateAlarmNextTimeDisplay(id);
+                
+                if (alarmElement.active) {
+                    startAlarmCheck(id);
+                }
+                
+                const hoursInput = alarmElement.querySelector('.alarm-hours');
+                const minutesInput = alarmElement.querySelector('.alarm-minutes');
+                
+                hoursInput.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    if (value < 0) this.value = 0;
+                    if (value > 23) this.value = 23;
+                    alarmElement.hours = parseInt(this.value) || 0;
+                    updateAlarmDisplay(id);
+                    updateAlarmNextTimeDisplay(id);
+                    if (alarmElement.querySelector('.save-container').classList.contains('saved')) {
+                        updateSavedAlarm(id);
+                    }
+                });
+                
+                minutesInput.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    if (value < 0) this.value = 0;
+                    if (value > 59) this.value = 59;
+                    alarmElement.minutes = parseInt(this.value) || 0;
+                    updateAlarmDisplay(id);
+                    updateAlarmNextTimeDisplay(id);
+                    if (alarmElement.querySelector('.save-container').classList.contains('saved')) {
+                        updateSavedAlarm(id);
+                    }
+                });
+            }
+
             function updateCityTime(id, offset) {
                 const cityElement = document.getElementById(`city-${id}`);
                 if (!cityElement) return;
@@ -2144,6 +2485,7 @@
 
             document.getElementById('addTimer').addEventListener('click', createTimer);
             document.getElementById('addStopwatch').addEventListener('click', createStopwatch);
+            document.getElementById('addAlarm').addEventListener('click', createAlarm);
             document.getElementById('addCity').addEventListener('click', showCityModal);
             document.getElementById('closeCityList').addEventListener('click', hideCityModal);
             document.getElementById('citySearch').addEventListener('input', filterCities);
@@ -2256,6 +2598,121 @@
                 stopwatchElement.startTime = null;
                 
                 stopwatchId++;
+            }
+
+            function createAlarm() {
+                const alarmContainer = document.getElementById('alarmContainer');
+                
+                const alarmDiv = document.createElement('div');
+                alarmDiv.className = 'alarm';
+                alarmDiv.id = `alarm-${alarmId}`;
+                
+                const alarmNumber = getNextAlarmNumber();
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                
+                alarmDiv.innerHTML = `
+                    <div class="alarm-header">
+                        <input type="text" class="alarm-title" value="Будильник ${alarmNumber}" placeholder="Название будильника">
+                        <div class="alarm-controls">
+                            <div class="save-container" onclick="toggleSaveAlarm(${alarmId})">
+                                <div class="checkbox-custom"></div>
+                                <span class="save-text">Сохранить</span>
+                            </div>
+                            <button class="delete-btn" onclick="deleteAlarm(${alarmId})">✕</button>
+                        </div>
+                    </div>
+                    <div class="alarm-time-inputs">
+                        <div class="alarm-time-input">
+                            <label>Часы</label>
+                            <input type="number" min="0" max="23" value="${hours}" class="alarm-hours">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                        <div class="alarm-time-input">
+                            <label>Минуты</label>
+                            <input type="number" min="0" max="59" value="${minutes}" class="alarm-minutes">
+                            <button class="dropdown-btn" onclick="toggleDropdown(this)">▼</button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="alarm-days" id="alarm-days-${alarmId}">
+                        <button class="day-btn active" data-day="1">П</button>
+                        <button class="day-btn active" data-day="2">В</button>
+                        <button class="day-btn active" data-day="3">С</button>
+                        <button class="day-btn active" data-day="4">Ч</button>
+                        <button class="day-btn active" data-day="5">П</button>
+                        <button class="day-btn active" data-day="6">С</button>
+                        <button class="day-btn active" data-day="0">В</button>
+                    </div>
+                    <div class="alarm-status" id="alarm-status-${alarmId}"></div>
+                    <div class="alarm-time-display" id="alarm-time-display-${alarmId}">
+                        ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}
+                        <div class="alarm-next-time" id="alarm-next-time-${alarmId}"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn start" onclick="toggleAlarm(${alarmId})">ВКЛ</button>
+                        <button class="control-btn" onclick="testAlarm(${alarmId})">▶ Тест</button>
+                    </div>
+                `;
+                
+                alarmContainer.appendChild(alarmDiv);
+                
+                const alarmElement = document.getElementById(`alarm-${alarmId}`);
+                alarmElement.style.animation = 'cardAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                const daysContainer = document.getElementById(`alarm-days-${alarmId}`);
+                const dayButtons = daysContainer.querySelectorAll('.day-btn');
+                
+                dayButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        updateAlarmDays(alarmId);
+                        updateAlarmNextTimeDisplay(alarmId);
+                    });
+                });
+                
+                alarmElement.hours = hours;
+                alarmElement.minutes = minutes;
+                alarmElement.days = [0, 1, 2, 3, 4, 5, 6];
+                alarmElement.active = false;
+                alarmElement.isRinging = false;
+                
+                initDropdown(alarmElement.querySelector('.alarm-hours + .dropdown-btn + .dropdown-list'), 0, 23);
+                initDropdown(alarmElement.querySelector('.alarm-minutes + .dropdown-btn + .dropdown-list'), 0, 59);
+                
+                updateAlarmStatus(alarmId);
+                updateAlarmNextTimeDisplay(alarmId);
+                
+                const hoursInput = alarmElement.querySelector('.alarm-hours');
+                const minutesInput = alarmElement.querySelector('.alarm-minutes');
+                
+                hoursInput.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    if (value < 0) this.value = 0;
+                    if (value > 23) this.value = 23;
+                    alarmElement.hours = parseInt(this.value) || 0;
+                    updateAlarmDisplay(alarmId);
+                    updateAlarmNextTimeDisplay(alarmId);
+                    if (alarmElement.querySelector('.save-container').classList.contains('saved')) {
+                        updateSavedAlarm(alarmId);
+                    }
+                });
+                
+                minutesInput.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    if (value < 0) this.value = 0;
+                    if (value > 59) this.value = 59;
+                    alarmElement.minutes = parseInt(this.value) || 0;
+                    updateAlarmDisplay(alarmId);
+                    updateAlarmNextTimeDisplay(alarmId);
+                    if (alarmElement.querySelector('.save-container').classList.contains('saved')) {
+                        updateSavedAlarm(alarmId);
+                    }
+                });
+                
+                alarmId++;
             }
 
             function showCityModal() {
@@ -2423,7 +2880,7 @@
             };
 
             document.addEventListener('click', function(event) {
-                if (!event.target.closest('.time-input')) {
+                if (!event.target.closest('.time-input') && !event.target.closest('.alarm-time-input')) {
                     document.querySelectorAll('.dropdown-list').forEach(dropdown => {
                         dropdown.classList.remove('show');
                     });
@@ -2541,6 +2998,72 @@
                 savePositions('city');
             };
 
+            window.toggleSaveAlarm = function(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const saveContainer = alarm.querySelector('.save-container');
+                const isSaved = saveContainer.classList.contains('saved');
+                
+                updateAlarmDays(id);
+                
+                if (isSaved) {
+                    saveContainer.classList.remove('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранить';
+                    
+                    const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                    if (savedAlarms[id]) {
+                        savedAlarms[id].saved = false;
+                        localStorage.setItem('savedAlarms', JSON.stringify(savedAlarms));
+                    }
+                } else {
+                    const title = alarm.querySelector('.alarm-title').value;
+                    const hours = alarm.hours;
+                    const minutes = alarm.minutes;
+                    const days = alarm.days;
+                    const active = alarm.active;
+                    
+                    saveContainer.classList.add('saved');
+                    saveContainer.querySelector('.save-text').textContent = 'Сохранен';
+                    
+                    const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                    savedAlarms[id] = {
+                        name: title,
+                        hours: hours,
+                        minutes: minutes,
+                        days: days,
+                        active: active,
+                        saved: true
+                    };
+                    
+                    localStorage.setItem('savedAlarms', JSON.stringify(savedAlarms));
+                }
+                savePositions('alarm');
+            };
+
+            function updateSavedAlarm(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const saveContainer = alarm.querySelector('.save-container');
+                
+                if (saveContainer.classList.contains('saved')) {
+                    const title = alarm.querySelector('.alarm-title').value;
+                    const hours = alarm.hours;
+                    const minutes = alarm.minutes;
+                    const days = alarm.days;
+                    const active = alarm.active;
+                    
+                    const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                    savedAlarms[id] = {
+                        name: title,
+                        hours: hours,
+                        minutes: minutes,
+                        days: days,
+                        active: active,
+                        saved: true
+                    };
+                    
+                    localStorage.setItem('savedAlarms', JSON.stringify(savedAlarms));
+                }
+            }
+
             window.deleteTimer = function(id) {
                 const timer = document.getElementById(`timer-${id}`);
                 if (timer) {
@@ -2594,6 +3117,25 @@
                         const positions = JSON.parse(localStorage.getItem('cityPositions') || '{}');
                         delete positions[id];
                         localStorage.setItem('cityPositions', JSON.stringify(positions));
+                    }, 600);
+                }
+            };
+
+            window.deleteAlarm = function(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                if (alarm) {
+                    clearInterval(alarm.checkInterval);
+                    alarm.classList.add('card-remove');
+                    setTimeout(() => {
+                        alarm.remove();
+                        
+                        const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                        delete savedAlarms[id];
+                        localStorage.setItem('savedAlarms', JSON.stringify(savedAlarms));
+                        
+                        const positions = JSON.parse(localStorage.getItem('alarmPositions') || '{}');
+                        delete positions[id];
+                        localStorage.setItem('alarmPositions', JSON.stringify(positions));
                     }, 600);
                 }
             };
@@ -2807,6 +3349,71 @@
                 }
             }
 
+            function updateAlarmNextTimeDisplay(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const nextTimeDisplay = document.getElementById(`alarm-next-time-${id}`);
+                
+                if (!alarm || !nextTimeDisplay) return;
+                
+                if (!alarm.active || alarm.days.length === 0) {
+                    nextTimeDisplay.textContent = '';
+                    return;
+                }
+                
+                const now = new Date();
+                const today = now.getDay();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                const currentSecond = now.getSeconds();
+                
+                const targetHour = alarm.hours;
+                const targetMinute = alarm.minutes;
+                
+                let daysToAdd = 0;
+                
+                if (alarm.days.includes(today)) {
+                    if (currentHour < targetHour || (currentHour === targetHour && currentMinute < targetMinute) || 
+                        (currentHour === targetHour && currentMinute === targetMinute && currentSecond < 1)) {
+                        daysToAdd = 0;
+                    } else {
+                        daysToAdd = 1;
+                    }
+                } else {
+                    daysToAdd = 1;
+                }
+                
+                let foundDay = false;
+                for (let i = 0; i < 7; i++) {
+                    const checkDay = (today + daysToAdd + i) % 7;
+                    if (alarm.days.includes(checkDay)) {
+                        daysToAdd += i;
+                        foundDay = true;
+                        break;
+                    }
+                }
+                
+                if (!foundDay) {
+                    nextTimeDisplay.textContent = '';
+                    return;
+                }
+                
+                const nextAlarmTime = new Date(now);
+                nextAlarmTime.setDate(now.getDate() + daysToAdd);
+                nextAlarmTime.setHours(targetHour, targetMinute, 0, 0);
+                
+                const diffMs = nextAlarmTime.getTime() - now.getTime();
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                if (diffHours > 0) {
+                    nextTimeDisplay.textContent = `Сработает через ${diffHours} ч ${diffMinutes} мин`;
+                } else if (diffMinutes > 0) {
+                    nextTimeDisplay.textContent = `Сработает через ${diffMinutes} мин`;
+                } else {
+                    nextTimeDisplay.textContent = 'Сработает через несколько секунд';
+                }
+            }
+
             function updateTimerDisplay(id) {
                 const timer = document.getElementById(`timer-${id}`);
                 const hours = parseInt(timer.querySelector('.hours-input').value) || 0;
@@ -2969,6 +3576,143 @@
                     `<span class="milliseconds">.${milliseconds.toString().padStart(3, '0')}</span>`;
             }
 
+            window.toggleAlarm = function(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const button = alarm.querySelector('.control-btn.start');
+                
+                alarm.active = !alarm.active;
+                button.textContent = alarm.active ? 'ВЫКЛ' : 'ВКЛ';
+                
+                if (alarm.active) {
+                    startAlarmCheck(id);
+                    updateAlarmNextTimeDisplay(id);
+                } else {
+                    clearInterval(alarm.checkInterval);
+                    if (alarm.isRinging) {
+                        stopAlarm(id);
+                    }
+                    const nextTimeDisplay = document.getElementById(`alarm-next-time-${id}`);
+                    if (nextTimeDisplay) nextTimeDisplay.textContent = '';
+                }
+                
+                updateAlarmStatus(id);
+                
+                if (alarm.querySelector('.save-container').classList.contains('saved')) {
+                    updateSavedAlarm(id);
+                }
+            };
+
+            window.testAlarm = function(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                triggerAlarm(id);
+            };
+
+            function updateAlarmDays(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const daysContainer = document.getElementById(`alarm-days-${id}`);
+                const dayButtons = daysContainer.querySelectorAll('.day-btn');
+                
+                const days = [];
+                dayButtons.forEach(btn => {
+                    if (btn.classList.contains('active')) {
+                        days.push(parseInt(btn.dataset.day));
+                    }
+                });
+                
+                alarm.days = days;
+                
+                if (alarm.querySelector('.save-container').classList.contains('saved')) {
+                    updateSavedAlarm(id);
+                }
+                
+                updateAlarmStatus(id);
+                updateAlarmNextTimeDisplay(id);
+            }
+
+            function updateAlarmDisplay(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const display = document.getElementById(`alarm-time-display-${id}`);
+                display.childNodes[0].textContent = `${alarm.hours.toString().padStart(2, '0')}:${alarm.minutes.toString().padStart(2, '0')}`;
+            }
+
+            function updateAlarmStatus(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const status = document.getElementById(`alarm-status-${id}`);
+                
+                if (alarm.isRinging) {
+                    status.textContent = '⏰ Звонит!';
+                    status.style.color = '#ff4444';
+                } else if (alarm.active) {
+                    const daysText = getDaysText(alarm.days);
+                    status.textContent = `Включен • ${daysText}`;
+                    status.style.color = '#4CAF50';
+                } else {
+                    status.textContent = 'Выключен';
+                    status.style.color = '#aaa';
+                }
+            }
+
+            function getDaysText(days) {
+                const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+                if (days.length === 7) return 'Ежедневно';
+                
+                const sortedDays = [...days].sort((a, b) => a - b);
+                return sortedDays.map(day => dayNames[day]).join(', ');
+            }
+
+            function startAlarmCheck(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                
+                clearInterval(alarm.checkInterval);
+                
+                alarm.checkInterval = setInterval(() => {
+                    const now = new Date();
+                    const currentDay = now.getDay();
+                    const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
+                    
+                    if (alarm.days.includes(currentDay) && 
+                        currentHour === alarm.hours && 
+                        currentMinute === alarm.minutes &&
+                        !alarm.isRinging) {
+                        triggerAlarm(id);
+                    }
+                    
+                    updateAlarmNextTimeDisplay(id);
+                }, 1000);
+            }
+
+            function triggerAlarm(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const display = document.getElementById(`alarm-time-display-${id}`);
+                
+                if (alarm.isRinging) return;
+                
+                alarm.isRinging = true;
+                display.style.color = '#ff4444';
+                display.style.animation = 'pulse 0.5s infinite alternate';
+                
+                updateAlarmStatus(id);
+                
+                setTimeout(() => {
+                    if (alarm.isRinging) {
+                        stopAlarm(id);
+                    }
+                }, 60000);
+            }
+
+            function stopAlarm(id) {
+                const alarm = document.getElementById(`alarm-${id}`);
+                const display = document.getElementById(`alarm-time-display-${id}`);
+                
+                alarm.isRinging = false;
+                display.style.color = '#ffeb3b';
+                display.style.animation = '';
+                
+                updateAlarmStatus(id);
+                updateAlarmNextTimeDisplay(id);
+            }
+
             document.addEventListener('input', function(e) {
                 if (e.target.classList.contains('hours-input') || 
                     e.target.classList.contains('minutes-input') || 
@@ -3057,16 +3801,58 @@
                         }
                     }
                 }
+                
+                if (e.target.classList.contains('alarm-title')) {
+                    const alarmDiv = e.target.closest('.alarm');
+                    if (alarmDiv) {
+                        const id = parseInt(alarmDiv.id.split('-')[1]);
+                        const saveContainer = alarmDiv.querySelector('.save-container');
+                        if (saveContainer.classList.contains('saved')) {
+                            const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
+                            if (savedAlarms[id]) {
+                                savedAlarms[id].name = e.target.value;
+                                localStorage.setItem('savedAlarms', JSON.stringify(savedAlarms));
+                            }
+                        }
+                    }
+                }
+                
+                if (e.target.classList.contains('alarm-hours') || e.target.classList.contains('alarm-minutes')) {
+                    const alarmDiv = e.target.closest('.alarm');
+                    if (alarmDiv) {
+                        const id = parseInt(alarmDiv.id.split('-')[1]);
+                        const value = parseInt(e.target.value) || 0;
+                        
+                        if (e.target.classList.contains('alarm-hours')) {
+                            if (value < 0) e.target.value = 0;
+                            if (value > 23) e.target.value = 23;
+                            alarmDiv.hours = parseInt(e.target.value) || 0;
+                        } else {
+                            if (value < 0) e.target.value = 0;
+                            if (value > 59) e.target.value = 59;
+                            alarmDiv.minutes = parseInt(e.target.value) || 0;
+                        }
+                        
+                        updateAlarmDisplay(id);
+                        updateAlarmNextTimeDisplay(id);
+                        
+                        if (alarmDiv.querySelector('.save-container').classList.contains('saved')) {
+                            updateSavedAlarm(id);
+                        }
+                    }
+                }
             });
             
             initDragAndDrop();
             loadSavedTimers();
             loadSavedStopwatches();
             loadSavedCities();
+            loadSavedAlarms();
             
             const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
             const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
             const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+            const savedAlarms = JSON.parse(localStorage.getItem('savedAlarms') || '{}');
             
             if (Object.keys(savedTimers).length === 0) {
                 createTimer();
@@ -3074,6 +3860,10 @@
             
             if (Object.keys(savedStopwatches).length === 0) {
                 createStopwatch();
+            }
+            
+            if (Object.keys(savedAlarms).length === 0) {
+                createAlarm();
             }
             
             document.addEventListener('click', function(e) {
