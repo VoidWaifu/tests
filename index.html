@@ -10,6 +10,14 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: none;
+        }
+
+        html, body {
+            overflow: hidden;
         }
 
         body {
@@ -18,6 +26,7 @@
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            position: relative;
         }
 
         .container {
@@ -47,6 +56,8 @@
             box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
             text-decoration: none;
             display: inline-block;
+            z-index: 1000;
+            position: relative;
         }
 
         .site-btn:hover {
@@ -66,6 +77,7 @@
             background: #1a1a1a;
             border-bottom: 2px solid #333;
             height: 64px;
+            z-index: 1000;
         }
 
         .tabs {
@@ -165,6 +177,7 @@
             box-shadow: 0 4px 15px rgba(255, 235, 59, 0.2);
             position: relative;
             overflow: hidden;
+            z-index: 1000;
         }
 
         .add-btn::after {
@@ -198,6 +211,8 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
+            position: relative;
+            min-height: 300px;
         }
 
         .timer, .stopwatch, .city-card {
@@ -213,6 +228,25 @@
             min-height: 280px;
             display: flex;
             flex-direction: column;
+            position: relative;
+            cursor: move;
+            touch-action: none;
+            -webkit-user-drag: none;
+            will-change: transform;
+        }
+
+        .timer.dragging, .stopwatch.dragging, .city-card.dragging {
+            z-index: 10000 !important;
+            cursor: grabbing !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(1.02) rotate(3deg);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .timer.drag-over, .stopwatch.drag-over, .city-card.drag-over {
+            border-color: #ffeb3b;
+            transform: scale(1.02);
+            transition: transform 0.2s;
         }
 
         @keyframes cardAppear {
@@ -234,6 +268,7 @@
             align-items: center;
             margin-bottom: 20px;
             min-height: 50px;
+            cursor: default;
         }
 
         .timer-title, .stopwatch-title, .city-title {
@@ -248,6 +283,9 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 50px;
             margin-right: 15px;
+            cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         .timer-title:focus, .stopwatch-title:focus, .city-title:focus {
@@ -360,6 +398,7 @@
             justify-content: center;
             flex-direction: column;
             gap: 5px;
+            cursor: default;
         }
 
         .end-time {
@@ -754,6 +793,36 @@
         .milliseconds {
             font-size: 36px;
             color: #ffc107;
+        }
+
+        .drop-indicator {
+            position: absolute;
+            background: #ffeb3b;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .drop-indicator.active {
+            opacity: 0.7;
+        }
+
+        .drop-indicator.horizontal {
+            height: 4px;
+            width: 100%;
+        }
+
+        .drop-indicator.vertical {
+            width: 4px;
+            height: 100%;
+        }
+
+        .drag-ghost {
+            opacity: 0.5;
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @media (max-width: 1200px) {
@@ -1165,6 +1234,15 @@
             if (!localStorage.getItem('savedCities')) {
                 localStorage.setItem('savedCities', JSON.stringify({}));
             }
+            if (!localStorage.getItem('timerPositions')) {
+                localStorage.setItem('timerPositions', JSON.stringify({}));
+            }
+            if (!localStorage.getItem('stopwatchPositions')) {
+                localStorage.setItem('stopwatchPositions', JSON.stringify({}));
+            }
+            if (!localStorage.getItem('cityPositions')) {
+                localStorage.setItem('cityPositions', JSON.stringify({}));
+            }
             
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.content');
@@ -1463,6 +1541,326 @@
                 {name: "Хобарт", country: "Австралия", offset: 10}
             ];
 
+            let dragState = {
+                element: null,
+                offsetX: 0,
+                offsetY: 0,
+                startX: 0,
+                startY: 0,
+                originalX: 0,
+                originalY: 0,
+                container: null,
+                type: null,
+                ghost: null,
+                dropIndicator: null,
+                siblings: []
+            };
+
+            function initDragAndDrop() {
+                document.addEventListener('mousedown', startDrag);
+                document.addEventListener('touchstart', startDragTouch, { passive: false });
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', dragTouch, { passive: false });
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+                document.addEventListener('touchcancel', stopDrag);
+            }
+
+            function startDrag(e) {
+                if (e.button !== 0) return;
+                if (!e.target.closest('.timer, .stopwatch, .city-card')) return;
+                
+                const element = e.target.closest('.timer, .stopwatch, .city-card');
+                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn')) {
+                    return;
+                }
+
+                e.preventDefault();
+                
+                const rect = element.getBoundingClientRect();
+                dragState = {
+                    element: element,
+                    offsetX: e.clientX - rect.left,
+                    offsetY: e.clientY - rect.top,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    originalX: rect.left,
+                    originalY: rect.top,
+                    container: element.parentNode,
+                    type: element.classList.contains('timer') ? 'timer' : 
+                          element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
+                    ghost: null,
+                    dropIndicator: null,
+                    siblings: Array.from(element.parentNode.children).filter(child => child !== element)
+                };
+
+                element.classList.add('dragging');
+                element.style.zIndex = '10000';
+                element.style.position = 'fixed';
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.left = rect.left + 'px';
+                element.style.top = rect.top + 'px';
+                element.style.cursor = 'grabbing';
+
+                createDropIndicator();
+                updateSiblingStates();
+            }
+
+            function startDragTouch(e) {
+                if (!e.target.closest('.timer, .stopwatch, .city-card')) return;
+                
+                const element = e.target.closest('.timer, .stopwatch, .city-card');
+                if (e.target.closest('.timer-title, .stopwatch-title, .city-title, .delete-btn, .save-container, .control-btn, .time-input input, .dropdown-btn')) {
+                    return;
+                }
+
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const rect = element.getBoundingClientRect();
+                dragState = {
+                    element: element,
+                    offsetX: touch.clientX - rect.left,
+                    offsetY: touch.clientY - rect.top,
+                    startX: touch.clientX,
+                    startY: touch.clientY,
+                    originalX: rect.left,
+                    originalY: rect.top,
+                    container: element.parentNode,
+                    type: element.classList.contains('timer') ? 'timer' : 
+                          element.classList.contains('stopwatch') ? 'stopwatch' : 'city',
+                    ghost: null,
+                    dropIndicator: null,
+                    siblings: Array.from(element.parentNode.children).filter(child => child !== element)
+                };
+
+                element.classList.add('dragging');
+                element.style.zIndex = '10000';
+                element.style.position = 'fixed';
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.left = rect.left + 'px';
+                element.style.top = rect.top + 'px';
+                element.style.cursor = 'grabbing';
+
+                createDropIndicator();
+                updateSiblingStates();
+            }
+
+            function drag(e) {
+                if (!dragState.element) return;
+                
+                e.preventDefault();
+                
+                const x = e.clientX - dragState.offsetX;
+                const y = e.clientY - dragState.offsetY;
+                
+                dragState.element.style.left = x + 'px';
+                dragState.element.style.top = y + 'px';
+                
+                updateDropIndicator(x, y);
+            }
+
+            function dragTouch(e) {
+                if (!dragState.element || e.touches.length === 0) return;
+                
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const x = touch.clientX - dragState.offsetX;
+                const y = touch.clientY - dragState.offsetY;
+                
+                dragState.element.style.left = x + 'px';
+                dragState.element.style.top = y + 'px';
+                
+                updateDropIndicator(x, y);
+            }
+
+            function stopDrag(e) {
+                if (!dragState.element) return;
+                
+                e.preventDefault();
+                
+                const element = dragState.element;
+                const container = dragState.container;
+                const type = dragState.type;
+                
+                element.classList.remove('dragging');
+                element.style.cursor = '';
+                
+                if (dragState.dropIndicator && dragState.dropIndicator.parentNode) {
+                    const indicator = dragState.dropIndicator;
+                    const insertBefore = indicator.dataset.insertBefore === 'true';
+                    const targetIndex = parseInt(indicator.dataset.targetIndex);
+                    
+                    if (targetIndex >= 0 && targetIndex < container.children.length) {
+                        const targetElement = container.children[targetIndex];
+                        if (insertBefore) {
+                            container.insertBefore(element, targetElement);
+                        } else {
+                            if (targetElement.nextSibling) {
+                                container.insertBefore(element, targetElement.nextSibling);
+                            } else {
+                                container.appendChild(element);
+                            }
+                        }
+                    }
+                    
+                    indicator.remove();
+                }
+                
+                element.style.position = '';
+                element.style.left = '';
+                element.style.top = '';
+                element.style.width = '';
+                element.style.height = '';
+                element.style.zIndex = '';
+                
+                resetSiblingStates();
+                
+                savePositions(type);
+                
+                dragState = {
+                    element: null,
+                    offsetX: 0,
+                    offsetY: 0,
+                    startX: 0,
+                    startY: 0,
+                    originalX: 0,
+                    originalY: 0,
+                    container: null,
+                    type: null,
+                    ghost: null,
+                    dropIndicator: null,
+                    siblings: []
+                };
+            }
+
+            function createDropIndicator() {
+                const indicator = document.createElement('div');
+                indicator.className = 'drop-indicator horizontal';
+                indicator.style.position = 'absolute';
+                indicator.style.left = '0';
+                indicator.style.top = '0';
+                indicator.style.opacity = '0';
+                dragState.container.appendChild(indicator);
+                dragState.dropIndicator = indicator;
+            }
+
+            function updateDropIndicator(x, y) {
+                if (!dragState.dropIndicator || !dragState.container) return;
+                
+                const containerRect = dragState.container.getBoundingClientRect();
+                const element = dragState.element;
+                const indicator = dragState.dropIndicator;
+                
+                let closestIndex = -1;
+                let closestDistance = Infinity;
+                let insertBefore = true;
+                
+                const children = Array.from(dragState.container.children).filter(child => 
+                    !child.classList.contains('drop-indicator')
+                );
+                
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (child === element) continue;
+                    
+                    const rect = child.getBoundingClientRect();
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const distance = Math.abs(y + element.offsetHeight / 2 - centerY);
+                    
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestIndex = i;
+                        insertBefore = y + element.offsetHeight / 2 < centerY;
+                    }
+                }
+                
+                if (closestIndex >= 0 && closestDistance < 100) {
+                    const targetElement = children[closestIndex];
+                    const targetRect = targetElement.getBoundingClientRect();
+                    
+                    indicator.style.width = targetRect.width + 'px';
+                    indicator.style.height = '4px';
+                    indicator.style.left = targetRect.left - containerRect.left + 'px';
+                    
+                    if (insertBefore) {
+                        indicator.style.top = targetRect.top - containerRect.top - 2 + 'px';
+                    } else {
+                        indicator.style.top = targetRect.bottom - containerRect.top - 2 + 'px';
+                    }
+                    
+                    indicator.style.opacity = '0.7';
+                    indicator.dataset.targetIndex = closestIndex.toString();
+                    indicator.dataset.insertBefore = insertBefore.toString();
+                } else {
+                    indicator.style.opacity = '0';
+                }
+            }
+
+            function updateSiblingStates() {
+                dragState.siblings.forEach(sibling => {
+                    sibling.classList.add('drag-ghost');
+                });
+            }
+
+            function resetSiblingStates() {
+                dragState.siblings.forEach(sibling => {
+                    sibling.classList.remove('drag-ghost');
+                    sibling.classList.remove('drag-over');
+                });
+            }
+
+            function savePositions(type) {
+                const container = type === 'timer' ? document.getElementById('timerContainer') :
+                                type === 'stopwatch' ? document.getElementById('stopwatchContainer') :
+                                document.getElementById('cityContainer');
+                
+                if (!container) return;
+                
+                const positions = {};
+                const children = Array.from(container.children);
+                
+                children.forEach((child, index) => {
+                    const id = child.id.split('-')[1];
+                    if (id) {
+                        positions[id] = index;
+                    }
+                });
+                
+                const key = type + 'Positions';
+                localStorage.setItem(key, JSON.stringify(positions));
+            }
+
+            function loadPositions(type) {
+                const key = type + 'Positions';
+                const positions = JSON.parse(localStorage.getItem(key) || '{}');
+                
+                const container = type === 'timer' ? document.getElementById('timerContainer') :
+                                type === 'stopwatch' ? document.getElementById('stopwatchContainer') :
+                                document.getElementById('cityContainer');
+                
+                if (!container) return positions;
+                
+                const children = Array.from(container.children);
+                const sortedChildren = children.sort((a, b) => {
+                    const idA = a.id.split('-')[1];
+                    const idB = b.id.split('-')[1];
+                    const posA = positions[idA] !== undefined ? positions[idA] : Infinity;
+                    const posB = positions[idB] !== undefined ? positions[idB] : Infinity;
+                    return posA - posB;
+                });
+                
+                sortedChildren.forEach(child => {
+                    container.appendChild(child);
+                });
+                
+                return positions;
+            }
+
             function getNextTimerNumber() {
                 const timers = document.querySelectorAll('.timer');
                 const usedNumbers = [];
@@ -1503,47 +1901,62 @@
 
             function loadSavedTimers() {
                 const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
+                const positions = JSON.parse(localStorage.getItem('timerPositions') || '{}');
                 
                 const savedIds = Object.keys(savedTimers).map(id => parseInt(id)).filter(id => !isNaN(id));
                 if (savedIds.length > 0) {
                     timerId = Math.max(...savedIds) + 1;
                 }
                 
-                for (const [id, timerData] of Object.entries(savedTimers)) {
-                    if (timerData.saved) {
-                        createTimerFromData(id, timerData);
+                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                
+                const allIds = new Set([...sortedIds, ...Object.keys(savedTimers)]);
+                
+                Array.from(allIds).forEach(id => {
+                    if (savedTimers[id]) {
+                        createTimerFromData(id, savedTimers[id]);
                     }
-                }
+                });
             }
 
             function loadSavedStopwatches() {
                 const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
+                const positions = JSON.parse(localStorage.getItem('stopwatchPositions') || '{}');
                 
                 const savedIds = Object.keys(savedStopwatches).map(id => parseInt(id)).filter(id => !isNaN(id));
                 if (savedIds.length > 0) {
                     stopwatchId = Math.max(...savedIds) + 1;
                 }
                 
-                for (const [id, stopwatchData] of Object.entries(savedStopwatches)) {
-                    if (stopwatchData.saved) {
-                        createStopwatchFromData(id, stopwatchData);
+                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                
+                const allIds = new Set([...sortedIds, ...Object.keys(savedStopwatches)]);
+                
+                Array.from(allIds).forEach(id => {
+                    if (savedStopwatches[id]) {
+                        createStopwatchFromData(id, savedStopwatches[id]);
                     }
-                }
+                });
             }
 
             function loadSavedCities() {
                 const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
+                const positions = JSON.parse(localStorage.getItem('cityPositions') || '{}');
                 
                 const savedIds = Object.keys(savedCities).map(id => parseInt(id)).filter(id => !isNaN(id));
                 if (savedIds.length > 0) {
                     cityId = Math.max(...savedIds) + 1;
                 }
                 
-                for (const [id, cityData] of Object.entries(savedCities)) {
-                    if (cityData.saved) {
-                        createCityFromData(id, cityData);
+                const sortedIds = Object.keys(positions).sort((a, b) => positions[a] - positions[b]);
+                
+                const allIds = new Set([...sortedIds, ...Object.keys(savedCities)]);
+                
+                Array.from(allIds).forEach(id => {
+                    if (savedCities[id]) {
+                        createCityFromData(id, savedCities[id]);
                     }
-                }
+                });
             }
 
             function createTimerFromData(id, timerData) {
@@ -2221,6 +2634,10 @@
                         const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                         delete savedTimers[id];
                         localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
+                        
+                        const positions = JSON.parse(localStorage.getItem('timerPositions') || '{}');
+                        delete positions[id];
+                        localStorage.setItem('timerPositions', JSON.stringify(positions));
                     }, 600);
                 }
             };
@@ -2236,6 +2653,10 @@
                         const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
                         delete savedStopwatches[id];
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
+                        
+                        const positions = JSON.parse(localStorage.getItem('stopwatchPositions') || '{}');
+                        delete positions[id];
+                        localStorage.setItem('stopwatchPositions', JSON.stringify(positions));
                     }, 600);
                 }
             };
@@ -2251,6 +2672,10 @@
                         const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
                         delete savedCities[id];
                         localStorage.setItem('savedCities', JSON.stringify(savedCities));
+                        
+                        const positions = JSON.parse(localStorage.getItem('cityPositions') || '{}');
+                        delete positions[id];
+                        localStorage.setItem('cityPositions', JSON.stringify(positions));
                     }, 600);
                 }
             };
@@ -2716,6 +3141,7 @@
                 }
             });
             
+            initDragAndDrop();
             loadSavedTimers();
             loadSavedStopwatches();
             loadSavedCities();
