@@ -1463,6 +1463,44 @@
                 {name: "Хобарт", country: "Австралия", offset: 10}
             ];
 
+            function getNextTimerNumber() {
+                const timers = document.querySelectorAll('.timer');
+                const usedNumbers = [];
+                
+                timers.forEach(timer => {
+                    const title = timer.querySelector('.timer-title').value;
+                    const match = title.match(/^Таймер (\d+)$/);
+                    if (match) {
+                        usedNumbers.push(parseInt(match[1]));
+                    }
+                });
+                
+                let nextNumber = 1;
+                while (usedNumbers.includes(nextNumber)) {
+                    nextNumber++;
+                }
+                return nextNumber;
+            }
+
+            function getNextStopwatchNumber() {
+                const stopwatches = document.querySelectorAll('.stopwatch');
+                const usedNumbers = [];
+                
+                stopwatches.forEach(stopwatch => {
+                    const title = stopwatch.querySelector('.stopwatch-title').value;
+                    const match = title.match(/^Секундомер (\d+)$/);
+                    if (match) {
+                        usedNumbers.push(parseInt(match[1]));
+                    }
+                });
+                
+                let nextNumber = 1;
+                while (usedNumbers.includes(nextNumber)) {
+                    nextNumber++;
+                }
+                return nextNumber;
+            }
+
             function loadSavedTimers() {
                 const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                 
@@ -1789,9 +1827,11 @@
                 timerDiv.className = 'timer';
                 timerDiv.id = `timer-${timerId}`;
                 
+                const timerNumber = getNextTimerNumber();
+                
                 timerDiv.innerHTML = `
                     <div class="timer-header">
-                        <input type="text" class="timer-title" value="Таймер ${timerId}" placeholder="Название таймера">
+                        <input type="text" class="timer-title" value="Таймер ${timerNumber}" placeholder="Название таймера">
                         <div class="timer-controls">
                             <div class="save-container" onclick="toggleSaveTimer(${timerId})">
                                 <div class="checkbox-custom"></div>
@@ -1857,9 +1897,11 @@
                 stopwatchDiv.className = 'stopwatch';
                 stopwatchDiv.id = `stopwatch-${stopwatchId}`;
                 
+                const stopwatchNumber = getNextStopwatchNumber();
+                
                 stopwatchDiv.innerHTML = `
                     <div class="stopwatch-header">
-                        <input type="text" class="stopwatch-title" value="Секундомер ${stopwatchId}" placeholder="Название секундомера">
+                        <input type="text" class="stopwatch-title" value="Секундомер ${stopwatchNumber}" placeholder="Название секундомера">
                         <div class="stopwatch-controls">
                             <div class="save-container" onclick="toggleSaveStopwatch(${stopwatchId})">
                                 <div class="checkbox-custom"></div>
@@ -1891,6 +1933,7 @@
             function showCityModal() {
                 const modal = document.getElementById('cityModal');
                 modal.classList.add('active');
+                renderCityList();
             }
 
             function hideCityModal() {
@@ -2694,8 +2737,6 @@
                     hideCityModal();
                 }
             });
-            
-            renderCityList();
         });
     </script>
 </body>
