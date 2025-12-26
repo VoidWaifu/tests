@@ -94,7 +94,7 @@
 
         .tab {
             flex: 1;
-            padding: 18px 24px;
+            padding: 0 24px;
             background: transparent;
             border: none;
             cursor: pointer;
@@ -106,6 +106,9 @@
             position: relative;
             overflow: hidden;
             z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tab:hover {
@@ -588,16 +591,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            animation: fadeIn 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .city-list-modal.active {
-            display: flex;
+            background: rgba(0, 0, 0, 0.9);
+            opacity: 1;
+            visibility: visible;
         }
 
         .city-list-content {
@@ -610,6 +617,14 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .city-list-modal.active .city-list-content {
+            transform: scale(1);
+            opacity: 1;
         }
 
         .city-list-header {
@@ -787,10 +802,14 @@
             }
             
             .tab {
-                padding: 12px 16px;
+                padding: 0 16px;
                 font-size: 14px;
                 min-width: 120px;
                 white-space: nowrap;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             
             .content {
@@ -971,9 +990,13 @@
             }
             
             .tab {
-                padding: 10px 12px;
+                padding: 0 12px;
                 font-size: 12px;
                 min-width: 110px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             
             .timer-container, .stopwatch-container, .city-container {
@@ -1868,7 +1891,6 @@
             function showCityModal() {
                 const modal = document.getElementById('cityModal');
                 modal.classList.add('active');
-                renderCityList();
             }
 
             function hideCityModal() {
@@ -2672,6 +2694,8 @@
                     hideCityModal();
                 }
             });
+            
+            renderCityList();
         });
     </script>
 </body>
