@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Таймеры, секундомеры, часы</title>
-    <link rel="icon" type="image/png" href="../assets/icon.png">
+    <title>Таймеры и часы</title>
     <style>
         * {
             margin: 0;
@@ -59,20 +58,39 @@
             transform: translateY(-1px) scale(0.98);
         }
 
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #333;
+        .tabs-container {
+            position: relative;
             margin-bottom: 20px;
-            width: 100%;
             border-radius: 20px 20px 0 0;
             overflow: hidden;
             background: #1a1a1a;
+            border-bottom: 2px solid #333;
+            height: 64px;
+        }
+
+        .tabs {
+            display: flex;
+            position: relative;
+            height: 100%;
+        }
+
+        .tab-slider {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 33.333%;
+            height: 100%;
+            background: #ffeb3b;
+            border-radius: 20px 20px 0 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+            box-shadow: 0 4px 20px rgba(255, 235, 59, 0.3);
         }
 
         .tab {
             flex: 1;
             padding: 18px 24px;
-            background: #1a1a1a;
+            background: transparent;
             border: none;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -82,59 +100,43 @@
             color: #aaa;
             position: relative;
             overflow: hidden;
-        }
-
-        .tab::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
-            transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .tab:hover::before {
-            left: 100%;
+            z-index: 2;
         }
 
         .tab:hover {
             color: #ffeb3b;
-            background: #222;
-            transform: translateY(-2px);
         }
 
         .tab.active {
-            background: #ffeb3b;
             color: #0a0a0a;
-            box-shadow: 0 4px 20px rgba(255, 235, 59, 0.3);
-            transform: translateY(0);
+        }
+
+        .content-container {
+            position: relative;
+            min-height: 500px;
         }
 
         .content {
-            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             padding: 30px;
             border: 1px solid #333;
             border-radius: 0 0 20px 20px;
             min-height: 500px;
             background: #1a1a1a;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .content.active {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            position: relative;
         }
 
         .add-btn {
@@ -184,18 +186,6 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
-            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .timer, .stopwatch, .city-card {
@@ -718,13 +708,22 @@
         }
 
         .card-remove {
-            animation: cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: cardRemove 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            pointer-events: none;
         }
 
         @keyframes cardRemove {
-            to {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-20px) scale(0.95);
+            }
+            100% {
                 opacity: 0;
-                transform: translateX(100px) scale(0.8);
+                transform: translateY(100px) scale(0.8);
             }
         }
 
@@ -766,12 +765,16 @@
                 border-radius: 10px;
             }
             
-            .tabs {
-                flex-direction: row;
+            .tabs-container {
                 border-radius: 12px 12px 0 0;
                 margin-bottom: 10px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+                height: 54px;
+            }
+            
+            .tab-slider {
+                border-radius: 12px 12px 0 0;
             }
             
             .tab {
@@ -1079,25 +1082,30 @@
             <a href="https://voidwaifu.github.io" target="_blank" class="site-btn">Мой сайт</a>
         </div>
 
-        <div class="tabs">
-            <div class="tab" data-tab="timer">ТАЙМЕР</div>
-            <div class="tab" data-tab="stopwatch">СЕКУНДОМЕР</div>
-            <div class="tab" data-tab="clock">ЧАСЫ</div>
+        <div class="tabs-container">
+            <div class="tab-slider" id="tabSlider"></div>
+            <div class="tabs">
+                <div class="tab" data-tab="timer">ТАЙМЕР</div>
+                <div class="tab" data-tab="stopwatch">СЕКУНДОМЕР</div>
+                <div class="tab" data-tab="clock">ЧАСЫ</div>
+            </div>
         </div>
 
-        <div id="timer" class="content">
-            <button class="add-btn" id="addTimer">＋ ДОБАВИТЬ ТАЙМЕР</button>
-            <div class="timer-container" id="timerContainer"></div>
-        </div>
+        <div class="content-container">
+            <div id="timer" class="content">
+                <button class="add-btn" id="addTimer">＋ ДОБАВИТЬ ТАЙМЕР</button>
+                <div class="timer-container" id="timerContainer"></div>
+            </div>
 
-        <div id="stopwatch" class="content">
-            <button class="add-btn" id="addStopwatch">＋ ДОБАВИТЬ СЕКУНДОМЕР</button>
-            <div class="stopwatch-container" id="stopwatchContainer"></div>
-        </div>
+            <div id="stopwatch" class="content">
+                <button class="add-btn" id="addStopwatch">＋ ДОБАВИТЬ СЕКУНДОМЕР</button>
+                <div class="stopwatch-container" id="stopwatchContainer"></div>
+            </div>
 
-        <div id="clock" class="content">
-            <button class="add-btn" id="addCity">＋ ДОБАВИТЬ ГОРОД</button>
-            <div class="city-container" id="cityContainer"></div>
+            <div id="clock" class="content">
+                <button class="add-btn" id="addCity">＋ ДОБАВИТЬ ГОРОД</button>
+                <div class="city-container" id="cityContainer"></div>
+            </div>
         </div>
 
         <div class="city-list-modal" id="cityModal">
@@ -1128,35 +1136,46 @@
             
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.content');
+            const tabSlider = document.getElementById('tabSlider');
             
             const lastActiveTab = localStorage.getItem('lastActiveTab') || 'timer';
+            let currentTab = lastActiveTab;
+            
+            function updateTabSlider() {
+                const activeTab = document.querySelector('.tab.active');
+                if (activeTab) {
+                    const index = Array.from(tabs).indexOf(activeTab);
+                    tabSlider.style.transform = `translateX(${index * 100}%)`;
+                }
+            }
+            
+            function switchTab(target) {
+                currentTab = target;
+                
+                const targetTab = document.querySelector(`.tab[data-tab="${target}"]`);
+                const targetContent = document.getElementById(target);
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                targetTab.classList.add('active');
+                targetContent.classList.add('active');
+                
+                updateTabSlider();
+                localStorage.setItem('lastActiveTab', target);
+            }
             
             tabs.forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.getAttribute('data-tab') === lastActiveTab) {
-                    tab.classList.add('active');
-                }
-                
                 tab.addEventListener('click', () => {
                     const target = tab.getAttribute('data-tab');
-                    
-                    tabs.forEach(t => t.classList.remove('active'));
-                    contents.forEach(c => c.classList.remove('active'));
-                    
-                    tab.classList.add('active');
-                    const targetContent = document.getElementById(target);
-                    targetContent.classList.add('active');
-                    
-                    localStorage.setItem('lastActiveTab', target);
+                    if (target !== currentTab) {
+                        switchTab(target);
+                    }
                 });
             });
             
-            contents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === lastActiveTab) {
-                    content.classList.add('active');
-                }
-            });
+            switchTab(lastActiveTab);
+            setTimeout(updateTabSlider, 100);
 
             let timerId = 1;
             let stopwatchId = 1;
@@ -2110,14 +2129,14 @@
                 const timer = document.getElementById(`timer-${id}`);
                 if (timer) {
                     clearInterval(timer.intervalId);
-                    timer.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    timer.classList.add('card-remove');
                     setTimeout(() => {
                         timer.remove();
                         
                         const savedTimers = JSON.parse(localStorage.getItem('savedTimers') || '{}');
                         delete savedTimers[id];
                         localStorage.setItem('savedTimers', JSON.stringify(savedTimers));
-                    }, 400);
+                    }, 600);
                 }
             };
 
@@ -2125,14 +2144,14 @@
                 const stopwatch = document.getElementById(`stopwatch-${id}`);
                 if (stopwatch) {
                     clearInterval(stopwatch.intervalId);
-                    stopwatch.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    stopwatch.classList.add('card-remove');
                     setTimeout(() => {
                         stopwatch.remove();
                         
                         const savedStopwatches = JSON.parse(localStorage.getItem('savedStopwatches') || '{}');
                         delete savedStopwatches[id];
                         localStorage.setItem('savedStopwatches', JSON.stringify(savedStopwatches));
-                    }, 400);
+                    }, 600);
                 }
             };
 
@@ -2140,14 +2159,14 @@
                 const city = document.getElementById(`city-${id}`);
                 if (city) {
                     clearInterval(city.updateInterval);
-                    city.style.animation = 'cardRemove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                    city.classList.add('card-remove');
                     setTimeout(() => {
                         city.remove();
                         
                         const savedCities = JSON.parse(localStorage.getItem('savedCities') || '{}');
                         delete savedCities[id];
                         localStorage.setItem('savedCities', JSON.stringify(savedCities));
-                    }, 400);
+                    }, 600);
                 }
             };
 
