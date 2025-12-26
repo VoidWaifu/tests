@@ -85,6 +85,11 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1;
             box-shadow: 0 4px 20px rgba(255, 235, 59, 0.3);
+            transition: none;
+        }
+
+        .tabs-container.initialized .tab-slider {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab {
@@ -129,7 +134,7 @@
             opacity: 0;
             visibility: hidden;
             transform: translateY(10px);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: none;
         }
 
         .content.active {
@@ -137,6 +142,10 @@
             visibility: visible;
             transform: translateY(0);
             position: relative;
+        }
+
+        .tabs-container.initialized ~ .content-container .content {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .add-btn {
@@ -1082,7 +1091,7 @@
             <a href="https://voidwaifu.github.io" target="_blank" class="site-btn">Мой сайт</a>
         </div>
 
-        <div class="tabs-container">
+        <div class="tabs-container" id="tabsContainer">
             <div class="tab-slider" id="tabSlider"></div>
             <div class="tabs">
                 <div class="tab" data-tab="timer">ТАЙМЕР</div>
@@ -1137,6 +1146,7 @@
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.content');
             const tabSlider = document.getElementById('tabSlider');
+            const tabsContainer = document.getElementById('tabsContainer');
             
             const lastActiveTab = localStorage.getItem('lastActiveTab') || 'timer';
             let currentTab = lastActiveTab;
@@ -1149,7 +1159,7 @@
                 }
             }
             
-            function switchTab(target) {
+            function switchTab(target, initialLoad = false) {
                 currentTab = target;
                 
                 const targetTab = document.querySelector(`.tab[data-tab="${target}"]`);
@@ -1161,21 +1171,31 @@
                 targetTab.classList.add('active');
                 targetContent.classList.add('active');
                 
+                if (!initialLoad) {
+                    localStorage.setItem('lastActiveTab', target);
+                }
+                
                 updateTabSlider();
-                localStorage.setItem('lastActiveTab', target);
+            }
+            
+            function initializeTabs() {
+                switchTab(lastActiveTab, true);
+                
+                setTimeout(() => {
+                    tabsContainer.classList.add('initialized');
+                }, 10);
             }
             
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const target = tab.getAttribute('data-tab');
                     if (target !== currentTab) {
-                        switchTab(target);
+                        switchTab(target, false);
                     }
                 });
             });
             
-            switchTab(lastActiveTab);
-            setTimeout(updateTabSlider, 100);
+            initializeTabs();
 
             let timerId = 1;
             let stopwatchId = 1;
