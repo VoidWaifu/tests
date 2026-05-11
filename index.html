@@ -1,814 +1,1475 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Генератор данных</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --milk-bg: #f6f5f3;
-      --milk-dark: #e9e7e2;
-      --milk-border: #d6d3cb;
-      --milk-shadow: #bdb8ad;
-      --text-main: #2d2a26;
-      --text-muted: #6d6a65;
-      --accent: #b8a98b;
-      --button-bg: #e0ddd5;
-      --button-hover: #d1cbbf;
-      --button-active: #b8a98b;
-    }
-    body {
-      background: linear-gradient(135deg, var(--milk-bg) 60%, var(--milk-dark) 100%);
-      min-height: 100vh;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--text-main);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-bottom: 1rem;
-    }
-    .doc-container {
-      background: var(--milk-bg);
-      border: 2px solid var(--milk-border);
-      border-radius: 18px;
-      box-shadow: 0 8px 32px 0 var(--milk-shadow);
-      padding: 2.5rem 2.5rem 2rem 2.5rem;
-      max-width: 540px;
-      width: 100%;
-      margin: 2rem 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .doc-header {
-      font-size: 1.7rem;
-      font-weight: bold;
-      letter-spacing: 0.04em;
-      margin-bottom: 1.2rem;
-      color: var(--accent);
-      text-align: center;
-      font-family: 'Georgia', serif;
-      border-bottom: 1.5px dashed var(--milk-border);
-      padding-bottom: 0.7rem;
-    }
-    .doc-country-select {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 1.2rem;
-      gap: 0.7em;
-    }
-    .doc-country-select label {
-      font-family: 'Georgia', serif;
-      color: var(--text-muted);
-      font-size: 1.08rem;
-      font-weight: 500;
-    }
-    .doc-country-select select {
-      font-family: 'Georgia', serif;
-      font-size: 1.08rem;
-      border-radius: 7px;
-      border: 1px solid var(--milk-border);
-      background: var(--milk-dark);
-      color: var(--text-main);
-      padding: 0.25em 1em 0.25em 0.7em;
-      outline: none;
-      transition: border 0.18s;
-    }
-    .doc-fields {
-      margin-top: 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-    .doc-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1.1rem;
-      font-size: 1.08rem;
-    }
-    .doc-label {
-      min-width: 140px;
-      color: var(--text-muted);
-      font-family: 'Georgia', serif;
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      margin-right: 0.7em;
-      flex-shrink: 0;
-    }
-    .doc-value-wrap {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      min-width: 0;
-      gap: 0.5em;
-    }
-    .doc-value {
-      flex: 1 1 0;
-      background: var(--milk-dark);
-      border-radius: 7px;
-      padding: 0.38em 0.7em;
-      border: 1px solid var(--milk-border);
-      font-family: 'Georgia', serif;
-      font-size: 1.08rem;
-      color: var(--text-main);
-      min-height: 1.6em;
-      transition: background 0.2s;
-      user-select: all;
-      min-width: 0;
-      width: 100%;
-      box-sizing: border-box;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .copy-btn {
-      background: var(--button-bg);
-      color: var(--text-muted);
-      border: 1px solid var(--milk-border);
-      border-radius: 6px;
-      font-family: 'Georgia', serif;
-      font-size: 1.05rem;
-      padding: 0.25em 0.7em;
-      cursor: pointer;
-      margin-left: 0;
-      transition: background 0.18s, color 0.18s;
-      outline: none;
-      min-width: 2.5em;
-      height: 2em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .copy-btn:hover {
-      background: var(--button-hover);
-      color: var(--accent);
-    }
-    .copy-btn:active {
-      background: var(--button-active);
-      color: #fff;
-    }
-    .doc-btn {
-      background: var(--button-bg);
-      color: var(--text-main);
-      border: 1.5px solid var(--milk-border);
-      border-radius: 8px;
-      font-family: 'Georgia', serif;
-      font-size: 1.08rem;
-      padding: 0.38em 1.2em;
-      margin-left: 0.5em;
-      cursor: pointer;
-      transition: background 0.18s, box-shadow 0.18s;
-      box-shadow: 0 2px 8px 0 var(--milk-shadow);
-      outline: none;
-    }
-    .doc-btn:hover {
-      background: var(--button-hover);
-    }
-    .doc-btn:active {
-      background: var(--button-active);
-      color: #fff;
-    }
-    .doc-footer {
-      text-align: center;
-      margin-top: 2.2rem;
-    }
-    .site-footer {
-      max-width:540px;
-      margin: 2rem auto 1.5rem auto;
-      padding:0 1em;
-      color:#888;
-      font-size:0.97em;
-      text-align:center;
-      /* margin-top:auto;  optional: uncomment to force footer to bottom of viewport when content is short */
-    }
-    @media (max-width: 600px) {
-      .doc-container {
-        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
-        max-width: 98vw;
-      }
-      .doc-label {
-        min-width: 90px;
-        font-size: 0.98rem;
-      }
-      .doc-value {
-        font-size: 0.98rem;
-      }
-      .doc-btn, .copy-btn {
-        font-size: 0.98rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VK File Uploader — загрузка файлов в группу ВКонтакте</title>
+    <style>
+        :root {
+            --bg: #0a0a12;
+            --card-bg: rgba(20, 20, 40, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent: #5b8af7;
+            --accent2: #8b5cf6;
+            --accent-glow: rgba(91, 138, 247, 0.25);
+            --text: #e0e0ec;
+            --text-secondary: #9898b8;
+            --danger: #f55a5a;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --input-bg: rgba(15, 15, 30, 0.8);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animated background */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            animation: floatOrb 20s infinite ease-in-out;
+        }
+        .bg-orb:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #4f6ef7;
+            top: -15%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        .bg-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #7c3aed;
+            bottom: -20%;
+            right: -8%;
+            animation-delay: -7s;
+        }
+        .bg-orb:nth-child(3) {
+            width: 350px;
+            height: 350px;
+            background: #3b82f6;
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+            opacity: 0.2;
+        }
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(60px, -80px) scale(1.15);
+            }
+            50% {
+                transform: translate(-30px, 40px) scale(0.9);
+            }
+            75% {
+                transform: translate(-70px, -30px) scale(1.1);
+            }
+        }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Main container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 560px;
+            padding: 20px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: var(--transition);
+            animation: fadeSlideIn 0.5s ease-out;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card+.card {
+            margin-top: 16px;
+            animation-delay: 0.1s;
+        }
+
+        /* Logo / Icon */
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 26px;
+            box-shadow: 0 8px 32px var(--accent-glow);
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                box-shadow: 0 8px 32px var(--accent-glow);
+            }
+            50% {
+                box-shadow: 0 8px 48px rgba(91, 138, 247, 0.45), 0 0 80px rgba(139, 92, 246, 0.2);
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #c8d6ff, #e8e0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 7px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            font-family: inherit;
+            outline: none;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(91, 138, 247, 0.1);
+            background: rgba(20, 20, 40, 0.95);
+        }
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .input-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239898b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        .input-group select option {
+            background: #1a1a2e;
+            color: #e0e0ec;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            letter-spacing: 0.01em;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(91, 138, 247, 0.3);
+            width: 100%;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 28px rgba(91, 138, 247, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 12px rgba(91, 138, 247, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--input-border);
+            color: var(--text);
+            width: 100%;
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(91, 138, 247, 0.06);
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            width: auto;
+        }
+        .btn-danger-text {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        .btn-danger-text:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* File drop zone */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.015);
+            position: relative;
+        }
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(91, 138, 247, 0.06);
+            box-shadow: 0 0 40px rgba(91, 138, 247, 0.08);
+        }
+        .drop-zone.drag-over {
+            transform: scale(1.02);
+            border-style: solid;
+        }
+        .drop-zone-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+        .drop-zone-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .drop-zone-hint {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .file-selected-info {
+            background: rgba(91, 138, 247, 0.1);
+            border: 1px solid rgba(91, 138, 247, 0.25);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeSlideIn 0.3s ease-out;
+        }
+        .file-selected-info .file-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .file-selected-info .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .file-selected-info .file-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-selected-info .file-size {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .file-selected-info .remove-file {
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .file-selected-info .remove-file:hover {
+            background: rgba(245, 90, 90, 0.3);
+            color: var(--danger);
+        }
+
+        /* Status messages */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .status-badge.success {
+            background: rgba(74, 222, 128, 0.12);
+            color: var(--success);
+        }
+        .status-badge.error {
+            background: rgba(245, 90, 90, 0.12);
+            color: var(--danger);
+        }
+        .status-badge.loading {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--warning);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 0.9rem;
+            animation: slideInRight 0.4s ease-out;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            max-width: 380px;
+            cursor: pointer;
+        }
+        .toast.success {
+            background: rgba(30, 50, 30, 0.9);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #b8f0d0;
+        }
+        .toast.error {
+            background: rgba(50, 20, 20, 0.9);
+            border: 1px solid rgba(245, 90, 90, 0.3);
+            color: #f0c0c0;
+        }
+        .toast.info {
+            background: rgba(20, 30, 50, 0.9);
+            border: 1px solid rgba(91, 138, 247, 0.3);
+            color: #c0d0f0;
+        }
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Progress bar */
+        .progress-bar-wrap {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            height: 6px;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* History list */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            font-size: 0.82rem;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .history-item:hover {
+            border-color: var(--card-border);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .history-item .h-icon {
+            font-size: 1.2rem;
+        }
+        .history-item .h-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .history-item .h-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-item .h-date {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        .history-item .h-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .history-item .h-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Hidden file input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Section divider */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--card-border);
+            margin: 20px 0;
+        }
+
+        /* Token display */
+        .token-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 14px;
+            border-radius: 20px;
+            flex-wrap: wrap;
+        }
+        .token-display .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            flex-shrink: 0;
+        }
+        .token-display span {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .card {
+                padding: 22px 16px;
+                border-radius: 12px;
+            }
+            .drop-zone {
+                padding: 28px 14px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .btn {
+                padding: 12px 18px;
+                font-size: 0.9rem;
+            }
+            .toast {
+                max-width: 90vw;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Hidden panels */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Pulse for upload btn when ready */
+        .btn-ready {
+            animation: readyPulse 2s infinite;
+        }
+        @keyframes readyPulse {
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(91, 138, 247, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 36px rgba(91, 138, 247, 0.6), 0 0 60px rgba(139, 92, 246, 0.25);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="doc-container">
-    <div class="doc-header">Генератор данных</div>
-    <div class="doc-country-select">
-      <label for="country-select">Страна:</label>
-      <select id="country-select">
-        <option value="ru">Россия</option>
-        <option value="us">США</option>
-      </select>
+
+    <!-- Background effects -->
+    <div class="bg-orbs">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
     </div>
-    <div class="doc-fields">
-      <div class="doc-row">
-        <span class="doc-label">Имя:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-name"></span>
-          <button class="copy-btn" data-copy="field-name" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Фамилия:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-surname"></span>
-          <button class="copy-btn" data-copy="field-surname" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Отчество:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-patronymic"></span>
-          <button class="copy-btn" data-copy="field-patronymic" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Страна:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-country"></span>
-          <button class="copy-btn" data-copy="field-country" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Город / Штат:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-city"></span>
-          <button class="copy-btn" data-copy="field-city" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Улица:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-street"></span>
-          <button class="copy-btn" data-copy="field-street" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Дом:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-house"></span>
-          <button class="copy-btn" data-copy="field-house" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Этаж:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-floor"></span>
-          <button class="copy-btn" data-copy="field-floor" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Квартира:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-flat"></span>
-          <button class="copy-btn" data-copy="field-flat" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Почтовый индекс:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-zip"></span>
-          <button class="copy-btn" data-copy="field-zip" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Телефон:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-phone"></span>
-          <button class="copy-btn" data-copy="field-phone" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Дата рождения:</span>
-        <span class="doc-value-wrap">
-          <span class="doc-value" id="field-birth"></span>
-          <button class="copy-btn" data-copy="field-birth" title="Копировать">⧉</button>
-        </span>
-      </div>
-      <div class="doc-row">
-        <span class="doc-label">Почта:</span>
-        <button class="doc-btn" id="field-email" onclick="window.open('https://temp-mail.org', '_blank')">Открыть temp-mail</button>
-      </div>
+    <div class="grid-overlay"></div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- App container -->
+    <div class="app-container">
+
+        <!-- ============ WELCOME SCREEN ============ -->
+        <div id="welcomeScreen" class="card hidden">
+            <div class="logo-icon">🔐</div>
+            <h1>VK File Uploader</h1>
+            <p class="subtitle">
+                Загружайте любые файлы в вашу группу ВКонтакте.<br>
+                Файлы преобразуются в Base64 и сохраняются как TXT-документы.
+            </p>
+            <div class="input-group">
+                <label>🔑 VK API Токен</label>
+                <input type="password" id="tokenInput" placeholder="Вставьте ваш access_token...">
+            </div>
+            <p style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
+                Токен должен иметь права: <strong>docs</strong>, <strong>groups</strong>, <strong>offline</strong>.
+                <br>Получить токен можно в
+                <a href="https://vkhost.github.io/" target="_blank" style="color:var(--accent);">VK Host</a>
+                или через
+                <a href="https://dev.vk.com/ru/api/access-token/getting-started" target="_blank" style="color:var(--accent);">OAuth ВК</a>.
+            </p>
+            <button class="btn btn-primary" id="saveTokenBtn">
+                ✨ Продолжить
+            </button>
+            <p id="tokenError" style="color:var(--danger);font-size:0.8rem;text-align:center;margin-top:12px;display:none;"></p>
+        </div>
+
+        <!-- ============ MAIN APP ============ -->
+        <div id="mainApp" class="hidden">
+
+            <!-- Header card -->
+            <div class="card" style="padding:18px 22px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="logo-icon" style="width:36px;height:36px;border-radius:10px;font-size:18px;margin:0;">📁</div>
+                        <strong style="font-size:1rem;">VK File Uploader</strong>
+                    </div>
+                    <div class="token-display">
+                        <span class="dot"></span>
+                        <span id="tokenPreview">Токен загружен</span>
+                        <button class="btn-danger-text" id="changeTokenBtn">Сменить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group selector card -->
+            <div class="card">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>👥 Группа для загрузки</label>
+                    <select id="groupSelect">
+                        <option value="">Загрузка групп...</option>
+                    </select>
+                </div>
+                <div id="groupManual" style="display:none;margin-top:10px;">
+                    <div class="input-group" style="margin-bottom:0;">
+                        <label>ID группы (вручную)</label>
+                        <input type="number" id="groupManualInput" placeholder="Например: 12345678">
+                    </div>
+                </div>
+                <p id="groupError" style="color:var(--danger);font-size:0.75rem;margin-top:8px;display:none;"></p>
+                <button class="btn btn-outline btn-sm" id="refreshGroupsBtn" style="margin-top:10px;">🔄 Обновить список групп</button>
+            </div>
+
+            <!-- File upload card -->
+            <div class="card">
+                <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📎 Выберите файл</label>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">📤</div>
+                    <div class="drop-zone-text">Нажмите или перетащите файл сюда</div>
+                    <div class="drop-zone-hint">Любой файл — изображение, документ, архив и т.д.</div>
+                </div>
+                <input type="file" id="fileInput">
+                <div id="fileInfo" class="file-selected-info hidden">
+                    <span class="file-icon">📄</span>
+                    <div class="file-details">
+                        <div class="file-name" id="fileNameDisplay"></div>
+                        <div class="file-size" id="fileSizeDisplay"></div>
+                    </div>
+                    <button class="remove-file" id="removeFileBtn" title="Убрать файл">✕</button>
+                </div>
+                <p id="fileSizeWarning" style="color:var(--warning);font-size:0.75rem;margin-top:8px;display:none;">
+                    ⚠️ Файл большой — после Base64-кодирования размер увеличится ~на 33%.
+                </p>
+            </div>
+
+            <!-- Password card -->
+            <div class="card">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>🔒 Пароль (опционально)</label>
+                    <input type="text" id="passwordInput" placeholder="Оставьте пустым, если шифрование не нужно">
+                </div>
+                <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">
+                    Если указать пароль — Base64-данные будут зашифрованы (AES-GCM) перед загрузкой.
+                </p>
+            </div>
+
+            <!-- Upload button -->
+            <button class="btn btn-primary" id="uploadBtn" disabled>
+                🚀 Загрузить в группу ВК
+            </button>
+
+            <!-- Progress -->
+            <div id="progressArea" class="hidden" style="margin-top:12px;">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
+                </div>
+                <p id="progressText" style="text-align:center;font-size:0.8rem;color:var(--text-secondary);margin-top:6px;"></p>
+            </div>
+
+            <!-- Status -->
+            <div id="statusArea" style="text-align:center;margin-top:12px;"></div>
+
+            <!-- History -->
+            <div class="card" id="historyCard">
+                <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📋 История загрузок</label>
+                <div id="historyList">
+                    <p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>
+                </div>
+                <button class="btn btn-outline btn-sm" id="clearHistoryBtn" style="margin-top:8px;">🗑 Очистить историю</button>
+            </div>
+        </div>
     </div>
-    <div class="doc-footer">
-      <button class="doc-btn" id="generate-btn">Сгенерировать</button>
-    </div>
-  </div>
-  <script>
-    // --- ДАННЫЕ ---
-    // Удаляем addresses из data, теперь адреса будут получаться через OSM API
-    const data = {
-      ru: {
-        names: [
-          "Александр","Дмитрий","Максим","Сергей","Андрей","Алексей","Артём","Илья","Кирилл","Михаил",
-          "Никита","Матвей","Роман","Егор","Артур","Владимир","Иван","Тимофей","Евгений","Денис",
-          "Павел","Глеб","Владислав","Руслан","Марк","Константин","Тимур","Олег","Ярослав","Антон",
-          "Виктор","Виталий","Григорий","Даниил","Станислав","Борис","Василий","Герман","Данила","Елисей",
-          "Захар","Игнат","Клим","Лев","Мирон","Платон","Святослав","Степан","Фёдор","Ян"
-        ],
-        surnames: [
-          "Иванов","Смирнов","Кузнецов","Попов","Васильев","Петров","Соколов","Михайлов","Новиков","Фёдоров",
-          "Морозов","Волков","Алексеев","Лебедев","Семенов","Егоров","Павлов","Козлов","Степанов","Николаев",
-          "Орлов","Андреев","Макаров","Никитин","Захаров","Зайцев","Соловьёв","Борисов","Яковлев","Григорьев",
-          "Романов","Воробьёв","Сергеев","Кузьмин","Фролов","Александров","Дмитриев","Королев","Гусев","Киселёв",
-          "Ильин","Максимов","Поляков","Сорокин","Виноградов","Ковалёв","Белов","Медведев","Антонов","Тарасов"
-        ],
-        patronymics: [
-          "Александрович","Дмитриевич","Максимович","Сергеевич","Андреевич","Алексеевич","Артёмович","Ильич","Кириллович","Михайлович",
-          "Никитич","Матвеевич","Романович","Егорович","Артурович","Владимирович","Иванович","Тимофеевич","Евгеньевич","Денисович",
-          "Павлович","Глебович","Владиславович","Русланович","Маркович","Константинович","Тимурович","Олегович","Ярославович","Антонович","Викторович",
-          "Витальевич","Григорьевич","Даниилович","Станиславович","Борисович","Васильевич","Германович","Данилович","Елисеевич","Захарович",
-          "Игнатьевич","Климович","Львович","Миронович","Платонович","Святославович","Степанович","Фёдорович","Янович","Петрович"
-        ],
-        phones: [
-          "+7 (495) 123-45-67","+7 (812) 234-56-78","+7 (383) 345-67-89","+7 (343) 456-78-90","+7 (843) 567-89-01",
-          "+7 (831) 678-90-12","+7 (351) 789-01-23","+7 (846) 890-12-34","+7 (381) 901-23-45","+7 (863) 012-34-56",
-          "+7 (347) 123-45-67","+7 (391) 234-56-78","+7 (342) 345-67-89","+7 (473) 456-78-90","+7 (844) 567-89-01",
-          "+7 (861) 678-90-12","+7 (845) 789-01-23","+7 (345) 890-12-34","+7 (848) 901-23-45","+7 (3412) 012-34-56",
-          "+7 (3852) 123-45-67","+7 (8422) 234-56-78","+7 (3952) 345-67-89","+7 (4212) 456-78-90","+7 (4852) 567-89-01",
-          "+7 (423) 678-90-12","+7 (8722) 789-01-23","+7 (3822) 890-12-34","+7 (3532) 901-23-45","+7 (3842) 012-34-56",
-          "+7 (3843) 123-45-67","+7 (4912) 234-56-78","+7 (8512) 345-67-89","+7 (8412) 456-78-90","+7 (4742) 567-89-01",
-          "+7 (8332) 678-90-12","+7 (8352) 789-01-23","+7 (495) 890-12-34","+7 (4012) 901-23-45","+7 (4872) 012-34-56",
-          "+7 (4712) 123-45-67","+7 (8692) 234-56-78","+7 (862) 345-67-89","+7 (8652) 456-78-90","+7 (3012) 567-89-01",
-          "+7 (4822) 678-90-12","+7 (3519) 789-01-23","+7 (4932) 890-12-34","+7 (4832) 901-23-45"
-        ],
-        births: [
-          "12.03.1990 (34 года)","25.07.1985 (39 лет)","09.11.1992 (31 год)","18.01.1980 (44 года)","03.06.1999 (25 лет)",
-          "14.02.1995 (29 лет)","27.08.1988 (35 лет)","05.12.1996 (27 лет)","21.04.1993 (31 год)","30.09.1982 (41 год)",
-          "11.05.1991 (33 года)","16.10.1987 (36 лет)","07.07.1998 (25 лет)","23.01.1983 (41 год)","02.12.1994 (29 лет)",
-          "19.06.1986 (38 лет)","28.03.1997 (27 лет)","10.08.1989 (34 года)","15.04.1990 (34 года)","08.11.1981 (42 года)",
-          "13.02.1993 (31 год)","22.09.1984 (39 лет)","06.06.1995 (29 лет)","17.12.1992 (31 год)","29.05.1988 (36 лет)",
-          "04.10.1996 (27 лет)","20.03.1985 (39 лет)","31.07.1981 (42 года)","12.01.1997 (27 лет)","26.04.1991 (33 года)",
-          "09.09.1983 (40 лет)","18.06.1994 (30 лет)","03.11.1989 (34 года)","15.08.1982 (41 год)","27.02.1990 (34 года)",
-          "06.05.1998 (26 лет)","21.10.1986 (37 лет)","30.03.1995 (29 лет)","11.07.1992 (31 год)","24.12.1987 (36 лет)",
-          "02.09.1988 (35 лет)","19.04.1993 (31 год)","08.06.1985 (39 лет)","23.11.1996 (27 лет)","14.01.1981 (43 года)",
-          "29.08.1991 (32 года)","05.03.1984 (40 лет)","17.07.1997 (26 лет)","28.10.1983 (40 лет)","10.12.1992 (31 год)",
-          "21.05.1989 (35 лет)","03.08.1995 (28 лет)"
-        ]
-      },
-      us: {
-        names: [
-          "James","John","Robert","Michael","William","David","Richard","Joseph","Thomas","Charles",
-          "Christopher","Daniel","Matthew","Anthony","Mark","Donald","Steven","Paul","Andrew","Joshua",
-          "Kenneth","Kevin","Brian","George","Edward","Ronald","Timothy","Jason","Jeffrey","Ryan",
-          "Jacob","Gary","Nicholas","Eric","Stephen","Jonathan","Larry","Justin","Scott","Brandon",
-          "Benjamin","Samuel","Gregory","Frank","Alexander","Raymond","Patrick","Jack","Dennis","Jerry"
-        ],
-        surnames: [
-          "Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez",
-          "Hernandez","Lopez","Gonzalez","Wilson","Anderson","Thomas","Taylor","Moore","Jackson","Martin",
-          "Lee","Perez","Thompson","White","Harris","Sanchez","Clark","Ramirez","Lewis","Robinson",
-          "Walker","Young","Allen","King","Wright","Scott","Torres","Nguyen","Hill","Flores",
-          "Green","Adams","Nelson","Baker","Hall","Rivera","Campbell","Mitchell","Carter","Roberts"
-        ],
-        patronymics: [
-          "Jameson","Johnson","Robertson","Michaelson","Williamson","Davidson","Richardson","Josephson","Thomason","Charleson",
-          "Christopherson","Danielson","Matthewson","Anthonyson","Markson","Donaldson","Stevenson","Paulson","Andrewson","Joshuason",
-          "Kennethson","Kevinson","Brianson","Georgeson","Edwardson","Ronaldson","Timothyson","Jasonson","Jeffreyson","Ryans",
-          "Jacobson","Garyson","Nicholson","Ericson","Stephenson","Jonathanson","Larryson","Justinson","Scottson","Brandonson",
-          "Benjamison","Samuelson","Gregoryson","Frankson","Alexanderson","Raymondson","Patrickson","Jacksonson","Dennison","Jerryson"
-        ],
-        phones: [
-          "+1 (212) 555-0173","+1 (213) 555-0198","+1 (312) 555-0147","+1 (713) 555-0123","+1 (602) 555-0189",
-          "+1 (215) 555-0134","+1 (210) 555-0167","+1 (619) 555-0192","+1 (214) 555-0183","+1 (408) 555-0145",
-          "+1 (512) 555-0178","+1 (904) 555-0129","+1 (817) 555-0137","+1 (614) 555-0194","+1 (704) 555-0182",
-          "+1 (415) 555-0191","+1 (317) 555-0176","+1 (206) 555-0187","+1 (303) 555-0195","+1 (202) 555-0172",
-          "+1 (617) 555-0193","+1 (915) 555-0184","+1 (615) 555-0197","+1 (313) 555-0186","+1 (405) 555-0199",
-          "+1 (503) 555-0175","+1 (702) 555-0190","+1 (901) 555-0188","+1 (502) 555-0196","+1 (410) 555-0185",
-          "+1 (414) 555-0174","+1 (505) 555-0192","+1 (520) 555-0191","+1 (559) 555-0193","+1 (480) 555-0194",
-          "+1 (916) 555-0195","+1 (404) 555-0196","+1 (816) 555-0197","+1 (719) 555-0198","+1 (305) 555-0199",
-          "+1 (919) 555-0171","+1 (402) 555-0172","+1 (562) 555-0173","+1 (757) 555-0174","+1 (510) 555-0175",
-          "+1 (612) 555-0176","+1 (918) 555-0177","+1 (817) 555-0178","+1 (813) 555-0179","+1 (305) 555-0180"
-        ],
-        births: [
-          "03/12/1990 (34 y.o.)","07/25/1985 (39 y.o.)","11/09/1992 (31 y.o.)","01/18/1980 (44 y.o.)","06/03/1999 (25 y.o.)",
-          "02/14/1995 (29 y.o.)","08/27/1988 (35 y.o.)","12/05/1996 (27 y.o.)","04/21/1993 (31 y.o.)","09/30/1982 (41 y.o.)",
-          "05/11/1991 (33 y.o.)","10/16/1987 (36 y.o.)","07/07/1998 (25 y.o.)","01/23/1983 (41 y.o.)","12/02/1994 (29 y.o.)",
-          "06/19/1986 (38 y.o.)","03/28/1997 (27 y.o.)","08/10/1989 (34 y.o.)","04/15/1990 (34 y.o.)","11/08/1981 (42 y.o.)",
-          "02/13/1993 (31 y.o.)","09/22/1984 (39 y.o.)","06/06/1995 (29 y.o.)","12/17/1992 (31 y.o.)","05/29/1988 (36 y.o.)",
-          "10/04/1996 (27 y.o.)","03/20/1985 (39 y.o.)","07/31/1981 (42 y.o.)","01/12/1997 (27 y.o.)","04/26/1991 (33 y.o.)",
-          "09/09/1983 (40 y.o.)","06/18/1994 (30 y.o.)","11/03/1989 (34 y.o.)","08/15/1982 (41 y.o.)","02/27/1990 (34 y.o.)",
-          "05/06/1998 (26 y.o.)","10/21/1986 (37 y.o.)","03/30/1995 (29 y.o.)","07/11/1992 (31 y.o.)","12/24/1987 (36 y.o.)",
-          "09/02/1988 (35 y.o.)","04/19/1993 (31 y.o.)","06/08/1985 (39 y.o.)","11/23/1996 (27 y.o.)","01/14/1981 (43 y.o.)",
-          "08/29/1991 (32 y.o.)","03/05/1984 (40 y.o.)","07/17/1997 (26 y.o.)","10/28/1983 (40 y.o.)","12/10/1992 (31 y.o.)",
-          "05/21/1989 (35 y.o.)","08/03/1995 (28 y.o.)"
-        ]
-      }
-    };
 
-    function rand(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
+    <script>
+        (function() {
+            // ============ DOM ELEMENTS ============
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const mainApp = document.getElementById('mainApp');
+            const tokenInput = document.getElementById('tokenInput');
+            const saveTokenBtn = document.getElementById('saveTokenBtn');
+            const tokenError = document.getElementById('tokenError');
+            const tokenPreview = document.getElementById('tokenPreview');
+            const changeTokenBtn = document.getElementById('changeTokenBtn');
+            const groupSelect = document.getElementById('groupSelect');
+            const groupManual = document.getElementById('groupManual');
+            const groupManualInput = document.getElementById('groupManualInput');
+            const groupError = document.getElementById('groupError');
+            const refreshGroupsBtn = document.getElementById('refreshGroupsBtn');
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const fileSizeDisplay = document.getElementById('fileSizeDisplay');
+            const removeFileBtn = document.getElementById('removeFileBtn');
+            const fileSizeWarning = document.getElementById('fileSizeWarning');
+            const passwordInput = document.getElementById('passwordInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressArea = document.getElementById('progressArea');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const statusArea = document.getElementById('statusArea');
+            const historyList = document.getElementById('historyList');
+            const historyCard = document.getElementById('historyCard');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const toastContainer = document.getElementById('toastContainer');
 
-    let selectedCountry = "ru";
-    const countrySelect = document.getElementById("country-select");
-    countrySelect.addEventListener("change", function() {
-      selectedCountry = this.value;
-      generate();
-    });
+            // ============ STATE ============
+            let vkToken = '';
+            let selectedFile = null;
+            let selectedGroupId = null;
+            let groupsCache = [];
+            const VK_API_VERSION = '5.199';
+            const MAX_FILE_SIZE_MB = 150; // warn above this
 
-    // --- Новый код: получение случайного адреса через OpenStreetMap Nominatim ---
-    async function fetchBuildingLevels(osm_type, osm_id) {
-      // osm_type из Nominatim: "node", "way", "relation"
-      const type = osm_type === 'relation' ? 'relation' : (osm_type === 'way' ? 'way' : 'node');
-      const query = `[out:json][timeout:25];(${type}(${osm_id}););out tags;`;
-      try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: query
-        });
-        const j = await res.json();
-        if (j.elements && j.elements.length > 0 && j.elements[0].tags) {
-          const tags = j.elements[0].tags;
-          const levels = tags['building:levels'] || tags['levels'] || tags['building:height'];
-          if (levels) {
-            const m = String(levels).match(/\d+/);
-            return m ? parseInt(m[0], 10) : null;
-          }
-        }
-      } catch (e) {
-        // silently fail and return null
-      }
-      return null;
-    }
-
-    // helper: get city bbox via Nominatim
-    async function getCityBBox(city, countryCode) {
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&countrycodes=${countryCode}&format=json&limit=1`;
-        const res = await fetch(url, { headers: { 'Accept-Language': countryCode === "ru" ? "ru" : "en" }});
-        const j = await res.json();
-        if (j && j.length > 0 && j[0].boundingbox) {
-          // boundingbox: [south, north, west, east]
-          const bb = j[0].boundingbox.map(parseFloat);
-          return { south: bb[0], north: bb[1], west: bb[2], east: bb[3] };
-        }
-      } catch (e) {}
-      return null;
-    }
-
-    // helper: определить, выглядит ли элемент как многоквартирный дом (есть подъезды/многоуровневый)
-    function isMultiUnit(tags, levels) {
-      if (!tags) tags = {};
-      const b = (tags['building'] || tags['building:type'] || '').toString().toLowerCase();
-      const multiKeywords = ['apartment','apartments','block','residential','condominium','condo','terrace','terraced_house','multi-family','flats','flat','apartament','housing'];
-      if (b && multiKeywords.some(k => b.includes(k))) return true;
-      // явные признаки подъездов/квартир
-      if (tags['addr:unit'] || tags['entrance'] || tags['entrances'] || tags['door']) return true;
-      // уровни/этажи >=2 — скорее многоквартирное
-      if (levels && Number.isFinite(levels) && Number(levels) >= 2) return true;
-      // building:use == residential
-      if ((tags['building:use'] || '').toString().toLowerCase().includes('residential')) return true;
-      return false;
-    }
-
-    // helper: query Overpass for addr:housenumber within bbox, optional buildingRegex to prefer multiunit buildings
-    async function queryOverpassAddresses(bbox, buildingRegex) {
-      const { south, west, north, east } = bbox;
-      const buildingClause = buildingRegex ? `["building"~"${buildingRegex}",i]` : '';
-      const query = `[out:json][timeout:25];
-        (
-          node["addr:housenumber"]${buildingClause}(${south},${west},${north},${east});
-          way["addr:housenumber"]${buildingClause}(${south},${west},${north},${east});
-          relation["addr:housenumber"]${buildingClause}(${south},${west},${north},${east});
-        );
-        out center tags;`;
-      try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: query
-        });
-        const j = await res.json();
-        return Array.isArray(j.elements) ? j.elements : [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    // helper: query Overpass for addr:housenumber within bbox
-    async function queryOverpassAddresses(bbox) {
-      const { south, west, north, east } = bbox;
-      const query = `[out:json][timeout:25];
-        (
-          node["addr:housenumber"](${south},${west},${north},${east});
-          way["addr:housenumber"](${south},${west},${north},${east});
-          relation["addr:housenumber"](${south},${west},${north},${east});
-        );
-        out center tags;`;
-      try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: query
-        });
-        const j = await res.json();
-        return Array.isArray(j.elements) ? j.elements : [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    // pick random address element and normalize tags
-    function elementToAddress(el, defaultCity) {
-      const t = el.tags || {};
-      const street = t['addr:street'] || t['street'] || t['road'] || "";
-      const houseRaw = t['addr:housenumber'] || "";
-      const houseMatch = String(houseRaw).match(/\d+/);
-      const house = houseMatch ? houseMatch[0] : houseRaw;
-      const city = t['addr:city'] || t['city'] || t['addr:town'] || t['addr:village'] || defaultCity || "";
-      const state = t['addr:state'] || t['state'] || "";
-      const postcode = t['addr:postcode'] || t['postcode'] || "";
-      // levels from tags if present
-      let levels = null;
-      const lv = t['building:levels'] || t['levels'] || t['building:height'];
-      if (lv) {
-        const m = String(lv).match(/\d+/);
-        if (m) levels = parseInt(m[0], 10);
-      }
-      // extract coordinates if available (node: lat/lon, way/relation: center)
-      let lat = null, lon = null;
-      if (el.center && el.center.lat && el.center.lon) {
-        lat = parseFloat(el.center.lat); lon = parseFloat(el.center.lon);
-      } else if (el.lat && el.lon) {
-        lat = parseFloat(el.lat); lon = parseFloat(el.lon);
-      }
-      return { street, house, city, state, zip: postcode, levels, lat, lon };
-    }
-
-    // reverse geocode to get postcode if missing
-    async function reverseGeocode(lat, lon, countryCode) {
-      if (!lat || !lon) return "";
-      try {
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&addressdetails=1`;
-        const res = await fetch(url, { headers: { 'Accept-Language': countryCode === "ru" ? "ru" : "en" }});
-        const j = await res.json();
-        if (j && j.address) {
-          return j.address.postcode || "";
-        }
-      } catch (e) {}
-      return "";
-    }
-
-    // main: get random real address
-    async function getRandomAddress(countryCode) {
-      const cities = countryCode === "ru"
-        ? [
-            "Москва","Санкт-Петербург","Екатеринбург","Новосибирск","Казань",
-            "Нижний Новгород","Самара","Омск","Челябинск","Ростов-на-Дону",
-            "Уфа","Волгоград","Пермь","Краснодар","Воронеж",
-            "Саратов","Тюмень","Ижевск","Ярославль","Хабаровск"
-          ]
-        : [
-            "New York","Los Angeles","Chicago","Houston","San Francisco",
-            "Philadelphia","Phoenix","San Diego","Dallas","San Jose",
-            "Austin","Jacksonville","Fort Worth","Columbus","Indianapolis",
-            "Charlotte","Seattle","Denver","Washington","Boston"
-          ];
-
-      // regex для запросов Overpass — предпочитать явно многоквартирные типы
-      const multiBuildingRegex = 'apartment|apartments|block|residential|condominium|condo|terrace|terraced_house|multi-family|flats|flat';
-
-      for (let attempt = 0; attempt < 6; attempt++) {
-        const city = rand(cities);
-        // 1) get bbox
-        const bbox = await getCityBBox(city, countryCode);
-        if (!bbox) continue;
-
-        // optionally slightly shrink bbox margins to avoid huge rural areas
-        const latPad = (bbox.north - bbox.south) * 0.02;
-        const lonPad = (bbox.east - bbox.west) * 0.02;
-        const sb = { south: bbox.south + latPad, north: bbox.north - latPad, west: bbox.west + lonPad, east: bbox.east - lonPad };
-
-        // 2) сначала пробуем Overpass с фильтром по building (предпочтение многоквартирным)
-        let elements = await queryOverpassAddresses(sb, multiBuildingRegex);
-
-        // фильтруем элементы, чтобы убедиться, что это действительно многоквартирный дом
-        elements = elements.filter(el => {
-          const tags = el.tags || {};
-          let levels = null;
-          const lv = tags['building:levels'] || tags['levels'] || tags['building:height'];
-          if (lv) { const m = String(lv).match(/\d+/); if (m) levels = parseInt(m[0],10); }
-          return isMultiUnit(tags, levels);
-        });
-
-        // если ничего не нашли с фильтром — пробуем без фильтра, но также отфильтруем по isMultiUnit
-        if (elements.length === 0) {
-          const elementsAll = await queryOverpassAddresses(sb);
-          const filtered = elementsAll.filter(el => {
-            const tags = el.tags || {};
-            let levels = null;
-            const lv = tags['building:levels'] || tags['levels'] || tags['building:height'];
-            if (lv) { const m = String(lv).match(/\d+/); if (m) levels = parseInt(m[0],10); }
-            return isMultiUnit(tags, levels);
-          });
-          elements = filtered;
-        }
-
-        if (elements.length === 0) {
-          // try with original bbox if shrink removed results
-          const elements2 = await queryOverpassAddresses(bbox, multiBuildingRegex);
-          const filtered2 = elements2.filter(el => {
-            const tags = el.tags || {};
-            let levels = null;
-            const lv = tags['building:levels'] || tags['levels'] || tags['building:height'];
-            if (lv) { const m = String(lv).match(/\d+/); if (m) levels = parseInt(m[0],10); }
-            return isMultiUnit(tags, levels);
-          });
-          if (filtered2.length > 0) {
-            const el = rand(filtered2);
-            let addr = elementToAddress(el, city);
-            if ((!addr.zip || addr.zip === "") && addr.lat && addr.lon) {
-              const pc = await reverseGeocode(addr.lat, addr.lon, countryCode);
-              if (pc) addr.zip = pc;
-            }
-            const maxFloors = (addr.levels && Number.isFinite(addr.levels) && addr.levels > 0) ? addr.levels : 10;
-            const floor = Math.floor(Math.random() * maxFloors) + 1;
-            const maxFlats = Math.max(1, maxFloors * 4);
-            const flat = Math.floor(Math.random() * maxFlats) + 1;
-            return { city: addr.city, state: addr.state, street: addr.street, house: addr.house, zip: addr.zip, floor, flat };
-          }
-          continue;
-        }
-
-        // pick random element from filtered results
-        const el = rand(elements);
-        let addr = elementToAddress(el, city);
-        if ((!addr.zip || addr.zip === "") && addr.lat && addr.lon) {
-          const pc = await reverseGeocode(addr.lat, addr.lon, countryCode);
-          if (pc) addr.zip = pc;
-        }
-
-        // if street or house missing, skip
-        if (!addr.street || !addr.house) continue;
-
-        // floors / flats estimation
-        const maxFloors = (addr.levels && Number.isFinite(addr.levels) && addr.levels > 0) ? addr.levels : 10;
-        const floor = Math.floor(Math.random() * maxFloors) + 1;
-        const maxFlats = Math.max(1, maxFloors * 4);
-        const flat = Math.floor(Math.random() * maxFlats) + 1;
-
-        // assemble
-        const cityLabel = addr.city || city;
-        return { city: cityLabel, state: addr.state || "", street: addr.street, house: addr.house, zip: addr.zip || "", floor, flat };
-      }
-
-      // fallback to previous simpler Nominatim search if Overpass fails
-      try {
-        const fallbackUrl = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(rand(countryCode==="ru"?["Москва","Санкт-Петербург"]:["New York","Los Angeles"]))}&countrycodes=${countryCode}&street=*&format=json&limit=30&addressdetails=1&extratags=1`;
-        const res = await fetch(fallbackUrl, { headers: { 'Accept-Language': countryCode === "ru" ? "ru" : "en" }});
-        const results = await res.json();
-        // фильтруем Nominatim-результаты, оставляя только те, что выглядят как многоквартирные
-        const streets = (results || []).filter(r => r.address && (r.address.road || r.address.street) && r.address.house_number).map(r => {
-          // determine if multiunit from extratags or address details
-          const extratags = r.extratags || {};
-          const tags = Object.assign({}, extratags, (r.address || {}));
-          let maxFloors = null;
-          const levelsRaw = extratags['building:levels'] || extratags['levels'] || extratags['building:height'] || r.address['building:levels'] || r.address['levels'];
-          if (levelsRaw) {
-            const m = String(levelsRaw).match(/\d+/);
-            if (m) maxFloors = parseInt(m[0],10);
-          }
-          const looksMulti = isMultiUnit(tags, maxFloors);
-          return { raw: r, looksMulti, maxFloors };
-        }).filter(x => x.looksMulti);
-
-        if (streets.length > 0) {
-          const aWrap = rand(streets);
-          const a = aWrap.raw;
-          let maxFloors = aWrap.maxFloors;
-          if (!maxFloors && a.osm_type && a.osm_id) {
-            try {
-              const q = `[out:json][timeout:10];(${a.osm_type}(${a.osm_id}););out tags;`;
-              const r2 = await fetch('https://overpass-api.de/api/interpreter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: q
-              });
-              const j = await r2.json();
-              if (j.elements && j.elements[0] && j.elements[0].tags) {
-                const t = j.elements[0].tags;
-                const lv = t['building:levels'] || t['levels'] || t['building:height'];
-                if (lv) {
-                  const m = String(lv).match(/\d+/);
-                  if (m) maxFloors = parseInt(m[0],10);
+            // ============ STORAGE ============
+            function getStoredToken() {
+                try {
+                    return localStorage.getItem('vk_uploader_token') || '';
+                } catch (e) {
+                    return '';
                 }
-              }
-            } catch(e){}
-          }
-          if (!maxFloors || !Number.isFinite(maxFloors) || maxFloors < 1) maxFloors = 10;
-          const houseMatch = String(a.address.house_number || "").match(/\d+/);
-          const house = houseMatch ? houseMatch[0] : (a.address.house_number||"");
-          const floor = Math.floor(Math.random() * maxFloors) + 1;
-          const maxFlats = Math.max(1, maxFloors * 4);
-          const flat = Math.floor(Math.random() * maxFlats) + 1;
-          let postcode = a.address.postcode || "";
-          if ((!postcode || postcode === "") && a.lat && a.lon) {
-            const pc2 = await reverseGeocode(a.lat, a.lon, countryCode);
-            if (pc2) postcode = pc2;
-          }
-          return {
-            city: a.address.city || a.address.town || a.address.village || "",
-            state: a.address.state || "",
-            street: a.address.road || a.address.street || "",
-            house: house,
-            zip: postcode || "",
-            floor, flat
-          };
-        }
-      } catch(e){}
+            }
 
-      return null;
-    }
+            function setStoredToken(token) {
+                try {
+                    localStorage.setItem('vk_uploader_token', token);
+                } catch (e) {
+                    // localStorage not available
+                }
+            }
 
-    // --- Модифицированная функция generate ---
-    async function generate() {
-      const country = selectedCountry;
-      const d = data[country];
+            function getStoredGroupId() {
+                try {
+                    return localStorage.getItem('vk_uploader_group_id') || '';
+                } catch (e) {
+                    return '';
+                }
+            }
 
-      const name = rand(d.names);
-      const surname = rand(d.surnames);
-      const patronymic = rand(d.patronymics);
+            function setStoredGroupId(groupId) {
+                try {
+                    localStorage.setItem('vk_uploader_group_id', groupId);
+                } catch (e) {}
+            }
 
-      document.getElementById("field-city").textContent = "Загрузка...";
-      document.getElementById("field-street").textContent = "Загрузка...";
-      document.getElementById("field-house").textContent = "Загрузка...";
-      document.getElementById("field-floor").textContent = "Загрузка...";
-      document.getElementById("field-flat").textContent = "Загрузка...";
-      document.getElementById("field-zip").textContent = "Загрузка...";
+            function getUploadHistory() {
+                try {
+                    const raw = localStorage.getItem('vk_uploader_history');
+                    return raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
 
-      let addr = await getRandomAddress(country);
-      if (!addr) {
-        addr = {
-          city: country === "ru" ? "Город не найден" : "City not found",
-          state: "",
-          street: "",
-          house: "",
-          zip: "",
-          floor: "",
-          flat: ""
-        };
-      }
+            function addToHistory(entry) {
+                const history = getUploadHistory();
+                history.unshift(entry);
+                if (history.length > 50) history.length = 50;
+                try {
+                    localStorage.setItem('vk_uploader_history', JSON.stringify(history));
+                } catch (e) {}
+                renderHistory();
+            }
 
-      const city = country === "ru"
-        ? addr.city
-        : addr.city + (addr.state ? ", " + addr.state : "");
-      const street = addr.street;
-      const house = addr.house;
-      const zip = addr.zip;
-      const floor = addr.floor;
-      const flat = addr.flat;
+            function clearHistory() {
+                try {
+                    localStorage.removeItem('vk_uploader_history');
+                } catch (e) {}
+                renderHistory();
+                showToast('История очищена', 'info');
+            }
 
-      const phone = rand(d.phones);
-      const birth = rand(d.births);
-      const countryLabel = country === "ru" ? "Россия" : "США";
+            // ============ TOASTS ============
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                toast.addEventListener('click', () => toast.remove());
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100px)';
+                    toast.style.transition = '0.4s ease';
+                    setTimeout(() => toast.remove(), 400);
+                }, 4000);
+            }
 
-      document.getElementById("field-name").textContent = name;
-      document.getElementById("field-surname").textContent = surname;
-      document.getElementById("field-patronymic").textContent = patronymic;
-      document.getElementById("field-country").textContent = countryLabel;
-      document.getElementById("field-city").textContent = city;
-      document.getElementById("field-street").textContent = street;
-      document.getElementById("field-house").textContent = house;
-      document.getElementById("field-floor").textContent = floor;
-      document.getElementById("field-flat").textContent = flat;
-      document.getElementById("field-zip").textContent = zip;
-      document.getElementById("field-phone").textContent = phone;
-      document.getElementById("field-birth").textContent = birth;
-    }
+            // ============ UI HELPERS ============
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+            }
 
-    document.getElementById("generate-btn").addEventListener("click", generate);
+            function showStatus(message, type) {
+                statusArea.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
+            }
 
-    function copyField(fieldId, btn) {
-      const value = document.getElementById(fieldId).textContent;
-      if (!value) return;
-      navigator.clipboard.writeText(value).then(() => {
-        btn.textContent = "✓";
-        setTimeout(() => { btn.textContent = "⧉"; }, 900);
-      });
-    }
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        copyField(this.getAttribute('data-copy'), this);
-      });
-    });
+            function clearStatus() {
+                statusArea.innerHTML = '';
+            }
 
-    window.onload = generate;
-  </script>
-  <footer class="site-footer">
-     Персональные данные являются случайно сгенерированными и не относятся к реальным людям, любые совпадения с реальностью случайны.<br>
-     Сгенерированные адреса существуют в реальности и были получены через OpenStreetMap.<br>
-     Использовать сайт в целях мошенничества запрещено.
-   </footer>
- </body>
- </html>
+            function setProgress(percent, text) {
+                progressArea.classList.remove('hidden');
+                progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+                if (text) progressText.textContent = text;
+            }
+
+            function hideProgress() {
+                progressArea.classList.add('hidden');
+                progressBar.style.width = '0%';
+                progressText.textContent = '';
+            }
+
+            function updateUploadButton() {
+                if (selectedFile && selectedGroupId && vkToken) {
+                    uploadBtn.disabled = false;
+                    uploadBtn.classList.add('btn-ready');
+                } else {
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.remove('btn-ready');
+                }
+            }
+
+            // ============ VK API ============
+            async function vkApiCall(method, params = {}) {
+                const url = new URL(`https://api.vk.com/method/${method}`);
+                url.searchParams.set('access_token', vkToken);
+                url.searchParams.set('v', VK_API_VERSION);
+                for (const [key, value] of Object.entries(params)) {
+                    if (value !== undefined && value !== null && value !== '') {
+                        url.searchParams.set(key, value);
+                    }
+                }
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(`VK API error [${data.error.error_code}]: ${data.error.error_msg}`);
+                }
+                return data.response;
+            }
+
+            async function validateToken(token) {
+                const originalToken = vkToken;
+                vkToken = token;
+                try {
+                    await vkApiCall('users.get', { count: 1 });
+                    return true;
+                } catch (e) {
+                    vkToken = originalToken;
+                    throw e;
+                }
+            }
+
+            async function fetchGroups() {
+                try {
+                    const response = await vkApiCall('groups.get', {
+                        filter: 'admin',
+                        extended: 1,
+                        fields: 'name,photo_50',
+                    });
+                    if (response && response.items) {
+                        groupsCache = response.items;
+                        return response.items;
+                    }
+                    return [];
+                } catch (e) {
+                    console.warn('Failed to fetch groups:', e.message);
+                    return null;
+                }
+            }
+
+            function populateGroupSelect(groups) {
+                groupSelect.innerHTML = '';
+                if (groups && groups.length > 0) {
+                    groups.forEach(group => {
+                        const option = document.createElement('option');
+                        option.value = Math.abs(group.id);
+                        option.textContent = group.name || `Группа #${Math.abs(group.id)}`;
+                        groupSelect.appendChild(option);
+                    });
+                    groupSelect.style.display = '';
+                    groupManual.style.display = 'none';
+                    groupError.style.display = 'none';
+                } else if (groups === null) {
+                    // API error - show manual input
+                    groupSelect.style.display = 'none';
+                    groupManual.style.display = '';
+                    groupError.textContent =
+                        'Не удалось загрузить группы. Проверьте права токена (нужен доступ к groups). Введите ID группы вручную.';
+                    groupError.style.display = '';
+                } else {
+                    // Empty list
+                    groupSelect.innerHTML =
+                        '<option value="">Нет групп с правами администратора</option>';
+                    groupSelect.style.display = '';
+                    groupManual.style.display = '';
+                    groupError.style.display = '';
+                }
+                restoreGroupSelection();
+            }
+
+            function restoreGroupSelection() {
+                const storedId = getStoredGroupId();
+                if (storedId && groupSelect.style.display !== 'none') {
+                    const options = Array.from(groupSelect.options);
+                    const match = options.find(opt => opt.value === storedId);
+                    if (match) {
+                        groupSelect.value = storedId;
+                        selectedGroupId = parseInt(storedId);
+                    }
+                }
+                if (storedId && groupManual.style.display !== 'none') {
+                    groupManualInput.value = storedId;
+                    selectedGroupId = parseInt(storedId);
+                }
+                updateUploadButton();
+            }
+
+            function getSelectedGroupId() {
+                if (groupSelect.style.display !== 'none' && groupSelect.value) {
+                    return parseInt(groupSelect.value);
+                }
+                if (groupManual.style.display !== 'none' && groupManualInput.value) {
+                    return parseInt(groupManualInput.value);
+                }
+                return null;
+            }
+
+            // ============ FILE HANDLING ============
+            function handleFile(file) {
+                if (!file) return;
+                selectedFile = file;
+                fileNameDisplay.textContent = file.name;
+                fileSizeDisplay.textContent = formatFileSize(file.size);
+                fileInfo.classList.remove('hidden');
+                dropZone.style.opacity = '0.5';
+
+                const sizeMB = file.size / (1024 * 1024);
+                if (sizeMB > MAX_FILE_SIZE_MB) {
+                    fileSizeWarning.style.display = '';
+                } else {
+                    fileSizeWarning.style.display = 'none';
+                }
+                updateUploadButton();
+                clearStatus();
+                hideProgress();
+            }
+
+            function clearFile() {
+                selectedFile = null;
+                fileInput.value = '';
+                fileInfo.classList.add('hidden');
+                dropZone.style.opacity = '1';
+                fileSizeWarning.style.display = 'none';
+                fileNameDisplay.textContent = '';
+                fileSizeDisplay.textContent = '';
+                updateUploadButton();
+                clearStatus();
+                hideProgress();
+            }
+
+            function readFileAsBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1];
+                        resolve(base64);
+                    };
+                    reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // ============ ENCRYPTION ============
+            async function encryptData(plaintext, password) {
+                const encoder = new TextEncoder();
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(password), { name: 'PBKDF2' },
+                    false,
+                    ['deriveKey']
+                );
+                const key = await crypto.subtle.deriveKey({
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 200000,
+                        hash: 'SHA-256',
+                    },
+                    keyMaterial, { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt']
+                );
+
+                const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv },
+                    key,
+                    encoder.encode(plaintext)
+                );
+
+                const combined = {
+                    v: 1,
+                    salt: btoa(String.fromCharCode(...new Uint8Array(salt))),
+                    iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
+                    data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
+                };
+                return JSON.stringify(combined);
+            }
+
+            // ============ UPLOAD TO VK ============
+            async function uploadToVK(fileBase64, originalFilename, groupId, password) {
+                // Prepare data
+                let textContent;
+                if (password && password.trim()) {
+                    setProgress(10, 'Шифрование данных...');
+                    textContent = await encryptData(fileBase64, password.trim());
+                } else {
+                    textContent = fileBase64;
+                }
+
+                setProgress(20, 'Подготовка файла...');
+                const txtFilename = originalFilename + '.txt';
+                const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                const fileToUpload = new File([blob], txtFilename, { type: 'text/plain;charset=utf-8' });
+
+                setProgress(30, 'Получение сервера загрузки VK...');
+                const uploadServerResponse = await vkApiCall('docs.getMessagesUploadServer', {
+                    group_id: groupId,
+                    type: 'doc',
+                });
+
+                if (!uploadServerResponse || !uploadServerResponse.upload_url) {
+                    throw new Error('Не удалось получить URL для загрузки');
+                }
+
+                setProgress(40, 'Загрузка на сервер VK...');
+                const formData = new FormData();
+                formData.append('file', fileToUpload, txtFilename);
+
+                const uploadResult = await fetch(uploadServerResponse.upload_url, {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors',
+                });
+
+                if (!uploadResult.ok) {
+                    throw new Error(`Ошибка загрузки: HTTP ${uploadResult.status}`);
+                }
+
+                const uploadData = await uploadResult.json();
+                if (!uploadData.file) {
+                    throw new Error('Сервер VK не вернул идентификатор файла');
+                }
+
+                setProgress(70, 'Сохранение документа...');
+                const saveResponse = await vkApiCall('docs.save', {
+                    file: uploadData.file,
+                    title: txtFilename,
+                });
+
+                setProgress(100, 'Готово!');
+                return saveResponse;
+            }
+
+            // ============ MAIN UPLOAD FLOW ============
+            async function handleUpload() {
+                if (!selectedFile || !selectedGroupId || !vkToken) {
+                    showToast('Выберите файл, группу и убедитесь что токен указан', 'error');
+                    return;
+                }
+
+                uploadBtn.disabled = true;
+                uploadBtn.classList.remove('btn-ready');
+                hideProgress();
+                clearStatus();
+
+                try {
+                    setProgress(5, 'Чтение файла...');
+                    const base64Data = await readFileAsBase64(selectedFile);
+                    const password = passwordInput.value;
+
+                    const result = await uploadToVK(base64Data, selectedFile.name, selectedGroupId, password);
+
+                    // Build document link
+                    let docLink = '';
+                    if (result && result.doc) {
+                        const doc = Array.isArray(result.doc) ? result.doc[0] : result.doc;
+                        if (doc && doc.owner_id && doc.id) {
+                            docLink = `https://vk.com/doc${doc.owner_id}_${doc.id}`;
+                        }
+                    }
+
+                    showStatus('✅ Файл успешно загружен!', 'success');
+                    showToast('Файл загружен в группу!', 'success');
+
+                    // Add to history
+                    addToHistory({
+                        filename: selectedFile.name,
+                        size: selectedFile.size,
+                        date: new Date().toISOString(),
+                        groupId: selectedGroupId,
+                        groupName: getGroupName(selectedGroupId),
+                        docLink: docLink,
+                        encrypted: !!(password && password.trim()),
+                    });
+
+                    // Clear file after successful upload
+                    clearFile();
+                    passwordInput.value = '';
+
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showStatus('❌ Ошибка: ' + error.message, 'error');
+                    showToast('Ошибка загрузки: ' + error.message, 'error');
+                } finally {
+                    uploadBtn.disabled = false;
+                    updateUploadButton();
+                    setTimeout(hideProgress, 2000);
+                }
+            }
+
+            function getGroupName(groupId) {
+                if (groupsCache.length > 0) {
+                    const found = groupsCache.find(g => Math.abs(g.id) === groupId);
+                    if (found) return found.name;
+                }
+                return `Группа #${groupId}`;
+            }
+
+            // ============ HISTORY RENDERING ============
+            function renderHistory() {
+                const history = getUploadHistory();
+                if (history.length === 0) {
+                    historyList.innerHTML =
+                        '<p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>';
+                } else {
+                    historyList.innerHTML = history
+                        .map((entry, index) => {
+                            const date = new Date(entry.date);
+                            const dateStr = date.toLocaleString('ru-RU', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            });
+                            const icon = entry.encrypted ? '🔒' : '📄';
+                            const linkHtml = entry.docLink ?
+                                `<a href="${entry.docLink}" target="_blank" class="h-link" title="Открыть в ВК">🔗</a>` :
+                                '';
+                            return `
+                                <div class="history-item">
+                                    <span class="h-icon">${icon}</span>
+                                    <div class="h-info">
+                                        <div class="h-name" title="${entry.filename}">${entry.filename}</div>
+                                        <div class="h-date">${dateStr} · ${formatFileSize(entry.size)} · ${entry.groupName || 'Группа #' + entry.groupId}</div>
+                                    </div>
+                                    ${linkHtml}
+                                </div>
+                            `;
+                        })
+                        .join('');
+                }
+                if (getUploadHistory().length > 0) {
+                    historyCard.classList.remove('hidden');
+                }
+            }
+
+            // ============ INITIALIZATION ============
+            async function initApp() {
+                vkToken = getStoredToken();
+
+                if (vkToken) {
+                    // Token exists - show main app
+                    welcomeScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    tokenPreview.textContent = vkToken.substring(0, 16) + '...' + vkToken.substring(vkToken.length -
+                        8);
+                    await loadGroups();
+                    renderHistory();
+                    updateUploadButton();
+                } else {
+                    // No token - show welcome
+                    welcomeScreen.classList.remove('hidden');
+                    mainApp.classList.add('hidden');
+                }
+            }
+
+            async function loadGroups() {
+                groupSelect.innerHTML = '<option value="">Загрузка групп...</option>';
+                groupSelect.style.display = '';
+                groupManual.style.display = 'none';
+                groupError.style.display = 'none';
+                selectedGroupId = null;
+
+                const groups = await fetchGroups();
+                populateGroupSelect(groups);
+                updateUploadButton();
+            }
+
+            function switchToWelcome() {
+                vkToken = '';
+                setStoredToken('');
+                welcomeScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                tokenInput.value = '';
+                tokenError.style.display = 'none';
+                selectedFile = null;
+                selectedGroupId = null;
+                groupsCache = [];
+                clearFile();
+                hideProgress();
+                clearStatus();
+            }
+
+            // ============ EVENT LISTENERS ============
+
+            // Save token
+            saveTokenBtn.addEventListener('click', async () => {
+                const token = tokenInput.value.trim();
+                if (!token) {
+                    tokenError.textContent = 'Введите токен';
+                    tokenError.style.display = '';
+                    return;
+                }
+                tokenError.style.display = 'none';
+                saveTokenBtn.disabled = true;
+                saveTokenBtn.innerHTML = '<span class="spinner"></span> Проверка токена...';
+
+                try {
+                    await validateToken(token);
+                    vkToken = token;
+                    setStoredToken(token);
+                    tokenPreview.textContent = token.substring(0, 16) + '...' + token.substring(token.length -
+                        8);
+                    welcomeScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    showToast('Токен успешно проверен!', 'success');
+                    await loadGroups();
+                    renderHistory();
+                    updateUploadButton();
+                } catch (e) {
+                    tokenError.textContent = 'Ошибка: ' + e.message;
+                    tokenError.style.display = '';
+                } finally {
+                    saveTokenBtn.disabled = false;
+                    saveTokenBtn.innerHTML = '✨ Продолжить';
+                }
+            });
+
+            // Enter key on token input
+            tokenInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveTokenBtn.click();
+                }
+            });
+
+            // Change token
+            changeTokenBtn.addEventListener('click', () => {
+                if (confirm('Сменить токен? Вы вернётесь на экран ввода.')) {
+                    switchToWelcome();
+                }
+            });
+
+            // Refresh groups
+            refreshGroupsBtn.addEventListener('click', async () => {
+                refreshGroupsBtn.disabled = true;
+                refreshGroupsBtn.innerHTML = '<span class="spinner"></span> Загрузка...';
+                await loadGroups();
+                refreshGroupsBtn.disabled = false;
+                refreshGroupsBtn.innerHTML = '🔄 Обновить список групп';
+                if (groupsCache.length > 0) {
+                    showToast(`Загружено ${groupsCache.length} групп`, 'success');
+                }
+            });
+
+            // Group select change
+            groupSelect.addEventListener('change', () => {
+                selectedGroupId = getSelectedGroupId();
+                if (selectedGroupId) {
+                    setStoredGroupId(String(selectedGroupId));
+                }
+                updateUploadButton();
+            });
+
+            // Group manual input change
+            groupManualInput.addEventListener('input', () => {
+                selectedGroupId = getSelectedGroupId();
+                if (selectedGroupId) {
+                    setStoredGroupId(String(selectedGroupId));
+                }
+                updateUploadButton();
+            });
+
+            // Drop zone click
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            // Drag and drop
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('drag-over');
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleFile(e.dataTransfer.files[0]);
+                    fileInput.files = e.dataTransfer.files;
+                }
+            });
+
+            // Remove file
+            removeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                clearFile();
+            });
+
+            // Upload button
+            uploadBtn.addEventListener('click', handleUpload);
+
+            // Clear history
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm('Очистить всю историю загрузок?')) {
+                    clearHistory();
+                }
+            });
+
+            // Password input - update button state (file is still valid)
+            passwordInput.addEventListener('input', () => {
+                updateUploadButton();
+            });
+
+            // ============ START ============
+            initApp().catch((err) => {
+                console.error('Init error:', err);
+                welcomeScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+            });
+
+            console.log('🚀 VK File Uploader initialized');
+            console.log('📋 Поддерживаемые форматы: любые файлы → Base64 → TXT в группу ВК');
+            console.log('🔐 Шифрование: AES-256-GCM (Web Crypto API)');
+        })();
+    </script>
+</body>
+</html>
