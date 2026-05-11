@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VK File Uploader — загрузка файлов в вашу группу</title>
+    <title>VK File Uploader — загрузка файлов в группу</title>
     <style>
         :root {
             --bg: #0a0a12;
@@ -382,8 +382,6 @@
         #fileInput { display: none; }
         .hidden { display: none !important; }
 
-        .divider { border: none; border-top: 1px solid var(--card-border); margin: 20px 0; }
-
         .token-display {
             display: flex;
             align-items: center;
@@ -404,6 +402,15 @@
             h1 { font-size: 1.3rem; }
             .btn { padding: 12px 18px; font-size: 0.9rem; }
         }
+
+        .warning-note {
+            background: rgba(251,191,36,0.1);
+            border-left: 3px solid var(--warning);
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
@@ -417,7 +424,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="app-container">
-    <!-- Приветственный экран (ввод токена) -->
+    <!-- Приветственный экран -->
     <div id="welcomeScreen" class="card hidden">
         <div class="logo-icon">🔐</div>
         <h1>VK File Uploader</h1>
@@ -425,6 +432,10 @@
             Загружайте любые файлы в вашу группу ВКонтакте.<br>
             Файлы преобразуются в Base64 и сохраняются как TXT-документы.
         </p>
+        <div class="warning-note">
+            ⚠️ <strong>Важно:</strong> Открывайте эту страницу через локальный сервер (например, <code>http://localhost:8000</code>).<br>
+            Прямое открытие HTML-файла (<code>file://</code>) вызовет ошибки сети.
+        </div>
         <div class="input-group">
             <label>🔑 VK API Токен</label>
             <input type="password" id="tokenInput" placeholder="Вставьте ваш access_token...">
@@ -562,29 +573,67 @@
         // Состояние
         let vkToken = '';
         let selectedFile = null;
-        let selectedGroupId = null;          // ID группы (положительное число)
+        let selectedGroupId = null;
         let groupsCache = [];
         const VK_API_VERSION = '5.199';
         const MAX_FILE_SIZE_MB = 150;
 
-        // ===== Хранилище =====
-        function getStoredToken() {
-            try { return localStorage.getItem('vk_uploader_token') || ''; } catch(e) { return ''; }
+        // ===== JSONP-обёртка для VK API =====
+        function vkApiCall(method, params = {}) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'vk_jsonp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                window[callbackName] = (data) => {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    if (data.error) {
+                        reject(new Error(`VK API error [${data.error.error_code}]: ${data.error.error_msg}`));
+                    } else {
+                        resolve(data.response);
+                    }
+                };
+
+                const url = new URL(`https://api.vk.com/method/${method}`);
+                url.searchParams.set('access_token', vkToken);
+                url.searchParams.set('v', VK_API_VERSION);
+                url.searchParams.set('callback', callbackName);
+                for (const [key, value] of Object.entries(params)) {
+                    if (value !== undefined && value !== null && value !== '') {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                const script = document.createElement('script');
+                script.src = url.toString();
+                script.onerror = () => {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error('Ошибка сети при вызове VK API'));
+                };
+
+                // Таймаут 15 секунд
+                const timeout = setTimeout(() => {
+                    delete window[callbackName];
+                    if (script.parentNode) document.body.removeChild(script);
+                    reject(new Error('Таймаут запроса к VK API'));
+                }, 15000);
+
+                const originalCallback = window[callbackName];
+                window[callbackName] = (data) => {
+                    clearTimeout(timeout);
+                    originalCallback(data);
+                };
+
+                document.body.appendChild(script);
+            });
         }
-        function setStoredToken(token) {
-            try { localStorage.setItem('vk_uploader_token', token); } catch(e) {}
-        }
-        function getStoredGroupId() {
-            try { return localStorage.getItem('vk_uploader_group_id') || ''; } catch(e) { return ''; }
-        }
-        function setStoredGroupId(groupId) {
-            try { localStorage.setItem('vk_uploader_group_id', groupId); } catch(e) {}
-        }
+
+        // ===== Вспомогательные функции хранилища =====
+        function getStoredToken() { try { return localStorage.getItem('vk_uploader_token') || ''; } catch(e) { return ''; } }
+        function setStoredToken(token) { try { localStorage.setItem('vk_uploader_token', token); } catch(e) {} }
+        function getStoredGroupId() { try { return localStorage.getItem('vk_uploader_group_id') || ''; } catch(e) { return ''; } }
+        function setStoredGroupId(groupId) { try { localStorage.setItem('vk_uploader_group_id', groupId); } catch(e) {} }
         function getUploadHistory() {
-            try {
-                const raw = localStorage.getItem('vk_uploader_history');
-                return raw ? JSON.parse(raw) : [];
-            } catch(e) { return []; }
+            try { const raw = localStorage.getItem('vk_uploader_history'); return raw ? JSON.parse(raw) : []; } catch(e) { return []; }
         }
         function addToHistory(entry) {
             const history = getUploadHistory();
@@ -599,7 +648,6 @@
             showToast('История очищена', 'info');
         }
 
-        // ===== Всплывающие уведомления =====
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -614,7 +662,6 @@
             }, 4000);
         }
 
-        // ===== Интерфейсные утилиты =====
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
@@ -622,11 +669,8 @@
             return (bytes/(1024*1024*1024)).toFixed(2) + ' GB';
         }
 
-        function showStatus(message, type) {
-            statusArea.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
-        }
+        function showStatus(message, type) { statusArea.innerHTML = `<span class="status-badge ${type}">${message}</span>`; }
         function clearStatus() { statusArea.innerHTML = ''; }
-
         function setProgress(percent, text) {
             progressArea.classList.remove('hidden');
             progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
@@ -648,31 +692,15 @@
             }
         }
 
-        // ===== VK API =====
-        async function vkApiCall(method, params = {}) {
-            const url = new URL(`https://api.vk.com/method/${method}`);
-            url.searchParams.set('access_token', vkToken);
-            url.searchParams.set('v', VK_API_VERSION);
-            for (const [key, value] of Object.entries(params)) {
-                if (value !== undefined && value !== null && value !== '') {
-                    url.searchParams.set(key, value);
-                }
-            }
-            const response = await fetch(url.toString());
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            const data = await response.json();
-            if (data.error) throw new Error(`VK API error [${data.error.error_code}]: ${data.error.error_msg}`);
-            return data.response;
-        }
-
+        // ===== Валидация токена и загрузка групп =====
         async function validateToken(token) {
-            const originalToken = vkToken;
+            // Пробуем вызвать groups.get (подходит для токена сообщества)
             vkToken = token;
             try {
-                await vkApiCall('users.get', { count: 1 });
+                await vkApiCall('groups.get', { filter: 'admin' });
                 return true;
             } catch(e) {
-                vkToken = originalToken;
+                vkToken = '';
                 throw e;
             }
         }
@@ -690,20 +718,18 @@
                 }
                 return [];
             } catch(e) {
-                console.warn('Не удалось получить список групп:', e.message);
-                return null;   // null означает ошибку API
+                console.warn('Ошибка получения групп:', e.message);
+                return null;
             }
         }
 
         function setupGroupInterface(groups) {
-            // Скрываем все варианты
             groupSelect.classList.add('hidden');
             groupManual.classList.add('hidden');
             groupAutoInfo.classList.add('hidden');
             groupError.style.display = 'none';
 
             if (groups === null) {
-                // Ошибка API — показываем ручной ввод
                 groupManual.classList.remove('hidden');
                 groupError.textContent = 'Не удалось загрузить список групп. Введите ID группы вручную.';
                 groupError.style.display = '';
@@ -712,7 +738,6 @@
             }
 
             if (groups.length === 0) {
-                // Нет групп — ручной ввод
                 groupManual.classList.remove('hidden');
                 groupError.textContent = 'У вас нет администрируемых групп. Введите ID группы вручную.';
                 groupError.style.display = '';
@@ -721,15 +746,12 @@
             }
 
             if (groups.length === 1) {
-                // Ровно одна группа — авто-выбор
                 const group = groups[0];
                 selectedGroupId = Math.abs(group.id);
                 setStoredGroupId(String(selectedGroupId));
                 groupAutoName.textContent = group.name || `Группа #${selectedGroupId}`;
                 groupAutoInfo.classList.remove('hidden');
-                // Скрываем всё остальное
             } else {
-                // Несколько групп — показываем выпадающий список
                 groupSelect.innerHTML = '<option value="">Выберите группу...</option>';
                 groups.forEach(group => {
                     const option = document.createElement('option');
@@ -761,17 +783,12 @@
         }
 
         function getSelectedGroupId() {
-            if (!groupSelect.classList.contains('hidden') && groupSelect.value) {
-                return parseInt(groupSelect.value);
-            }
-            if (!groupManual.classList.contains('hidden') && groupManualInput.value) {
-                return parseInt(groupManualInput.value);
-            }
-            // Если авто-выбор активен, selectedGroupId уже установлен
+            if (!groupSelect.classList.contains('hidden') && groupSelect.value) return parseInt(groupSelect.value);
+            if (!groupManual.classList.contains('hidden') && groupManualInput.value) return parseInt(groupManualInput.value);
             return selectedGroupId;
         }
 
-        // ===== Работа с файлами =====
+        // ===== Файлы =====
         function handleFile(file) {
             if (!file) return;
             selectedFile = file;
@@ -779,8 +796,7 @@
             fileSizeDisplay.textContent = formatFileSize(file.size);
             fileInfo.classList.remove('hidden');
             dropZone.style.opacity = '0.5';
-            const sizeMB = file.size / (1024*1024);
-            fileSizeWarning.style.display = sizeMB > MAX_FILE_SIZE_MB ? '' : 'none';
+            fileSizeWarning.style.display = (file.size/(1024*1024) > MAX_FILE_SIZE_MB) ? '' : 'none';
             updateUploadButton();
             clearStatus();
             hideProgress();
@@ -792,8 +808,6 @@
             fileInfo.classList.add('hidden');
             dropZone.style.opacity = '1';
             fileSizeWarning.style.display = 'none';
-            fileNameDisplay.textContent = '';
-            fileSizeDisplay.textContent = '';
             updateUploadButton();
             clearStatus();
             hideProgress();
@@ -802,56 +816,39 @@
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
+                reader.onload = () => resolve(reader.result.split(',')[1]);
                 reader.onerror = () => reject(new Error('Ошибка чтения файла'));
                 reader.readAsDataURL(file);
             });
         }
 
-        // ===== Шифрование (AES-GCM) =====
+        // ===== Шифрование =====
         async function encryptData(plaintext, password) {
             const encoder = new TextEncoder();
             const salt = crypto.getRandomValues(new Uint8Array(16));
             const iv = crypto.getRandomValues(new Uint8Array(12));
-
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                encoder.encode(password),
-                { name: 'PBKDF2' },
-                false,
-                ['deriveKey']
-            );
+            const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
             const key = await crypto.subtle.deriveKey(
-                { name: 'PBKDF2', salt: salt, iterations: 200000, hash: 'SHA-256' },
+                { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
                 keyMaterial,
                 { name: 'AES-GCM', length: 256 },
                 false,
                 ['encrypt']
             );
-
-            const ciphertext = await crypto.subtle.encrypt(
-                { name: 'AES-GCM', iv: iv },
-                key,
-                encoder.encode(plaintext)
-            );
-
-            const combined = {
+            const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(plaintext));
+            return JSON.stringify({
                 v: 1,
                 salt: btoa(String.fromCharCode(...new Uint8Array(salt))),
                 iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
-                data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
-            };
-            return JSON.stringify(combined);
+                data: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
+            });
         }
 
         // ===== Загрузка в VK =====
         async function uploadToVK(fileBase64, originalFilename, groupId, password) {
             let textContent;
             if (password && password.trim()) {
-                setProgress(10, 'Шифрование данных...');
+                setProgress(10, 'Шифрование...');
                 textContent = await encryptData(fileBase64, password.trim());
             } else {
                 textContent = fileBase64;
@@ -862,7 +859,7 @@
             const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
             const fileToUpload = new File([blob], txtFilename, { type: 'text/plain;charset=utf-8' });
 
-            setProgress(30, 'Получение сервера загрузки VK...');
+            setProgress(30, 'Получение сервера загрузки...');
             const uploadServerResponse = await vkApiCall('docs.getMessagesUploadServer', {
                 group_id: groupId,
                 type: 'doc',
@@ -875,6 +872,7 @@
             const formData = new FormData();
             formData.append('file', fileToUpload, txtFilename);
 
+            // Для загрузки используем fetch, который должен работать с http://localhost
             const uploadResult = await fetch(uploadServerResponse.upload_url, {
                 method: 'POST',
                 body: formData,
@@ -895,10 +893,9 @@
             return saveResponse;
         }
 
-        // ===== Основной обработчик загрузки =====
         async function handleUpload() {
             if (!selectedFile || !selectedGroupId || !vkToken) {
-                showToast('Выберите файл, группу и убедитесь что токен указан', 'error');
+                showToast('Выберите файл, группу и убедитесь, что токен указан', 'error');
                 return;
             }
             uploadBtn.disabled = true;
@@ -910,15 +907,12 @@
                 setProgress(5, 'Чтение файла...');
                 const base64Data = await readFileAsBase64(selectedFile);
                 const password = passwordInput.value;
-
                 const result = await uploadToVK(base64Data, selectedFile.name, selectedGroupId, password);
 
                 let docLink = '';
                 if (result && result.doc) {
                     const doc = Array.isArray(result.doc) ? result.doc[0] : result.doc;
-                    if (doc && doc.owner_id && doc.id) {
-                        docLink = `https://vk.com/doc${doc.owner_id}_${doc.id}`;
-                    }
+                    if (doc && doc.owner_id && doc.id) docLink = `https://vk.com/doc${doc.owner_id}_${doc.id}`;
                 }
 
                 showStatus('✅ Файл успешно загружен!', 'success');
@@ -930,16 +924,16 @@
                     date: new Date().toISOString(),
                     groupId: selectedGroupId,
                     groupName: getGroupName(selectedGroupId),
-                    docLink: docLink,
+                    docLink,
                     encrypted: !!(password && password.trim()),
                 });
 
                 clearFile();
                 passwordInput.value = '';
             } catch(error) {
-                console.error('Upload error:', error);
+                console.error(error);
                 showStatus('❌ Ошибка: ' + error.message, 'error');
-                showToast('Ошибка загрузки: ' + error.message, 'error');
+                showToast('Ошибка: ' + error.message, 'error');
             } finally {
                 uploadBtn.disabled = false;
                 updateUploadButton();
@@ -948,39 +942,30 @@
         }
 
         function getGroupName(groupId) {
-            if (groupsCache.length > 0) {
-                const found = groupsCache.find(g => Math.abs(g.id) === groupId);
-                if (found) return found.name;
-            }
-            return `Группа #${groupId}`;
+            const found = groupsCache.find(g => Math.abs(g.id) === groupId);
+            return found ? found.name : `Группа #${groupId}`;
         }
 
-        // ===== История =====
         function renderHistory() {
             const history = getUploadHistory();
             if (history.length === 0) {
                 historyList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>';
-            } else {
-                historyList.innerHTML = history.map(entry => {
-                    const date = new Date(entry.date);
-                    const dateStr = date.toLocaleString('ru-RU', {
-                        day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
-                    });
-                    const icon = entry.encrypted ? '🔒' : '📄';
-                    const linkHtml = entry.docLink
-                        ? `<a href="${entry.docLink}" target="_blank" class="h-link" title="Открыть в ВК">🔗</a>`
-                        : '';
-                    return `
-                        <div class="history-item">
-                            <span class="h-icon">${icon}</span>
-                            <div class="h-info">
-                                <div class="h-name" title="${entry.filename}">${entry.filename}</div>
-                                <div class="h-date">${dateStr} · ${formatFileSize(entry.size)} · ${entry.groupName || 'Группа #'+entry.groupId}</div>
-                            </div>
-                            ${linkHtml}
-                        </div>`;
-                }).join('');
+                return;
             }
+            historyList.innerHTML = history.map(entry => {
+                const date = new Date(entry.date);
+                const dateStr = date.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                const icon = entry.encrypted ? '🔒' : '📄';
+                const linkHtml = entry.docLink ? `<a href="${entry.docLink}" target="_blank" class="h-link">🔗</a>` : '';
+                return `<div class="history-item">
+                    <span class="h-icon">${icon}</span>
+                    <div class="h-info">
+                        <div class="h-name" title="${entry.filename}">${entry.filename}</div>
+                        <div class="h-date">${dateStr} · ${formatFileSize(entry.size)} · ${entry.groupName || 'Группа #'+entry.groupId}</div>
+                    </div>
+                    ${linkHtml}
+                </div>`;
+            }).join('');
         }
 
         // ===== Инициализация =====
@@ -1000,7 +985,6 @@
         }
 
         async function loadGroups() {
-            // Показываем индикатор загрузки
             groupSelect.classList.add('hidden');
             groupManual.classList.add('hidden');
             groupAutoInfo.classList.add('hidden');
@@ -1010,10 +994,7 @@
 
             const groups = await fetchGroups();
             setupGroupInterface(groups);
-            // Если после настройки selectedGroupId не установлен, сбросим
-            if (!getSelectedGroupId()) {
-                selectedGroupId = null;
-            }
+            if (!getSelectedGroupId()) selectedGroupId = null;
             updateUploadButton();
         }
 
@@ -1032,7 +1013,7 @@
             clearStatus();
         }
 
-        // ===== События =====
+        // ===== Обработчики событий =====
         saveTokenBtn.addEventListener('click', async () => {
             const token = tokenInput.value.trim();
             if (!token) {
@@ -1064,15 +1045,8 @@
             }
         });
 
-        tokenInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') saveTokenBtn.click();
-        });
-
-        changeTokenBtn.addEventListener('click', () => {
-            if (confirm('Сменить токен? Вы вернётесь на экран ввода.')) {
-                switchToWelcome();
-            }
-        });
+        tokenInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveTokenBtn.click(); });
+        changeTokenBtn.addEventListener('click', () => { if (confirm('Сменить токен?')) switchToWelcome(); });
 
         refreshGroupsBtn.addEventListener('click', async () => {
             refreshGroupsBtn.disabled = true;
@@ -1080,13 +1054,7 @@
             await loadGroups();
             refreshGroupsBtn.disabled = false;
             refreshGroupsBtn.innerHTML = '🔄 Обновить список групп';
-            if (groupsCache.length > 0) {
-                showToast(`Загружено ${groupsCache.length} групп`, 'success');
-            } else if (groupsCache.length === 0) {
-                showToast('Список групп пуст', 'info');
-            } else {
-                showToast('Ошибка загрузки групп', 'error');
-            }
+            showToast(groupsCache.length > 0 ? `Загружено ${groupsCache.length} групп` : 'Список групп пуст', 'info');
         });
 
         groupSelect.addEventListener('change', () => {
@@ -1102,49 +1070,30 @@
         });
 
         dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); });
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-        });
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            if (e.dataTransfer.files?.[0]) {
                 handleFile(e.dataTransfer.files[0]);
                 fileInput.files = e.dataTransfer.files;
             }
         });
 
-        removeFileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            clearFile();
-        });
-
+        removeFileBtn.addEventListener('click', (e) => { e.stopPropagation(); clearFile(); });
         uploadBtn.addEventListener('click', handleUpload);
-
-        clearHistoryBtn.addEventListener('click', () => {
-            if (confirm('Очистить всю историю загрузок?')) clearHistory();
-        });
-
+        clearHistoryBtn.addEventListener('click', () => { if (confirm('Очистить историю?')) clearHistory(); });
         passwordInput.addEventListener('input', updateUploadButton);
 
         // Старт
         initApp().catch(err => {
-            console.error('Init error:', err);
+            console.error(err);
             welcomeScreen.classList.remove('hidden');
             mainApp.classList.add('hidden');
         });
-
-        console.log('🚀 VK File Uploader готов');
     })();
 </script>
 </body>
