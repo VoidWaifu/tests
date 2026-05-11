@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VK File Uploader — загрузка файлов в группу ВКонтакте</title>
+    <title>VK File Uploader — загрузка файлов в вашу группу</title>
     <style>
         :root {
             --bg: #0a0a12;
@@ -42,7 +42,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Animated background */
         .bg-orbs {
             position: fixed;
             top: 0;
@@ -60,48 +59,16 @@
             opacity: 0.35;
             animation: floatOrb 20s infinite ease-in-out;
         }
-        .bg-orb:nth-child(1) {
-            width: 500px;
-            height: 500px;
-            background: #4f6ef7;
-            top: -15%;
-            left: -10%;
-            animation-delay: 0s;
-        }
-        .bg-orb:nth-child(2) {
-            width: 400px;
-            height: 400px;
-            background: #7c3aed;
-            bottom: -20%;
-            right: -8%;
-            animation-delay: -7s;
-        }
-        .bg-orb:nth-child(3) {
-            width: 350px;
-            height: 350px;
-            background: #3b82f6;
-            top: 50%;
-            left: 50%;
-            animation-delay: -14s;
-            opacity: 0.2;
-        }
+        .bg-orb:nth-child(1) { width: 500px; height: 500px; background: #4f6ef7; top: -15%; left: -10%; animation-delay: 0s; }
+        .bg-orb:nth-child(2) { width: 400px; height: 400px; background: #7c3aed; bottom: -20%; right: -8%; animation-delay: -7s; }
+        .bg-orb:nth-child(3) { width: 350px; height: 350px; background: #3b82f6; top: 50%; left: 50%; animation-delay: -14s; opacity: 0.2; }
         @keyframes floatOrb {
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-            25% {
-                transform: translate(60px, -80px) scale(1.15);
-            }
-            50% {
-                transform: translate(-30px, 40px) scale(0.9);
-            }
-            75% {
-                transform: translate(-70px, -30px) scale(1.1);
-            }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(60px, -80px) scale(1.15); }
+            50% { transform: translate(-30px, 40px) scale(0.9); }
+            75% { transform: translate(-70px, -30px) scale(1.1); }
         }
 
-        /* Grid pattern overlay */
         .grid-overlay {
             position: fixed;
             top: 0;
@@ -117,7 +84,6 @@
             background-size: 50px 50px;
         }
 
-        /* Main container */
         .app-container {
             position: relative;
             z-index: 1;
@@ -126,7 +92,6 @@
             padding: 20px;
         }
 
-        /* Card */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -138,23 +103,13 @@
             transition: var(--transition);
             animation: fadeSlideIn 0.5s ease-out;
         }
+        .card+.card { margin-top: 16px; }
+
         @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .card+.card {
-            margin-top: 16px;
-            animation-delay: 0.1s;
-        }
-
-        /* Logo / Icon */
         .logo-icon {
             width: 56px;
             height: 56px;
@@ -169,16 +124,10 @@
             animation: pulseGlow 3s infinite ease-in-out;
         }
         @keyframes pulseGlow {
-            0%,
-            100% {
-                box-shadow: 0 8px 32px var(--accent-glow);
-            }
-            50% {
-                box-shadow: 0 8px 48px rgba(91, 138, 247, 0.45), 0 0 80px rgba(139, 92, 246, 0.2);
-            }
+            0%, 100% { box-shadow: 0 8px 32px var(--accent-glow); }
+            50% { box-shadow: 0 8px 48px rgba(91, 138, 247, 0.45), 0 0 80px rgba(139, 92, 246, 0.2); }
         }
 
-        /* Typography */
         h1 {
             font-size: 1.6rem;
             font-weight: 700;
@@ -198,7 +147,6 @@
             line-height: 1.5;
         }
 
-        /* Inputs */
         .input-group {
             margin-bottom: 18px;
         }
@@ -230,9 +178,7 @@
             box-shadow: 0 0 0 4px rgba(91, 138, 247, 0.1);
             background: rgba(20, 20, 40, 0.95);
         }
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.25);
-        }
+        .input-group input::placeholder { color: rgba(255, 255, 255, 0.25); }
         .input-group select {
             appearance: none;
             -webkit-appearance: none;
@@ -242,12 +188,8 @@
             padding-right: 40px;
             cursor: pointer;
         }
-        .input-group select option {
-            background: #1a1a2e;
-            color: #e0e0ec;
-        }
+        .input-group select option { background: #1a1a2e; color: #e0e0ec; }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -271,36 +213,17 @@
             box-shadow: 0 4px 20px rgba(91, 138, 247, 0.3);
             width: 100%;
         }
-        .btn-primary:hover {
-            box-shadow: 0 6px 28px rgba(91, 138, 247, 0.5);
-            transform: translateY(-1px);
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 12px rgba(91, 138, 247, 0.3);
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .btn-primary:hover { box-shadow: 0 6px 28px rgba(91, 138, 247, 0.5); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 12px rgba(91, 138, 247, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-outline {
             background: transparent;
             border: 1px solid var(--input-border);
             color: var(--text);
             width: 100%;
         }
-        .btn-outline:hover {
-            border-color: var(--accent);
-            background: rgba(91, 138, 247, 0.06);
-        }
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            border-radius: 8px;
-            width: auto;
-        }
+        .btn-outline:hover { border-color: var(--accent); background: rgba(91, 138, 247, 0.06); }
+        .btn-sm { padding: 8px 16px; font-size: 0.8rem; border-radius: 8px; width: auto; }
         .btn-danger-text {
             background: transparent;
             border: none;
@@ -311,12 +234,8 @@
             opacity: 0.7;
             transition: var(--transition);
         }
-        .btn-danger-text:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
+        .btn-danger-text:hover { opacity: 1; text-decoration: underline; }
 
-        /* File drop zone */
         .drop-zone {
             border: 2px dashed rgba(255, 255, 255, 0.18);
             border-radius: var(--radius);
@@ -325,32 +244,17 @@
             cursor: pointer;
             transition: var(--transition);
             background: rgba(255, 255, 255, 0.015);
-            position: relative;
         }
-        .drop-zone:hover,
-        .drop-zone.drag-over {
+        .drop-zone:hover, .drop-zone.drag-over {
             border-color: var(--accent);
             background: rgba(91, 138, 247, 0.06);
             box-shadow: 0 0 40px rgba(91, 138, 247, 0.08);
         }
-        .drop-zone.drag-over {
-            transform: scale(1.02);
-            border-style: solid;
-        }
-        .drop-zone-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            opacity: 0.7;
-        }
-        .drop-zone-text {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .drop-zone-hint {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            margin-top: 6px;
-        }
+        .drop-zone.drag-over { transform: scale(1.02); border-style: solid; }
+        .drop-zone-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.7; }
+        .drop-zone-text { font-weight: 600; font-size: 0.95rem; }
+        .drop-zone-hint { color: var(--text-secondary); font-size: 0.8rem; margin-top: 6px; }
+
         .file-selected-info {
             background: rgba(91, 138, 247, 0.1);
             border: 1px solid rgba(91, 138, 247, 0.25);
@@ -362,25 +266,10 @@
             gap: 12px;
             animation: fadeSlideIn 0.3s ease-out;
         }
-        .file-selected-info .file-icon {
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-        .file-selected-info .file-details {
-            flex: 1;
-            min-width: 0;
-        }
-        .file-selected-info .file-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .file-selected-info .file-size {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
+        .file-selected-info .file-icon { font-size: 28px; flex-shrink: 0; }
+        .file-selected-info .file-details { flex: 1; min-width: 0; }
+        .file-selected-info .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-selected-info .file-size { font-size: 0.75rem; color: var(--text-secondary); }
         .file-selected-info .remove-file {
             flex-shrink: 0;
             background: rgba(255, 255, 255, 0.08);
@@ -396,12 +285,8 @@
             align-items: center;
             justify-content: center;
         }
-        .file-selected-info .remove-file:hover {
-            background: rgba(245, 90, 90, 0.3);
-            color: var(--danger);
-        }
+        .file-selected-info .remove-file:hover { background: rgba(245, 90, 90, 0.3); color: var(--danger); }
 
-        /* Status messages */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -411,20 +296,10 @@
             font-size: 0.78rem;
             font-weight: 600;
         }
-        .status-badge.success {
-            background: rgba(74, 222, 128, 0.12);
-            color: var(--success);
-        }
-        .status-badge.error {
-            background: rgba(245, 90, 90, 0.12);
-            color: var(--danger);
-        }
-        .status-badge.loading {
-            background: rgba(251, 191, 36, 0.12);
-            color: var(--warning);
-        }
+        .status-badge.success { background: rgba(74, 222, 128, 0.12); color: var(--success); }
+        .status-badge.error { background: rgba(245, 90, 90, 0.12); color: var(--danger); }
+        .status-badge.loading { background: rgba(251, 191, 36, 0.12); color: var(--warning); }
 
-        /* Toast */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -448,33 +323,15 @@
             max-width: 380px;
             cursor: pointer;
         }
-        .toast.success {
-            background: rgba(30, 50, 30, 0.9);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            color: #b8f0d0;
-        }
-        .toast.error {
-            background: rgba(50, 20, 20, 0.9);
-            border: 1px solid rgba(245, 90, 90, 0.3);
-            color: #f0c0c0;
-        }
-        .toast.info {
-            background: rgba(20, 30, 50, 0.9);
-            border: 1px solid rgba(91, 138, 247, 0.3);
-            color: #c0d0f0;
-        }
+        .toast.success { background: rgba(30, 50, 30, 0.9); border: 1px solid rgba(74, 222, 128, 0.3); color: #b8f0d0; }
+        .toast.error { background: rgba(50, 20, 20, 0.9); border: 1px solid rgba(245, 90, 90, 0.3); color: #f0c0c0; }
+        .toast.info { background: rgba(20, 30, 50, 0.9); border: 1px solid rgba(91, 138, 247, 0.3); color: #c0d0f0; }
+
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -484,13 +341,8 @@
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Progress bar */
         .progress-bar-wrap {
             background: rgba(255, 255, 255, 0.06);
             border-radius: 20px;
@@ -505,19 +357,8 @@
             transition: width 0.3s ease;
             animation: shimmer 2s infinite;
         }
-        @keyframes shimmer {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
+        @keyframes shimmer { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* History list */
         .history-item {
             display: flex;
             align-items: center;
@@ -530,50 +371,19 @@
             border: 1px solid transparent;
             transition: var(--transition);
         }
-        .history-item:hover {
-            border-color: var(--card-border);
-            background: rgba(255, 255, 255, 0.04);
-        }
-        .history-item .h-icon {
-            font-size: 1.2rem;
-        }
-        .history-item .h-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .history-item .h-name {
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .history-item .h-date {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-        }
-        .history-item .h-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.75rem;
-            flex-shrink: 0;
-        }
-        .history-item .h-link:hover {
-            text-decoration: underline;
-        }
+        .history-item:hover { border-color: var(--card-border); background: rgba(255, 255, 255, 0.04); }
+        .history-item .h-icon { font-size: 1.2rem; }
+        .history-item .h-info { flex: 1; min-width: 0; }
+        .history-item .h-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item .h-date { font-size: 0.7rem; color: var(--text-secondary); }
+        .history-item .h-link { color: var(--accent); text-decoration: none; font-size: 0.75rem; flex-shrink: 0; }
+        .history-item .h-link:hover { text-decoration: underline; }
 
-        /* Hidden file input */
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
+        .hidden { display: none !important; }
 
-        /* Section divider */
-        .divider {
-            border: none;
-            border-top: 1px solid var(--card-border);
-            margin: 20px 0;
-        }
+        .divider { border: none; border-top: 1px solid var(--card-border); margin: 20px 0; }
 
-        /* Token display */
         .token-display {
             display: flex;
             align-items: center;
@@ -585,891 +395,757 @@
             border-radius: 20px;
             flex-wrap: wrap;
         }
-        .token-display .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--success);
-            flex-shrink: 0;
-        }
-        .token-display span {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .token-display .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+        .token-display span { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Responsive */
         @media (max-width: 600px) {
-            .card {
-                padding: 22px 16px;
-                border-radius: 12px;
-            }
-            .drop-zone {
-                padding: 28px 14px;
-            }
-            h1 {
-                font-size: 1.3rem;
-            }
-            .btn {
-                padding: 12px 18px;
-                font-size: 0.9rem;
-            }
-            .toast {
-                max-width: 90vw;
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Hidden panels */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Pulse for upload btn when ready */
-        .btn-ready {
-            animation: readyPulse 2s infinite;
-        }
-        @keyframes readyPulse {
-            0%,
-            100% {
-                box-shadow: 0 4px 20px rgba(91, 138, 247, 0.3);
-            }
-            50% {
-                box-shadow: 0 4px 36px rgba(91, 138, 247, 0.6), 0 0 60px rgba(139, 92, 246, 0.25);
-            }
+            .card { padding: 22px 16px; border-radius: 12px; }
+            .drop-zone { padding: 28px 14px; }
+            h1 { font-size: 1.3rem; }
+            .btn { padding: 12px 18px; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
+<div class="bg-orbs">
+    <div class="bg-orb"></div>
+    <div class="bg-orb"></div>
+    <div class="bg-orb"></div>
+</div>
+<div class="grid-overlay"></div>
 
-    <!-- Background effects -->
-    <div class="bg-orbs">
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-    </div>
-    <div class="grid-overlay"></div>
+<div class="toast-container" id="toastContainer"></div>
 
-    <!-- Toast container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- App container -->
-    <div class="app-container">
-
-        <!-- ============ WELCOME SCREEN ============ -->
-        <div id="welcomeScreen" class="card hidden">
-            <div class="logo-icon">🔐</div>
-            <h1>VK File Uploader</h1>
-            <p class="subtitle">
-                Загружайте любые файлы в вашу группу ВКонтакте.<br>
-                Файлы преобразуются в Base64 и сохраняются как TXT-документы.
-            </p>
-            <div class="input-group">
-                <label>🔑 VK API Токен</label>
-                <input type="password" id="tokenInput" placeholder="Вставьте ваш access_token...">
-            </div>
-            <p style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
-                Токен должен иметь права: <strong>docs</strong>, <strong>groups</strong>, <strong>offline</strong>.
-                <br>Получить токен можно в
-                <a href="https://vkhost.github.io/" target="_blank" style="color:var(--accent);">VK Host</a>
-                или через
-                <a href="https://dev.vk.com/ru/api/access-token/getting-started" target="_blank" style="color:var(--accent);">OAuth ВК</a>.
-            </p>
-            <button class="btn btn-primary" id="saveTokenBtn">
-                ✨ Продолжить
-            </button>
-            <p id="tokenError" style="color:var(--danger);font-size:0.8rem;text-align:center;margin-top:12px;display:none;"></p>
+<div class="app-container">
+    <!-- Приветственный экран (ввод токена) -->
+    <div id="welcomeScreen" class="card hidden">
+        <div class="logo-icon">🔐</div>
+        <h1>VK File Uploader</h1>
+        <p class="subtitle">
+            Загружайте любые файлы в вашу группу ВКонтакте.<br>
+            Файлы преобразуются в Base64 и сохраняются как TXT-документы.
+        </p>
+        <div class="input-group">
+            <label>🔑 VK API Токен</label>
+            <input type="password" id="tokenInput" placeholder="Вставьте ваш access_token...">
         </div>
-
-        <!-- ============ MAIN APP ============ -->
-        <div id="mainApp" class="hidden">
-
-            <!-- Header card -->
-            <div class="card" style="padding:18px 22px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div class="logo-icon" style="width:36px;height:36px;border-radius:10px;font-size:18px;margin:0;">📁</div>
-                        <strong style="font-size:1rem;">VK File Uploader</strong>
-                    </div>
-                    <div class="token-display">
-                        <span class="dot"></span>
-                        <span id="tokenPreview">Токен загружен</span>
-                        <button class="btn-danger-text" id="changeTokenBtn">Сменить</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Group selector card -->
-            <div class="card">
-                <div class="input-group" style="margin-bottom:0;">
-                    <label>👥 Группа для загрузки</label>
-                    <select id="groupSelect">
-                        <option value="">Загрузка групп...</option>
-                    </select>
-                </div>
-                <div id="groupManual" style="display:none;margin-top:10px;">
-                    <div class="input-group" style="margin-bottom:0;">
-                        <label>ID группы (вручную)</label>
-                        <input type="number" id="groupManualInput" placeholder="Например: 12345678">
-                    </div>
-                </div>
-                <p id="groupError" style="color:var(--danger);font-size:0.75rem;margin-top:8px;display:none;"></p>
-                <button class="btn btn-outline btn-sm" id="refreshGroupsBtn" style="margin-top:10px;">🔄 Обновить список групп</button>
-            </div>
-
-            <!-- File upload card -->
-            <div class="card">
-                <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📎 Выберите файл</label>
-                <div class="drop-zone" id="dropZone">
-                    <div class="drop-zone-icon">📤</div>
-                    <div class="drop-zone-text">Нажмите или перетащите файл сюда</div>
-                    <div class="drop-zone-hint">Любой файл — изображение, документ, архив и т.д.</div>
-                </div>
-                <input type="file" id="fileInput">
-                <div id="fileInfo" class="file-selected-info hidden">
-                    <span class="file-icon">📄</span>
-                    <div class="file-details">
-                        <div class="file-name" id="fileNameDisplay"></div>
-                        <div class="file-size" id="fileSizeDisplay"></div>
-                    </div>
-                    <button class="remove-file" id="removeFileBtn" title="Убрать файл">✕</button>
-                </div>
-                <p id="fileSizeWarning" style="color:var(--warning);font-size:0.75rem;margin-top:8px;display:none;">
-                    ⚠️ Файл большой — после Base64-кодирования размер увеличится ~на 33%.
-                </p>
-            </div>
-
-            <!-- Password card -->
-            <div class="card">
-                <div class="input-group" style="margin-bottom:0;">
-                    <label>🔒 Пароль (опционально)</label>
-                    <input type="text" id="passwordInput" placeholder="Оставьте пустым, если шифрование не нужно">
-                </div>
-                <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">
-                    Если указать пароль — Base64-данные будут зашифрованы (AES-GCM) перед загрузкой.
-                </p>
-            </div>
-
-            <!-- Upload button -->
-            <button class="btn btn-primary" id="uploadBtn" disabled>
-                🚀 Загрузить в группу ВК
-            </button>
-
-            <!-- Progress -->
-            <div id="progressArea" class="hidden" style="margin-top:12px;">
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
-                </div>
-                <p id="progressText" style="text-align:center;font-size:0.8rem;color:var(--text-secondary);margin-top:6px;"></p>
-            </div>
-
-            <!-- Status -->
-            <div id="statusArea" style="text-align:center;margin-top:12px;"></div>
-
-            <!-- History -->
-            <div class="card" id="historyCard">
-                <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📋 История загрузок</label>
-                <div id="historyList">
-                    <p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>
-                </div>
-                <button class="btn btn-outline btn-sm" id="clearHistoryBtn" style="margin-top:8px;">🗑 Очистить историю</button>
-            </div>
-        </div>
+        <p style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
+            Токен должен иметь права: <strong>docs</strong>, <strong>groups</strong>, <strong>offline</strong>.<br>
+            Получить можно в
+            <a href="https://vkhost.github.io/" target="_blank" style="color:var(--accent);">VK Host</a>
+            или через
+            <a href="https://dev.vk.com/ru/api/access-token/getting-started" target="_blank" style="color:var(--accent);">OAuth ВК</a>.
+        </p>
+        <button class="btn btn-primary" id="saveTokenBtn">✨ Продолжить</button>
+        <p id="tokenError" style="color:var(--danger);font-size:0.8rem;text-align:center;margin-top:12px;display:none;"></p>
     </div>
 
-    <script>
-        (function() {
-            // ============ DOM ELEMENTS ============
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const mainApp = document.getElementById('mainApp');
-            const tokenInput = document.getElementById('tokenInput');
-            const saveTokenBtn = document.getElementById('saveTokenBtn');
-            const tokenError = document.getElementById('tokenError');
-            const tokenPreview = document.getElementById('tokenPreview');
-            const changeTokenBtn = document.getElementById('changeTokenBtn');
-            const groupSelect = document.getElementById('groupSelect');
-            const groupManual = document.getElementById('groupManual');
-            const groupManualInput = document.getElementById('groupManualInput');
-            const groupError = document.getElementById('groupError');
-            const refreshGroupsBtn = document.getElementById('refreshGroupsBtn');
-            const dropZone = document.getElementById('dropZone');
-            const fileInput = document.getElementById('fileInput');
-            const fileInfo = document.getElementById('fileInfo');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            const fileSizeDisplay = document.getElementById('fileSizeDisplay');
-            const removeFileBtn = document.getElementById('removeFileBtn');
-            const fileSizeWarning = document.getElementById('fileSizeWarning');
-            const passwordInput = document.getElementById('passwordInput');
-            const uploadBtn = document.getElementById('uploadBtn');
-            const progressArea = document.getElementById('progressArea');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            const statusArea = document.getElementById('statusArea');
-            const historyList = document.getElementById('historyList');
-            const historyCard = document.getElementById('historyCard');
-            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-            const toastContainer = document.getElementById('toastContainer');
+    <!-- Основной интерфейс -->
+    <div id="mainApp" class="hidden">
+        <div class="card" style="padding:18px 22px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="logo-icon" style="width:36px;height:36px;border-radius:10px;font-size:18px;margin:0;">📁</div>
+                    <strong style="font-size:1rem;">VK File Uploader</strong>
+                </div>
+                <div class="token-display">
+                    <span class="dot"></span>
+                    <span id="tokenPreview">Токен загружен</span>
+                    <button class="btn-danger-text" id="changeTokenBtn">Сменить</button>
+                </div>
+            </div>
+        </div>
 
-            // ============ STATE ============
-            let vkToken = '';
-            let selectedFile = null;
-            let selectedGroupId = null;
-            let groupsCache = [];
-            const VK_API_VERSION = '5.199';
-            const MAX_FILE_SIZE_MB = 150; // warn above this
+        <div class="card">
+            <div class="input-group" style="margin-bottom:0;">
+                <label>👥 Целевая группа</label>
+                <select id="groupSelect" class="hidden">
+                    <option value="">Выберите группу...</option>
+                </select>
+                <div id="groupManual" class="hidden">
+                    <input type="number" id="groupManualInput" placeholder="Введите ID группы (например, 12345678)">
+                </div>
+                <div id="groupAutoInfo" class="hidden" style="padding:10px;background:rgba(74,222,128,0.08);border-radius:8px;color:var(--success);font-size:0.9rem;">
+                    ✅ Автоматически выбрана группа: <strong id="groupAutoName"></strong>
+                </div>
+            </div>
+            <p id="groupError" style="color:var(--danger);font-size:0.75rem;margin-top:8px;display:none;"></p>
+            <button class="btn btn-outline btn-sm" id="refreshGroupsBtn" style="margin-top:10px;">🔄 Обновить список групп</button>
+        </div>
 
-            // ============ STORAGE ============
-            function getStoredToken() {
-                try {
-                    return localStorage.getItem('vk_uploader_token') || '';
-                } catch (e) {
-                    return '';
-                }
-            }
+        <div class="card">
+            <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📎 Выберите файл</label>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📤</div>
+                <div class="drop-zone-text">Нажмите или перетащите файл сюда</div>
+                <div class="drop-zone-hint">Любой файл — изображение, документ, архив и т.д.</div>
+            </div>
+            <input type="file" id="fileInput">
+            <div id="fileInfo" class="file-selected-info hidden">
+                <span class="file-icon">📄</span>
+                <div class="file-details">
+                    <div class="file-name" id="fileNameDisplay"></div>
+                    <div class="file-size" id="fileSizeDisplay"></div>
+                </div>
+                <button class="remove-file" id="removeFileBtn" title="Убрать файл">✕</button>
+            </div>
+            <p id="fileSizeWarning" style="color:var(--warning);font-size:0.75rem;margin-top:8px;display:none;">
+                ⚠️ Файл большой — после Base64-кодирования размер увеличится ~на 33%.
+            </p>
+        </div>
 
-            function setStoredToken(token) {
-                try {
-                    localStorage.setItem('vk_uploader_token', token);
-                } catch (e) {
-                    // localStorage not available
-                }
-            }
+        <div class="card">
+            <div class="input-group" style="margin-bottom:0;">
+                <label>🔒 Пароль (опционально)</label>
+                <input type="text" id="passwordInput" placeholder="Оставьте пустым, если шифрование не нужно">
+            </div>
+            <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">
+                Если указать пароль — Base64-данные будут зашифрованы (AES-GCM) перед загрузкой.
+            </p>
+        </div>
 
-            function getStoredGroupId() {
-                try {
-                    return localStorage.getItem('vk_uploader_group_id') || '';
-                } catch (e) {
-                    return '';
-                }
-            }
+        <button class="btn btn-primary" id="uploadBtn" disabled>🚀 Загрузить в группу ВК</button>
 
-            function setStoredGroupId(groupId) {
-                try {
-                    localStorage.setItem('vk_uploader_group_id', groupId);
-                } catch (e) {}
-            }
+        <div id="progressArea" class="hidden" style="margin-top:12px;">
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
+            </div>
+            <p id="progressText" style="text-align:center;font-size:0.8rem;color:var(--text-secondary);margin-top:6px;"></p>
+        </div>
 
-            function getUploadHistory() {
-                try {
-                    const raw = localStorage.getItem('vk_uploader_history');
-                    return raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    return [];
-                }
-            }
+        <div id="statusArea" style="text-align:center;margin-top:12px;"></div>
 
-            function addToHistory(entry) {
-                const history = getUploadHistory();
-                history.unshift(entry);
-                if (history.length > 50) history.length = 50;
-                try {
-                    localStorage.setItem('vk_uploader_history', JSON.stringify(history));
-                } catch (e) {}
-                renderHistory();
-            }
+        <div class="card" id="historyCard">
+            <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);">📋 История загрузок</label>
+            <div id="historyList">
+                <p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>
+            </div>
+            <button class="btn btn-outline btn-sm" id="clearHistoryBtn" style="margin-top:8px;">🗑 Очистить историю</button>
+        </div>
+    </div>
+</div>
 
-            function clearHistory() {
-                try {
-                    localStorage.removeItem('vk_uploader_history');
-                } catch (e) {}
-                renderHistory();
-                showToast('История очищена', 'info');
-            }
+<script>
+    (function() {
+        // DOM-элементы
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const mainApp = document.getElementById('mainApp');
+        const tokenInput = document.getElementById('tokenInput');
+        const saveTokenBtn = document.getElementById('saveTokenBtn');
+        const tokenError = document.getElementById('tokenError');
+        const tokenPreview = document.getElementById('tokenPreview');
+        const changeTokenBtn = document.getElementById('changeTokenBtn');
+        const groupSelect = document.getElementById('groupSelect');
+        const groupManual = document.getElementById('groupManual');
+        const groupManualInput = document.getElementById('groupManualInput');
+        const groupAutoInfo = document.getElementById('groupAutoInfo');
+        const groupAutoName = document.getElementById('groupAutoName');
+        const groupError = document.getElementById('groupError');
+        const refreshGroupsBtn = document.getElementById('refreshGroupsBtn');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const fileSizeDisplay = document.getElementById('fileSizeDisplay');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+        const fileSizeWarning = document.getElementById('fileSizeWarning');
+        const passwordInput = document.getElementById('passwordInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressArea = document.getElementById('progressArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const statusArea = document.getElementById('statusArea');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const toastContainer = document.getElementById('toastContainer');
 
-            // ============ TOASTS ============
-            function showToast(message, type = 'info') {
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
-                toast.addEventListener('click', () => toast.remove());
-                toastContainer.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(100px)';
-                    toast.style.transition = '0.4s ease';
-                    setTimeout(() => toast.remove(), 400);
-                }, 4000);
-            }
+        // Состояние
+        let vkToken = '';
+        let selectedFile = null;
+        let selectedGroupId = null;          // ID группы (положительное число)
+        let groupsCache = [];
+        const VK_API_VERSION = '5.199';
+        const MAX_FILE_SIZE_MB = 150;
 
-            // ============ UI HELPERS ============
-            function formatFileSize(bytes) {
-                if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-                if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-                return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-            }
+        // ===== Хранилище =====
+        function getStoredToken() {
+            try { return localStorage.getItem('vk_uploader_token') || ''; } catch(e) { return ''; }
+        }
+        function setStoredToken(token) {
+            try { localStorage.setItem('vk_uploader_token', token); } catch(e) {}
+        }
+        function getStoredGroupId() {
+            try { return localStorage.getItem('vk_uploader_group_id') || ''; } catch(e) { return ''; }
+        }
+        function setStoredGroupId(groupId) {
+            try { localStorage.setItem('vk_uploader_group_id', groupId); } catch(e) {}
+        }
+        function getUploadHistory() {
+            try {
+                const raw = localStorage.getItem('vk_uploader_history');
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
+        }
+        function addToHistory(entry) {
+            const history = getUploadHistory();
+            history.unshift(entry);
+            if (history.length > 50) history.length = 50;
+            try { localStorage.setItem('vk_uploader_history', JSON.stringify(history)); } catch(e) {}
+            renderHistory();
+        }
+        function clearHistory() {
+            try { localStorage.removeItem('vk_uploader_history'); } catch(e) {}
+            renderHistory();
+            showToast('История очищена', 'info');
+        }
 
-            function showStatus(message, type) {
-                statusArea.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
-            }
+        // ===== Всплывающие уведомления =====
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toast.addEventListener('click', () => toast.remove());
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                toast.style.transition = '0.4s ease';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
 
-            function clearStatus() {
-                statusArea.innerHTML = '';
-            }
+        // ===== Интерфейсные утилиты =====
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+            if (bytes < 1024*1024*1024) return (bytes/(1024*1024)).toFixed(2) + ' MB';
+            return (bytes/(1024*1024*1024)).toFixed(2) + ' GB';
+        }
 
-            function setProgress(percent, text) {
-                progressArea.classList.remove('hidden');
-                progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
-                if (text) progressText.textContent = text;
-            }
+        function showStatus(message, type) {
+            statusArea.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
+        }
+        function clearStatus() { statusArea.innerHTML = ''; }
 
-            function hideProgress() {
-                progressArea.classList.add('hidden');
-                progressBar.style.width = '0%';
-                progressText.textContent = '';
-            }
+        function setProgress(percent, text) {
+            progressArea.classList.remove('hidden');
+            progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+            if (text) progressText.textContent = text;
+        }
+        function hideProgress() {
+            progressArea.classList.add('hidden');
+            progressBar.style.width = '0%';
+            progressText.textContent = '';
+        }
 
-            function updateUploadButton() {
-                if (selectedFile && selectedGroupId && vkToken) {
-                    uploadBtn.disabled = false;
-                    uploadBtn.classList.add('btn-ready');
-                } else {
-                    uploadBtn.disabled = true;
-                    uploadBtn.classList.remove('btn-ready');
-                }
-            }
-
-            // ============ VK API ============
-            async function vkApiCall(method, params = {}) {
-                const url = new URL(`https://api.vk.com/method/${method}`);
-                url.searchParams.set('access_token', vkToken);
-                url.searchParams.set('v', VK_API_VERSION);
-                for (const [key, value] of Object.entries(params)) {
-                    if (value !== undefined && value !== null && value !== '') {
-                        url.searchParams.set(key, value);
-                    }
-                }
-                const response = await fetch(url.toString());
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                const data = await response.json();
-                if (data.error) {
-                    throw new Error(`VK API error [${data.error.error_code}]: ${data.error.error_msg}`);
-                }
-                return data.response;
-            }
-
-            async function validateToken(token) {
-                const originalToken = vkToken;
-                vkToken = token;
-                try {
-                    await vkApiCall('users.get', { count: 1 });
-                    return true;
-                } catch (e) {
-                    vkToken = originalToken;
-                    throw e;
-                }
-            }
-
-            async function fetchGroups() {
-                try {
-                    const response = await vkApiCall('groups.get', {
-                        filter: 'admin',
-                        extended: 1,
-                        fields: 'name,photo_50',
-                    });
-                    if (response && response.items) {
-                        groupsCache = response.items;
-                        return response.items;
-                    }
-                    return [];
-                } catch (e) {
-                    console.warn('Failed to fetch groups:', e.message);
-                    return null;
-                }
-            }
-
-            function populateGroupSelect(groups) {
-                groupSelect.innerHTML = '';
-                if (groups && groups.length > 0) {
-                    groups.forEach(group => {
-                        const option = document.createElement('option');
-                        option.value = Math.abs(group.id);
-                        option.textContent = group.name || `Группа #${Math.abs(group.id)}`;
-                        groupSelect.appendChild(option);
-                    });
-                    groupSelect.style.display = '';
-                    groupManual.style.display = 'none';
-                    groupError.style.display = 'none';
-                } else if (groups === null) {
-                    // API error - show manual input
-                    groupSelect.style.display = 'none';
-                    groupManual.style.display = '';
-                    groupError.textContent =
-                        'Не удалось загрузить группы. Проверьте права токена (нужен доступ к groups). Введите ID группы вручную.';
-                    groupError.style.display = '';
-                } else {
-                    // Empty list
-                    groupSelect.innerHTML =
-                        '<option value="">Нет групп с правами администратора</option>';
-                    groupSelect.style.display = '';
-                    groupManual.style.display = '';
-                    groupError.style.display = '';
-                }
-                restoreGroupSelection();
-            }
-
-            function restoreGroupSelection() {
-                const storedId = getStoredGroupId();
-                if (storedId && groupSelect.style.display !== 'none') {
-                    const options = Array.from(groupSelect.options);
-                    const match = options.find(opt => opt.value === storedId);
-                    if (match) {
-                        groupSelect.value = storedId;
-                        selectedGroupId = parseInt(storedId);
-                    }
-                }
-                if (storedId && groupManual.style.display !== 'none') {
-                    groupManualInput.value = storedId;
-                    selectedGroupId = parseInt(storedId);
-                }
-                updateUploadButton();
-            }
-
-            function getSelectedGroupId() {
-                if (groupSelect.style.display !== 'none' && groupSelect.value) {
-                    return parseInt(groupSelect.value);
-                }
-                if (groupManual.style.display !== 'none' && groupManualInput.value) {
-                    return parseInt(groupManualInput.value);
-                }
-                return null;
-            }
-
-            // ============ FILE HANDLING ============
-            function handleFile(file) {
-                if (!file) return;
-                selectedFile = file;
-                fileNameDisplay.textContent = file.name;
-                fileSizeDisplay.textContent = formatFileSize(file.size);
-                fileInfo.classList.remove('hidden');
-                dropZone.style.opacity = '0.5';
-
-                const sizeMB = file.size / (1024 * 1024);
-                if (sizeMB > MAX_FILE_SIZE_MB) {
-                    fileSizeWarning.style.display = '';
-                } else {
-                    fileSizeWarning.style.display = 'none';
-                }
-                updateUploadButton();
-                clearStatus();
-                hideProgress();
-            }
-
-            function clearFile() {
-                selectedFile = null;
-                fileInput.value = '';
-                fileInfo.classList.add('hidden');
-                dropZone.style.opacity = '1';
-                fileSizeWarning.style.display = 'none';
-                fileNameDisplay.textContent = '';
-                fileSizeDisplay.textContent = '';
-                updateUploadButton();
-                clearStatus();
-                hideProgress();
-            }
-
-            function readFileAsBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64 = reader.result.split(',')[1];
-                        resolve(base64);
-                    };
-                    reader.onerror = () => reject(new Error('Ошибка чтения файла'));
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            // ============ ENCRYPTION ============
-            async function encryptData(plaintext, password) {
-                const encoder = new TextEncoder();
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    encoder.encode(password), { name: 'PBKDF2' },
-                    false,
-                    ['deriveKey']
-                );
-                const key = await crypto.subtle.deriveKey({
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: 200000,
-                        hash: 'SHA-256',
-                    },
-                    keyMaterial, { name: 'AES-GCM', length: 256 },
-                    false,
-                    ['encrypt']
-                );
-
-                const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv },
-                    key,
-                    encoder.encode(plaintext)
-                );
-
-                const combined = {
-                    v: 1,
-                    salt: btoa(String.fromCharCode(...new Uint8Array(salt))),
-                    iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
-                    data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
-                };
-                return JSON.stringify(combined);
-            }
-
-            // ============ UPLOAD TO VK ============
-            async function uploadToVK(fileBase64, originalFilename, groupId, password) {
-                // Prepare data
-                let textContent;
-                if (password && password.trim()) {
-                    setProgress(10, 'Шифрование данных...');
-                    textContent = await encryptData(fileBase64, password.trim());
-                } else {
-                    textContent = fileBase64;
-                }
-
-                setProgress(20, 'Подготовка файла...');
-                const txtFilename = originalFilename + '.txt';
-                const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-                const fileToUpload = new File([blob], txtFilename, { type: 'text/plain;charset=utf-8' });
-
-                setProgress(30, 'Получение сервера загрузки VK...');
-                const uploadServerResponse = await vkApiCall('docs.getMessagesUploadServer', {
-                    group_id: groupId,
-                    type: 'doc',
-                });
-
-                if (!uploadServerResponse || !uploadServerResponse.upload_url) {
-                    throw new Error('Не удалось получить URL для загрузки');
-                }
-
-                setProgress(40, 'Загрузка на сервер VK...');
-                const formData = new FormData();
-                formData.append('file', fileToUpload, txtFilename);
-
-                const uploadResult = await fetch(uploadServerResponse.upload_url, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors',
-                });
-
-                if (!uploadResult.ok) {
-                    throw new Error(`Ошибка загрузки: HTTP ${uploadResult.status}`);
-                }
-
-                const uploadData = await uploadResult.json();
-                if (!uploadData.file) {
-                    throw new Error('Сервер VK не вернул идентификатор файла');
-                }
-
-                setProgress(70, 'Сохранение документа...');
-                const saveResponse = await vkApiCall('docs.save', {
-                    file: uploadData.file,
-                    title: txtFilename,
-                });
-
-                setProgress(100, 'Готово!');
-                return saveResponse;
-            }
-
-            // ============ MAIN UPLOAD FLOW ============
-            async function handleUpload() {
-                if (!selectedFile || !selectedGroupId || !vkToken) {
-                    showToast('Выберите файл, группу и убедитесь что токен указан', 'error');
-                    return;
-                }
-
+        function updateUploadButton() {
+            if (selectedFile && selectedGroupId && vkToken) {
+                uploadBtn.disabled = false;
+                uploadBtn.classList.add('btn-ready');
+            } else {
                 uploadBtn.disabled = true;
                 uploadBtn.classList.remove('btn-ready');
-                hideProgress();
-                clearStatus();
+            }
+        }
 
-                try {
-                    setProgress(5, 'Чтение файла...');
-                    const base64Data = await readFileAsBase64(selectedFile);
-                    const password = passwordInput.value;
+        // ===== VK API =====
+        async function vkApiCall(method, params = {}) {
+            const url = new URL(`https://api.vk.com/method/${method}`);
+            url.searchParams.set('access_token', vkToken);
+            url.searchParams.set('v', VK_API_VERSION);
+            for (const [key, value] of Object.entries(params)) {
+                if (value !== undefined && value !== null && value !== '') {
+                    url.searchParams.set(key, value);
+                }
+            }
+            const response = await fetch(url.toString());
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const data = await response.json();
+            if (data.error) throw new Error(`VK API error [${data.error.error_code}]: ${data.error.error_msg}`);
+            return data.response;
+        }
 
-                    const result = await uploadToVK(base64Data, selectedFile.name, selectedGroupId, password);
+        async function validateToken(token) {
+            const originalToken = vkToken;
+            vkToken = token;
+            try {
+                await vkApiCall('users.get', { count: 1 });
+                return true;
+            } catch(e) {
+                vkToken = originalToken;
+                throw e;
+            }
+        }
 
-                    // Build document link
-                    let docLink = '';
-                    if (result && result.doc) {
-                        const doc = Array.isArray(result.doc) ? result.doc[0] : result.doc;
-                        if (doc && doc.owner_id && doc.id) {
-                            docLink = `https://vk.com/doc${doc.owner_id}_${doc.id}`;
-                        }
+        async function fetchGroups() {
+            try {
+                const response = await vkApiCall('groups.get', {
+                    filter: 'admin',
+                    extended: 1,
+                    fields: 'name,photo_50',
+                });
+                if (response && response.items) {
+                    groupsCache = response.items;
+                    return response.items;
+                }
+                return [];
+            } catch(e) {
+                console.warn('Не удалось получить список групп:', e.message);
+                return null;   // null означает ошибку API
+            }
+        }
+
+        function setupGroupInterface(groups) {
+            // Скрываем все варианты
+            groupSelect.classList.add('hidden');
+            groupManual.classList.add('hidden');
+            groupAutoInfo.classList.add('hidden');
+            groupError.style.display = 'none';
+
+            if (groups === null) {
+                // Ошибка API — показываем ручной ввод
+                groupManual.classList.remove('hidden');
+                groupError.textContent = 'Не удалось загрузить список групп. Введите ID группы вручную.';
+                groupError.style.display = '';
+                restoreGroupSelection();
+                return;
+            }
+
+            if (groups.length === 0) {
+                // Нет групп — ручной ввод
+                groupManual.classList.remove('hidden');
+                groupError.textContent = 'У вас нет администрируемых групп. Введите ID группы вручную.';
+                groupError.style.display = '';
+                restoreGroupSelection();
+                return;
+            }
+
+            if (groups.length === 1) {
+                // Ровно одна группа — авто-выбор
+                const group = groups[0];
+                selectedGroupId = Math.abs(group.id);
+                setStoredGroupId(String(selectedGroupId));
+                groupAutoName.textContent = group.name || `Группа #${selectedGroupId}`;
+                groupAutoInfo.classList.remove('hidden');
+                // Скрываем всё остальное
+            } else {
+                // Несколько групп — показываем выпадающий список
+                groupSelect.innerHTML = '<option value="">Выберите группу...</option>';
+                groups.forEach(group => {
+                    const option = document.createElement('option');
+                    option.value = Math.abs(group.id);
+                    option.textContent = group.name || `Группа #${Math.abs(group.id)}`;
+                    groupSelect.appendChild(option);
+                });
+                groupSelect.classList.remove('hidden');
+                restoreGroupSelection();
+            }
+            updateUploadButton();
+        }
+
+        function restoreGroupSelection() {
+            const storedId = getStoredGroupId();
+            if (!storedId) return;
+            if (!groupSelect.classList.contains('hidden')) {
+                const options = Array.from(groupSelect.options);
+                const match = options.find(opt => opt.value === storedId);
+                if (match) {
+                    groupSelect.value = storedId;
+                    selectedGroupId = parseInt(storedId);
+                }
+            } else if (!groupManual.classList.contains('hidden')) {
+                groupManualInput.value = storedId;
+                selectedGroupId = parseInt(storedId);
+            }
+            updateUploadButton();
+        }
+
+        function getSelectedGroupId() {
+            if (!groupSelect.classList.contains('hidden') && groupSelect.value) {
+                return parseInt(groupSelect.value);
+            }
+            if (!groupManual.classList.contains('hidden') && groupManualInput.value) {
+                return parseInt(groupManualInput.value);
+            }
+            // Если авто-выбор активен, selectedGroupId уже установлен
+            return selectedGroupId;
+        }
+
+        // ===== Работа с файлами =====
+        function handleFile(file) {
+            if (!file) return;
+            selectedFile = file;
+            fileNameDisplay.textContent = file.name;
+            fileSizeDisplay.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+            dropZone.style.opacity = '0.5';
+            const sizeMB = file.size / (1024*1024);
+            fileSizeWarning.style.display = sizeMB > MAX_FILE_SIZE_MB ? '' : 'none';
+            updateUploadButton();
+            clearStatus();
+            hideProgress();
+        }
+
+        function clearFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.classList.add('hidden');
+            dropZone.style.opacity = '1';
+            fileSizeWarning.style.display = 'none';
+            fileNameDisplay.textContent = '';
+            fileSizeDisplay.textContent = '';
+            updateUploadButton();
+            clearStatus();
+            hideProgress();
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ===== Шифрование (AES-GCM) =====
+        async function encryptData(plaintext, password) {
+            const encoder = new TextEncoder();
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            const key = await crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: salt, iterations: 200000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+
+            const ciphertext = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                encoder.encode(plaintext)
+            );
+
+            const combined = {
+                v: 1,
+                salt: btoa(String.fromCharCode(...new Uint8Array(salt))),
+                iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
+                data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
+            };
+            return JSON.stringify(combined);
+        }
+
+        // ===== Загрузка в VK =====
+        async function uploadToVK(fileBase64, originalFilename, groupId, password) {
+            let textContent;
+            if (password && password.trim()) {
+                setProgress(10, 'Шифрование данных...');
+                textContent = await encryptData(fileBase64, password.trim());
+            } else {
+                textContent = fileBase64;
+            }
+
+            setProgress(20, 'Подготовка файла...');
+            const txtFilename = originalFilename + '.txt';
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const fileToUpload = new File([blob], txtFilename, { type: 'text/plain;charset=utf-8' });
+
+            setProgress(30, 'Получение сервера загрузки VK...');
+            const uploadServerResponse = await vkApiCall('docs.getMessagesUploadServer', {
+                group_id: groupId,
+                type: 'doc',
+            });
+            if (!uploadServerResponse || !uploadServerResponse.upload_url) {
+                throw new Error('Не удалось получить URL для загрузки');
+            }
+
+            setProgress(40, 'Загрузка на сервер VK...');
+            const formData = new FormData();
+            formData.append('file', fileToUpload, txtFilename);
+
+            const uploadResult = await fetch(uploadServerResponse.upload_url, {
+                method: 'POST',
+                body: formData,
+                mode: 'cors',
+            });
+            if (!uploadResult.ok) throw new Error(`Ошибка загрузки: HTTP ${uploadResult.status}`);
+
+            const uploadData = await uploadResult.json();
+            if (!uploadData.file) throw new Error('Сервер VK не вернул идентификатор файла');
+
+            setProgress(70, 'Сохранение документа...');
+            const saveResponse = await vkApiCall('docs.save', {
+                file: uploadData.file,
+                title: txtFilename,
+            });
+
+            setProgress(100, 'Готово!');
+            return saveResponse;
+        }
+
+        // ===== Основной обработчик загрузки =====
+        async function handleUpload() {
+            if (!selectedFile || !selectedGroupId || !vkToken) {
+                showToast('Выберите файл, группу и убедитесь что токен указан', 'error');
+                return;
+            }
+            uploadBtn.disabled = true;
+            uploadBtn.classList.remove('btn-ready');
+            hideProgress();
+            clearStatus();
+
+            try {
+                setProgress(5, 'Чтение файла...');
+                const base64Data = await readFileAsBase64(selectedFile);
+                const password = passwordInput.value;
+
+                const result = await uploadToVK(base64Data, selectedFile.name, selectedGroupId, password);
+
+                let docLink = '';
+                if (result && result.doc) {
+                    const doc = Array.isArray(result.doc) ? result.doc[0] : result.doc;
+                    if (doc && doc.owner_id && doc.id) {
+                        docLink = `https://vk.com/doc${doc.owner_id}_${doc.id}`;
                     }
+                }
 
-                    showStatus('✅ Файл успешно загружен!', 'success');
-                    showToast('Файл загружен в группу!', 'success');
+                showStatus('✅ Файл успешно загружен!', 'success');
+                showToast('Файл загружен в группу!', 'success');
 
-                    // Add to history
-                    addToHistory({
-                        filename: selectedFile.name,
-                        size: selectedFile.size,
-                        date: new Date().toISOString(),
-                        groupId: selectedGroupId,
-                        groupName: getGroupName(selectedGroupId),
-                        docLink: docLink,
-                        encrypted: !!(password && password.trim()),
+                addToHistory({
+                    filename: selectedFile.name,
+                    size: selectedFile.size,
+                    date: new Date().toISOString(),
+                    groupId: selectedGroupId,
+                    groupName: getGroupName(selectedGroupId),
+                    docLink: docLink,
+                    encrypted: !!(password && password.trim()),
+                });
+
+                clearFile();
+                passwordInput.value = '';
+            } catch(error) {
+                console.error('Upload error:', error);
+                showStatus('❌ Ошибка: ' + error.message, 'error');
+                showToast('Ошибка загрузки: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                updateUploadButton();
+                setTimeout(hideProgress, 2000);
+            }
+        }
+
+        function getGroupName(groupId) {
+            if (groupsCache.length > 0) {
+                const found = groupsCache.find(g => Math.abs(g.id) === groupId);
+                if (found) return found.name;
+            }
+            return `Группа #${groupId}`;
+        }
+
+        // ===== История =====
+        function renderHistory() {
+            const history = getUploadHistory();
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>';
+            } else {
+                historyList.innerHTML = history.map(entry => {
+                    const date = new Date(entry.date);
+                    const dateStr = date.toLocaleString('ru-RU', {
+                        day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
                     });
-
-                    // Clear file after successful upload
-                    clearFile();
-                    passwordInput.value = '';
-
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    showStatus('❌ Ошибка: ' + error.message, 'error');
-                    showToast('Ошибка загрузки: ' + error.message, 'error');
-                } finally {
-                    uploadBtn.disabled = false;
-                    updateUploadButton();
-                    setTimeout(hideProgress, 2000);
-                }
+                    const icon = entry.encrypted ? '🔒' : '📄';
+                    const linkHtml = entry.docLink
+                        ? `<a href="${entry.docLink}" target="_blank" class="h-link" title="Открыть в ВК">🔗</a>`
+                        : '';
+                    return `
+                        <div class="history-item">
+                            <span class="h-icon">${icon}</span>
+                            <div class="h-info">
+                                <div class="h-name" title="${entry.filename}">${entry.filename}</div>
+                                <div class="h-date">${dateStr} · ${formatFileSize(entry.size)} · ${entry.groupName || 'Группа #'+entry.groupId}</div>
+                            </div>
+                            ${linkHtml}
+                        </div>`;
+                }).join('');
             }
+        }
 
-            function getGroupName(groupId) {
-                if (groupsCache.length > 0) {
-                    const found = groupsCache.find(g => Math.abs(g.id) === groupId);
-                    if (found) return found.name;
-                }
-                return `Группа #${groupId}`;
-            }
-
-            // ============ HISTORY RENDERING ============
-            function renderHistory() {
-                const history = getUploadHistory();
-                if (history.length === 0) {
-                    historyList.innerHTML =
-                        '<p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;padding:16px 0;">Пока нет загрузок</p>';
-                } else {
-                    historyList.innerHTML = history
-                        .map((entry, index) => {
-                            const date = new Date(entry.date);
-                            const dateStr = date.toLocaleString('ru-RU', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            });
-                            const icon = entry.encrypted ? '🔒' : '📄';
-                            const linkHtml = entry.docLink ?
-                                `<a href="${entry.docLink}" target="_blank" class="h-link" title="Открыть в ВК">🔗</a>` :
-                                '';
-                            return `
-                                <div class="history-item">
-                                    <span class="h-icon">${icon}</span>
-                                    <div class="h-info">
-                                        <div class="h-name" title="${entry.filename}">${entry.filename}</div>
-                                        <div class="h-date">${dateStr} · ${formatFileSize(entry.size)} · ${entry.groupName || 'Группа #' + entry.groupId}</div>
-                                    </div>
-                                    ${linkHtml}
-                                </div>
-                            `;
-                        })
-                        .join('');
-                }
-                if (getUploadHistory().length > 0) {
-                    historyCard.classList.remove('hidden');
-                }
-            }
-
-            // ============ INITIALIZATION ============
-            async function initApp() {
-                vkToken = getStoredToken();
-
-                if (vkToken) {
-                    // Token exists - show main app
-                    welcomeScreen.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-                    tokenPreview.textContent = vkToken.substring(0, 16) + '...' + vkToken.substring(vkToken.length -
-                        8);
-                    await loadGroups();
-                    renderHistory();
-                    updateUploadButton();
-                } else {
-                    // No token - show welcome
-                    welcomeScreen.classList.remove('hidden');
-                    mainApp.classList.add('hidden');
-                }
-            }
-
-            async function loadGroups() {
-                groupSelect.innerHTML = '<option value="">Загрузка групп...</option>';
-                groupSelect.style.display = '';
-                groupManual.style.display = 'none';
-                groupError.style.display = 'none';
-                selectedGroupId = null;
-
-                const groups = await fetchGroups();
-                populateGroupSelect(groups);
-                updateUploadButton();
-            }
-
-            function switchToWelcome() {
-                vkToken = '';
-                setStoredToken('');
-                welcomeScreen.classList.remove('hidden');
-                mainApp.classList.add('hidden');
-                tokenInput.value = '';
-                tokenError.style.display = 'none';
-                selectedFile = null;
-                selectedGroupId = null;
-                groupsCache = [];
-                clearFile();
-                hideProgress();
-                clearStatus();
-            }
-
-            // ============ EVENT LISTENERS ============
-
-            // Save token
-            saveTokenBtn.addEventListener('click', async () => {
-                const token = tokenInput.value.trim();
-                if (!token) {
-                    tokenError.textContent = 'Введите токен';
-                    tokenError.style.display = '';
-                    return;
-                }
-                tokenError.style.display = 'none';
-                saveTokenBtn.disabled = true;
-                saveTokenBtn.innerHTML = '<span class="spinner"></span> Проверка токена...';
-
-                try {
-                    await validateToken(token);
-                    vkToken = token;
-                    setStoredToken(token);
-                    tokenPreview.textContent = token.substring(0, 16) + '...' + token.substring(token.length -
-                        8);
-                    welcomeScreen.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-                    showToast('Токен успешно проверен!', 'success');
-                    await loadGroups();
-                    renderHistory();
-                    updateUploadButton();
-                } catch (e) {
-                    tokenError.textContent = 'Ошибка: ' + e.message;
-                    tokenError.style.display = '';
-                } finally {
-                    saveTokenBtn.disabled = false;
-                    saveTokenBtn.innerHTML = '✨ Продолжить';
-                }
-            });
-
-            // Enter key on token input
-            tokenInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    saveTokenBtn.click();
-                }
-            });
-
-            // Change token
-            changeTokenBtn.addEventListener('click', () => {
-                if (confirm('Сменить токен? Вы вернётесь на экран ввода.')) {
-                    switchToWelcome();
-                }
-            });
-
-            // Refresh groups
-            refreshGroupsBtn.addEventListener('click', async () => {
-                refreshGroupsBtn.disabled = true;
-                refreshGroupsBtn.innerHTML = '<span class="spinner"></span> Загрузка...';
+        // ===== Инициализация =====
+        async function initApp() {
+            vkToken = getStoredToken();
+            if (vkToken) {
+                welcomeScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                tokenPreview.textContent = vkToken.substring(0, 16) + '...' + vkToken.substring(vkToken.length - 8);
                 await loadGroups();
-                refreshGroupsBtn.disabled = false;
-                refreshGroupsBtn.innerHTML = '🔄 Обновить список групп';
-                if (groupsCache.length > 0) {
-                    showToast(`Загружено ${groupsCache.length} групп`, 'success');
-                }
-            });
-
-            // Group select change
-            groupSelect.addEventListener('change', () => {
-                selectedGroupId = getSelectedGroupId();
-                if (selectedGroupId) {
-                    setStoredGroupId(String(selectedGroupId));
-                }
+                renderHistory();
                 updateUploadButton();
-            });
-
-            // Group manual input change
-            groupManualInput.addEventListener('input', () => {
-                selectedGroupId = getSelectedGroupId();
-                if (selectedGroupId) {
-                    setStoredGroupId(String(selectedGroupId));
-                }
-                updateUploadButton();
-            });
-
-            // Drop zone click
-            dropZone.addEventListener('click', () => {
-                fileInput.click();
-            });
-
-            // File input change
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    handleFile(e.target.files[0]);
-                }
-            });
-
-            // Drag and drop
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.add('drag-over');
-            });
-            dropZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-            });
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    handleFile(e.dataTransfer.files[0]);
-                    fileInput.files = e.dataTransfer.files;
-                }
-            });
-
-            // Remove file
-            removeFileBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                clearFile();
-            });
-
-            // Upload button
-            uploadBtn.addEventListener('click', handleUpload);
-
-            // Clear history
-            clearHistoryBtn.addEventListener('click', () => {
-                if (confirm('Очистить всю историю загрузок?')) {
-                    clearHistory();
-                }
-            });
-
-            // Password input - update button state (file is still valid)
-            passwordInput.addEventListener('input', () => {
-                updateUploadButton();
-            });
-
-            // ============ START ============
-            initApp().catch((err) => {
-                console.error('Init error:', err);
+            } else {
                 welcomeScreen.classList.remove('hidden');
                 mainApp.classList.add('hidden');
-            });
+            }
+        }
 
-            console.log('🚀 VK File Uploader initialized');
-            console.log('📋 Поддерживаемые форматы: любые файлы → Base64 → TXT в группу ВК');
-            console.log('🔐 Шифрование: AES-256-GCM (Web Crypto API)');
-        })();
-    </script>
+        async function loadGroups() {
+            // Показываем индикатор загрузки
+            groupSelect.classList.add('hidden');
+            groupManual.classList.add('hidden');
+            groupAutoInfo.classList.add('hidden');
+            groupError.style.display = 'none';
+            groupSelect.innerHTML = '<option value="">Загрузка групп...</option>';
+            groupSelect.classList.remove('hidden');
+
+            const groups = await fetchGroups();
+            setupGroupInterface(groups);
+            // Если после настройки selectedGroupId не установлен, сбросим
+            if (!getSelectedGroupId()) {
+                selectedGroupId = null;
+            }
+            updateUploadButton();
+        }
+
+        function switchToWelcome() {
+            vkToken = '';
+            setStoredToken('');
+            welcomeScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+            tokenInput.value = '';
+            tokenError.style.display = 'none';
+            selectedFile = null;
+            selectedGroupId = null;
+            groupsCache = [];
+            clearFile();
+            hideProgress();
+            clearStatus();
+        }
+
+        // ===== События =====
+        saveTokenBtn.addEventListener('click', async () => {
+            const token = tokenInput.value.trim();
+            if (!token) {
+                tokenError.textContent = 'Введите токен';
+                tokenError.style.display = '';
+                return;
+            }
+            tokenError.style.display = 'none';
+            saveTokenBtn.disabled = true;
+            saveTokenBtn.innerHTML = '<span class="spinner"></span> Проверка токена...';
+
+            try {
+                await validateToken(token);
+                vkToken = token;
+                setStoredToken(token);
+                tokenPreview.textContent = token.substring(0, 16) + '...' + token.substring(token.length - 8);
+                welcomeScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                showToast('Токен успешно проверен!', 'success');
+                await loadGroups();
+                renderHistory();
+                updateUploadButton();
+            } catch(e) {
+                tokenError.textContent = 'Ошибка: ' + e.message;
+                tokenError.style.display = '';
+            } finally {
+                saveTokenBtn.disabled = false;
+                saveTokenBtn.innerHTML = '✨ Продолжить';
+            }
+        });
+
+        tokenInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') saveTokenBtn.click();
+        });
+
+        changeTokenBtn.addEventListener('click', () => {
+            if (confirm('Сменить токен? Вы вернётесь на экран ввода.')) {
+                switchToWelcome();
+            }
+        });
+
+        refreshGroupsBtn.addEventListener('click', async () => {
+            refreshGroupsBtn.disabled = true;
+            refreshGroupsBtn.innerHTML = '<span class="spinner"></span> Загрузка...';
+            await loadGroups();
+            refreshGroupsBtn.disabled = false;
+            refreshGroupsBtn.innerHTML = '🔄 Обновить список групп';
+            if (groupsCache.length > 0) {
+                showToast(`Загружено ${groupsCache.length} групп`, 'success');
+            } else if (groupsCache.length === 0) {
+                showToast('Список групп пуст', 'info');
+            } else {
+                showToast('Ошибка загрузки групп', 'error');
+            }
+        });
+
+        groupSelect.addEventListener('change', () => {
+            selectedGroupId = getSelectedGroupId();
+            if (selectedGroupId) setStoredGroupId(String(selectedGroupId));
+            updateUploadButton();
+        });
+
+        groupManualInput.addEventListener('input', () => {
+            selectedGroupId = getSelectedGroupId();
+            if (selectedGroupId) setStoredGroupId(String(selectedGroupId));
+            updateUploadButton();
+        });
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleFile(e.dataTransfer.files[0]);
+                fileInput.files = e.dataTransfer.files;
+            }
+        });
+
+        removeFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearFile();
+        });
+
+        uploadBtn.addEventListener('click', handleUpload);
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Очистить всю историю загрузок?')) clearHistory();
+        });
+
+        passwordInput.addEventListener('input', updateUploadButton);
+
+        // Старт
+        initApp().catch(err => {
+            console.error('Init error:', err);
+            welcomeScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+        });
+
+        console.log('🚀 VK File Uploader готов');
+    })();
+</script>
 </body>
 </html>
